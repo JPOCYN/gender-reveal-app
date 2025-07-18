@@ -78,7 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Remove any duplicate partyForm submit handlers and keep only one:
   if (partyForm) {
+    console.log('Registering partyForm submit handler');
     partyForm.addEventListener('submit', async (e) => {
+      console.log('partyForm submit event fired');
       e.preventDefault();
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
@@ -86,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
         const partyName = partyNameInput.value.trim();
         const prediction = partyForm.hostPrediction.value;
+        console.log('Creating party:', { partyName, prediction, roomId, adminToken });
         await db.ref(`parties/${roomId}/info`).set({
           partyName,
           prediction,
@@ -93,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
         showPartyPanel({ partyName, roomId, adminToken });
+        console.log('Party panel shown');
       }
     });
   }

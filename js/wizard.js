@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const predictionError = document.getElementById('predictionError');
   const reviewPartyName = document.getElementById('reviewPartyName');
   const reviewPrediction = document.getElementById('reviewPrediction');
-  // const startPartyBtn = document.getElementById('startPartyBtn');
   let partyName = '';
   let prediction = '';
 
@@ -52,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     predictionError.textContent = '';
     reviewPartyName.textContent = partyName;
     reviewPrediction.innerHTML = prediction === 'boy' ? '<span class="text-blue-500 font-bold">Boy 💙</span>' : '<span class="text-pink-500 font-bold">Girl 💖</span>';
+    console.log('Ready for submit, partyName:', partyName, 'prediction:', prediction);
     goToStep(3);
   });
 
@@ -67,5 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // No click handler for startPartyBtn: let the form submit naturally
+  // Debug: log before form submit
+  const partyForm = document.getElementById('partyForm');
+  if (partyForm) {
+    partyForm.addEventListener('submit', () => {
+      console.log('[WIZARD] Form submit triggered, partyName:', partyNameInput.value, 'prediction:', document.querySelector('input[name="hostPrediction"]:checked')?.value);
+    });
+  }
 }); 
