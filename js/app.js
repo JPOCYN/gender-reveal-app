@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Show party panel modal
   function showPartyPanel({ partyName, roomId, adminToken }) {
+    console.log('showPartyPanel called', { partyName, roomId, adminToken });
     const panel = partyPanel;
     const panelPartyName = document.getElementById('panelPartyName');
     const panelQrCode = document.getElementById('panelQrCode');
@@ -82,21 +83,25 @@ document.addEventListener('DOMContentLoaded', () => {
     partyForm.addEventListener('submit', async (e) => {
       console.log('partyForm submit event fired');
       e.preventDefault();
-      if (typeof firebase !== 'undefined') {
-        const db = firebase.database();
-        const roomId = db.ref('parties').push().key;
-        const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
-        const partyName = partyNameInput.value.trim();
-        const prediction = partyForm.hostPrediction.value;
-        console.log('Creating party:', { partyName, prediction, roomId, adminToken });
-        await db.ref(`parties/${roomId}/info`).set({
-          partyName,
-          prediction,
-          createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
-        await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
-        showPartyPanel({ partyName, roomId, adminToken });
-        console.log('Party panel shown');
+      try {
+        if (typeof firebase !== 'undefined') {
+          const db = firebase.database();
+          const roomId = db.ref('parties').push().key;
+          const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
+          const partyName = partyNameInput.value.trim();
+          const prediction = partyForm.hostPrediction.value;
+          console.log('Creating party:', { partyName, prediction, roomId, adminToken });
+          await db.ref(`parties/${roomId}/info`).set({
+            partyName,
+            prediction,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+          });
+          await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
+          showPartyPanel({ partyName, roomId, adminToken });
+          console.log('Party panel shown');
+        }
+      } catch (err) {
+        console.error('Error creating party:', err);
       }
     });
   }
