@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const voteIdKey = `voteId_${roomId}`;
 
   // Cute emoji for badges
-  const badgeEmojis = ['👶','🍼','🎈','🎉','🧸','🎀','🦄','🐣','🐥','🦋','🌈','⭐','💫','🍭','🍬','🎂','🥳','😻','🐻','🐰'];
+  const badgeEmojis = ['👶🏻','🍼','🎈','🎉','🧸','🎀','🦄','🐣','🐥','🦋','🌈','⭐','💫','🍭','🍬','🎂','��','😻','🐻','🐰'];
   function emojiForName(name) {
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
