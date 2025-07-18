@@ -1,5 +1,5 @@
 // js/vote_results.js
-// Improved guest flow, voting/results, reveal logic
+// Improved guest flow, voting/results, reveal logic (no host prediction)
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Elements
   const partyNameEl = document.getElementById('partyName');
-  const hostPredictionEl = document.getElementById('hostPrediction');
+  // const hostPredictionEl = document.getElementById('hostPrediction'); // REMOVED
   const nameSection = document.getElementById('nameSection');
   const guestNameInput = document.getElementById('guestName');
   const submitNameBtn = document.getElementById('submitNameBtn');
@@ -67,10 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const info = snap.val();
     if (info) {
       partyNameEl.textContent = info.partyName || 'Gender Reveal Party';
-      hostPredictionEl.innerHTML = `Host predicts: <span class="${info.prediction==='boy'?'text-blue-500':'text-pink-500'} font-bold">${info.prediction==='boy'?'Boy 💙':'Girl 💖'}</span>`;
+      // hostPredictionEl.innerHTML = ... // REMOVED
     } else {
       partyNameEl.textContent = 'Gender Reveal Party';
-      hostPredictionEl.textContent = '';
+      // hostPredictionEl.textContent = ''; // REMOVED
     }
   });
 
