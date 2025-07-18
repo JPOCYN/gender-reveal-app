@@ -79,44 +79,25 @@ document.addEventListener('DOMContentLoaded', () => {
   if (partyForm) {
     partyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      partyError.textContent = '';
-      const partyName = partyNameInput.value.trim();
-      const prediction = partyForm.hostPrediction.value;
-      if (!partyName) {
-        partyError.textContent = 'Please enter a party name.';
-        partyNameInput.classList.add('border-red-500');
-        return;
-      }
-      if (!prediction) {
-        partyError.textContent = 'Please select a gender prediction.';
-        return;
-      }
-      // Show loading spinner on Start Party button
-      if (startPartyBtn) {
-        startPartyBtn.disabled = true;
-        startPartyBtn.innerHTML = '<span class="animate-spin inline-block mr-2 w-5 h-5 border-2 border-white border-t-blue-400 rounded-full"></span>Creating...';
-      }
-      const newRoomId = generateRoomId();
-      const adminToken = generateAdminToken();
-      if (typeof firebaseConfig !== 'undefined') {
-        firebase.initializeApp(firebaseConfig);
-      }
+      // No need to revalidate here, already handled in wizard
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
-        await db.ref(`parties/${newRoomId}`).set({
-          partyName,
-          prediction,
-          adminToken,
-          createdAt: firebase.database.ServerValue.TIMESTAMP
+        const roomId = db.ref('parties').push().key;
+        const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
+        const partyName = partyNameInput.value.trim();
+        const prediction = partyForm.hostPrediction.value;
+        await db.ref(`parties/${roomId}`).set({
+          info: {
+            partyName,
+            prediction,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+          },
+          adminToken
         });
+        // Redirect to vote page as admin
+        window.location.href = `/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
+        return;
       }
-      showPartyPanel({ partyName, roomId: newRoomId, adminToken });
-      // Reset Start Party button
-      if (startPartyBtn) {
-        startPartyBtn.disabled = false;
-        startPartyBtn.innerHTML = 'Start Party 🎈';
-      }
-      partyForm.querySelectorAll('input,button').forEach(el => el.disabled = false);
     });
   }
 
@@ -162,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.database();
-    const infoRef = db.ref(`rooms/${roomId}/info`);
+    const infoRef = db.ref(`parties/${roomId}`);
     infoRef.once('value').then(snap => {
       const info = snap.val();
       if (!info) {
