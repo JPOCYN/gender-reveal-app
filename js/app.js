@@ -52,24 +52,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         continueBtn.disabled = true;
         continueSpinner.classList.remove('hidden');
-        // Check for duplicate name in guest list
-        const guestsRef = db.ref(`rooms/${roomId}/guests`);
-        const guestsSnap = await guestsRef.once('value');
-        const guests = guestsSnap.val() || {};
-        const lower = name.toLowerCase();
-        if (Object.values(guests).some(n => n.trim().toLowerCase() === lower)) {
-          guestNameError.textContent = 'This name has already joined.';
-          guestNameInput.classList.add('border-red-500');
+        try {
+          // Check for duplicate name in guest list
+          const guestsRef = db.ref(`rooms/${roomId}/guests`);
+          const guestsSnap = await guestsRef.once('value');
+          const guests = guestsSnap.val() || {};
+          const lower = name.toLowerCase();
+          if (Object.values(guests).some(n => n.trim().toLowerCase() === lower)) {
+            guestNameError.textContent = 'This name has already joined.';
+            guestNameInput.classList.add('border-red-500');
+            continueBtn.disabled = false;
+            continueSpinner.classList.add('hidden');
+            return;
+          }
+          // Save name to guest list
+          await guestsRef.push(name);
+          // Save to localStorage for voting/results page
+          localStorage.setItem(`name_${roomId}`, name);
+          // Redirect to /vote.html?roomId=ROOM_ID&guest=GUEST_NAME
+          const encodedName = encodeURIComponent(name);
+          window.location.href = `/vote.html?roomId=${roomId}&guest=${encodedName}`;
+        } catch (err) {
+          guestNameError.textContent = 'An error occurred. Please try again.';
           continueBtn.disabled = false;
           continueSpinner.classList.add('hidden');
-          return;
         }
-        // Save name to guest list
-        await guestsRef.push(name);
-        // Save to localStorage for voting/results page
-        localStorage.setItem(`name_${roomId}`, name);
-        // Redirect to vote/results page (with roomId)
-        window.location.href = `${window.location.pathname}?roomId=${roomId}`;
       });
     });
     return;
