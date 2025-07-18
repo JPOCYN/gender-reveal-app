@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await db.ref(`parties/${newRoomId}/info`).set({
           partyName,
           prediction,
-          createdAt: Date.now(),
+          createdAt: firebase.database.ServerValue.TIMESTAMP
         });
         await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await db.ref(`parties/${newRoomId}/info`).set({
           partyName,
           prediction,
-          createdAt: Date.now(),
+          createdAt: firebase.database.ServerValue.TIMESTAMP
         });
         await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
