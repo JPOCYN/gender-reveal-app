@@ -47,7 +47,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
       adminBadge.textContent = 'Admin Mode';
-      adminBadge.className = 'fixed top-2 right-2 bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full shadow text-xs font-bold z-50';
+      adminBadge.className = 'fixed top-14 right-2 bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full shadow text-xs font-bold z-50';
+      // On wide screens, move left to avoid lang switcher
+      if (window.innerWidth > 640) {
+        adminBadge.className += ' sm:top-4 sm:right-36';
+      }
       document.body.appendChild(adminBadge);
     }
   }
