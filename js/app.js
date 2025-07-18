@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
-      showPartyPanel({ partyName, roomId: newRoomId, adminToken });
+      // Instead of showing the modal, dispatch an event for the wizard to handle redirect
+      window.dispatchEvent(new CustomEvent('partyCreated', { detail: { roomId: newRoomId, adminToken } }));
       // Reset Start Party button
       if (startPartyBtn) {
         startPartyBtn.disabled = false;
