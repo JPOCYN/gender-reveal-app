@@ -72,7 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Firebase
-  firebase.initializeApp(firebaseConfig);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
   const db = firebase.database();
   const infoRef = db.ref(`parties/${roomId}/info`);
   const votesRef = db.ref(`parties/${roomId}/votes`);
@@ -103,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminTokenParam) {
       adminTokenRef.once('value').then(snap => {
         const token = snap.val();
+        console.log('[ADMIN CHECK] Token in DB:', token, 'Token in URL:', adminTokenParam);
         if (token && token === adminTokenParam && revealGenderBtn) {
           isAdmin = true;
           revealGenderBtn.classList.remove('hidden');
@@ -148,10 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
     voteSection.classList.remove('hidden');
     localStorage.setItem(nameKey, guestName);
     resultsSection.classList.add('hidden');
+    checkAdminMode();
   } else {
     nameSection.classList.remove('hidden');
     voteSection.classList.add('hidden');
     resultsSection.classList.add('hidden');
+    checkAdminMode();
   }
 
   // Name submit
@@ -185,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
           userVoteId = newVoteRef.key;
           hasVoted = true;
           showResults();
+          checkAdminMode();
         } else {
           voteMsg.textContent = 'Error submitting vote. Try again!';
         }
@@ -216,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userChanged = true;
         hasVoted = true;
         showResults();
+        checkAdminMode();
       } else {
         voteMsg.textContent = 'Error changing vote. Try again!';
       }
@@ -230,11 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showResults() {
     resultsSection.classList.remove('hidden');
+    checkAdminMode();
   }
 
   if (guestName && localStorage.getItem(votedKey)) {
     hasVoted = true;
     showResults();
+    checkAdminMode();
   }
 
   votesRef.on('value', (snapshot) => {
@@ -256,6 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     boyNames.innerHTML = boyList.map(n => `<span class='pill-badge pill-boy'>${emojiForName(n)} ${n}</span>`).join('');
     girlNames.innerHTML = girlList.map(n => `<span class='pill-badge pill-girl'>${emojiForName(n)} ${n}</span>`).join('');
     if (hasVoted) showResults();
+    checkAdminMode();
   });
 
   revealRef.on('value', (snapshot) => {
@@ -268,5 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
       confetti += data.actual === 'boy' ? '💙' : '💖';
     }
     finalConfetti.innerHTML = confetti;
+    checkAdminMode();
   });
 }); 
