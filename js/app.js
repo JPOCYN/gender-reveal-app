@@ -86,17 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
         const partyName = partyNameInput.value.trim();
         const prediction = partyForm.hostPrediction.value;
-        await db.ref(`parties/${roomId}`).set({
-          info: {
-            partyName,
-            prediction,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-          },
-          adminToken
+        await db.ref(`parties/${roomId}/info`).set({
+          partyName,
+          prediction,
+          createdAt: firebase.database.ServerValue.TIMESTAMP
         });
-        // Redirect to vote page as admin
-        window.location.href = `/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
-        return;
+        await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
+        showPartyPanel({ partyName, roomId, adminToken });
       }
     });
   }
@@ -219,44 +215,20 @@ document.addEventListener('DOMContentLoaded', () => {
   if (partyForm) {
     partyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      partyError.textContent = '';
-      const partyName = partyNameInput.value.trim();
-      const prediction = partyForm.hostPrediction.value;
-      if (!partyName) {
-        partyError.textContent = 'Please enter a party name.';
-        partyNameInput.classList.add('border-red-500');
-        return;
-      }
-      if (!prediction) {
-        partyError.textContent = 'Please select a gender prediction.';
-        return;
-      }
-      // Show loading spinner on Start Party button
-      if (startPartyBtn) {
-        startPartyBtn.disabled = true;
-        startPartyBtn.innerHTML = '<span class="animate-spin inline-block mr-2 w-5 h-5 border-2 border-white border-t-blue-400 rounded-full"></span>Creating...';
-      }
-      const newRoomId = generateRoomId();
-      const adminToken = generateAdminToken();
-      if (typeof firebaseConfig !== 'undefined') {
-        firebase.initializeApp(firebaseConfig);
-      }
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
-        await db.ref(`parties/${newRoomId}`).set({
+        const roomId = db.ref('parties').push().key;
+        const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
+        const partyName = partyNameInput.value.trim();
+        const prediction = partyForm.hostPrediction.value;
+        await db.ref(`parties/${roomId}/info`).set({
           partyName,
           prediction,
-          adminToken,
           createdAt: firebase.database.ServerValue.TIMESTAMP
         });
+        await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
+        showPartyPanel({ partyName, roomId, adminToken });
       }
-      showPartyPanel({ partyName, roomId: newRoomId, adminToken });
-      // Reset Start Party button
-      if (startPartyBtn) {
-        startPartyBtn.disabled = false;
-        startPartyBtn.innerHTML = 'Start Party 🎈';
-      }
-      partyForm.querySelectorAll('input,button').forEach(el => el.disabled = false);
     });
   }
 }); 
