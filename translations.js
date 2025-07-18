@@ -18,7 +18,10 @@ window.TRANSLATIONS = {
     step3: "Guests vote: Everyone predicts boy or girl, live from their phones.",
     step4: "Reveal the result: When ready, hit \"Reveal Gender\" and celebrate together!",
     footer: "Made with ♥ for families & friends. | Creator: ",
-    creator: "OC"
+    creator: "OC",
+    bigScreenTitle: "Perfect for Parties & Big Screens",
+    bigScreenDesc: "Set up this website on your main TV or projector at the party. Guests can check in, vote, and watch live results together!",
+    adminF11Tip: "Tip: On the admin/share page, press <span class='font-bold'>F11</span> to enter full screen for the best party experience!",
   },
   zh: {
     heroTitle: "性別揭曉派對應用",
@@ -39,6 +42,9 @@ window.TRANSLATIONS = {
     step3: "賓客投票：每個人都能用手機預測男孩或女孩。",
     step4: "揭曉結果：準備好時，點擊「揭曉性別」一起慶祝！",
     footer: "用 ♥ 製作，獻給家人與朋友。| 製作者：",
-    creator: "OC"
+    creator: "OC",
+    bigScreenTitle: "派對與大螢幕的最佳選擇",
+    bigScreenDesc: "在派對現場的大電視或投影機上打開本網站。賓客可現場報到、投票並一起觀看即時結果！",
+    adminF11Tip: "小提示：在管理員／分享頁面，按下 <span class='font-bold'>F11</span> 進入全螢幕，享受最佳派對體驗！",
   }
 }; 

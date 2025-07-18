@@ -15,7 +15,11 @@
     @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
   </style>
 </head>
-<body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col items-center justify-center">
+<body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col">
+  <div id="langSwitcher" class="absolute top-4 right-4 z-50">
+    <button data-lang="en" class="lang-btn px-3 py-1 rounded-full font-bold bg-white bg-opacity-80 text-blue-700 mr-1">EN</button>
+    <button data-lang="zh" class="lang-btn px-3 py-1 rounded-full font-bold bg-white bg-opacity-80 text-pink-700">繁體</button>
+  </div>
   <div id="landingPage" class="w-full max-w-md mx-auto p-4 bg-white rounded-2xl shadow-xl text-center mt-8 wizard-card">
     <div class="flex justify-center gap-2 mb-6">
       <div id="step1" class="step step-active rounded-full w-8 h-8 flex items-center justify-center font-bold">1</div>
@@ -27,43 +31,43 @@
     <form id="partyForm" class="mb-4">
       <div id="wizardStep1">
         <div class="text-3xl mb-2 emoji-bounce">👶🏻🎈</div>
-        <h1 class="text-2xl font-extrabold mb-2">Welcome to the Gender Reveal Party Wizard!</h1>
-        <p class="mb-4 text-blue-700">Let's get started by naming your party.</p>
+        <h1 class="text-2xl font-extrabold mb-2" data-i18n="wizardWelcome">Welcome to the Gender Reveal Party Wizard!</h1>
+        <p class="mb-4 text-blue-700" data-i18n="wizardStep1Desc">Let's get started by naming your party.</p>
         <input id="partyName" type="text" placeholder="e.g. Emma's Reveal Party" class="w-full px-4 py-3 border-2 border-pink-200 rounded-xl mb-4 text-lg" required />
-        <button id="toStep2Btn" type="button" class="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded-xl transition-all">Next</button>
+        <button id="toStep2Btn" type="button" class="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded-xl transition-all" data-i18n="next">Next</button>
         <div id="partyNameError" class="text-red-500 text-sm mt-2"></div>
       </div>
       <div id="wizardStep2" class="hidden">
         <div class="text-3xl mb-2 emoji-bounce">🤔💭</div>
-        <h2 class="text-xl font-bold mb-2">What's the actual gender?</h2>
-        <p class="mb-3 text-blue-700">As the host, select the real answer to be revealed later.</p>
+        <h2 class="text-xl font-bold mb-2" data-i18n="actualGender">What's the actual gender?</h2>
+        <p class="mb-3 text-blue-700" data-i18n="actualGenderDesc">As the host, select the real answer to be revealed later.</p>
         <div class="flex justify-center gap-4 mb-4">
           <label class="flex flex-col items-center cursor-pointer">
             <input type="radio" name="hostPrediction" value="boy" class="form-radio text-blue-500 mb-2" />
-            <span class="text-blue-500 font-bold text-lg">Boy 💙</span>
+            <span class="text-blue-500 font-bold text-lg" data-i18n="boy">Boy 💙</span>
           </label>
           <label class="flex flex-col items-center cursor-pointer">
             <input type="radio" name="hostPrediction" value="girl" class="form-radio text-pink-500 mb-2" />
-            <span class="text-pink-500 font-bold text-lg">Girl 💖</span>
+            <span class="text-pink-500 font-bold text-lg" data-i18n="girl">Girl 💖</span>
           </label>
         </div>
         <div class="flex gap-2">
-          <button id="backToStep1Btn" type="button" class="flex-1 border border-blue-300 text-blue-500 bg-white hover:bg-blue-50 font-bold py-2 px-4 rounded-xl transition-all">← Back</button>
-          <button id="toStep3Btn" type="button" class="flex-1 bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl transition-all">Next</button>
+          <button id="backToStep1Btn" type="button" class="flex-1 border border-blue-300 text-blue-500 bg-white hover:bg-blue-50 font-bold py-2 px-4 rounded-xl transition-all" data-i18n="back">← Back</button>
+          <button id="toStep3Btn" type="button" class="flex-1 bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl transition-all" data-i18n="next">Next</button>
         </div>
         <div id="predictionError" class="text-red-500 text-sm mt-2"></div>
       </div>
       <div id="wizardStep3" class="hidden">
         <div class="text-3xl mb-2 emoji-bounce">🥳🎉</div>
-        <h2 class="text-xl font-bold mb-2">Ready to start the party?</h2>
-        <p class="mb-4 text-gray-700">Review your details and click below to create your party room!</p>
+        <h2 class="text-xl font-bold mb-2" data-i18n="ready">Ready to start the party?</h2>
+        <p class="mb-4 text-gray-700" data-i18n="reviewDesc">Review your details and click below to create your party room!</p>
         <div class="mb-2 p-3 rounded-xl bg-blue-50 text-left">
-          <div><span class="font-semibold">Party Name:</span> <span id="reviewPartyName"></span></div>
-          <div><span class="font-semibold">Prediction:</span> <span id="reviewPrediction"></span></div>
+          <div><span class="font-semibold" data-i18n="partyName">Party Name:</span> <span id="reviewPartyName"></span></div>
+          <div><span class="font-semibold" data-i18n="prediction">Prediction:</span> <span id="reviewPrediction"></span></div>
         </div>
         <div class="flex gap-2">
-          <button id="backToStep2Btn" type="button" class="flex-1 border border-green-300 text-green-500 bg-white hover:bg-green-50 font-bold py-2 px-4 rounded-xl transition-all">← Back</button>
-          <button id="startPartyBtn" type="submit" class="flex-1 bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-xl transition-all">Start Party 🎈</button>
+          <button id="backToStep2Btn" type="button" class="flex-1 border border-green-300 text-green-500 bg-white hover:bg-green-50 font-bold py-2 px-4 rounded-xl transition-all" data-i18n="back">← Back</button>
+          <button id="startPartyBtn" type="submit" class="flex-1 bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-xl transition-all" data-i18n="startParty">Start Party 🎈</button>
         </div>
         <div id="partyError" class="text-red-500 text-sm mt-2"></div>
       </div>
@@ -77,21 +81,21 @@
       <div class="mb-4">
         <div id="panelQrCode" class="flex justify-center mb-2"></div>
         <div class="mb-2">
-          <span class="font-semibold">Guest Link:</span>
+          <span class="font-semibold" data-i18n="guestLink">Guest Link:</span>
           <span id="panelGuestLink" class="block text-blue-600 break-all text-sm mb-1"></span>
-          <button id="copyGuestLinkBtn" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded text-xs mb-2">Copy Guest Link</button>
+          <button id="copyGuestLinkBtn" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded text-xs mb-2" data-i18n="copyGuestLink">Copy Guest Link</button>
         </div>
         <div class="mb-2">
-          <span class="font-semibold">Admin Link <span class="text-xs text-red-500">(Keep private)</span>:</span>
+          <span class="font-semibold" data-i18n="adminLink">Admin Link <span class="text-xs text-red-500">(Keep private)</span>:</span>
           <span id="panelAdminLink" class="block text-gray-700 break-all text-sm mb-1"></span>
-          <button id="copyAdminLinkBtn" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded text-xs mb-2">Copy Admin Link</button>
+          <button id="copyAdminLinkBtn" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded text-xs mb-2" data-i18n="copyAdminLink">Copy Admin Link</button>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 mt-2">
-          <button id="openGuestLinkBtn" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl">Open Vote Page</button>
-          <button id="openAdminLinkBtn" class="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl">Preview as Admin</button>
+          <button id="openGuestLinkBtn" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl" data-i18n="openVotePage">Open Vote Page</button>
+          <button id="openAdminLinkBtn" class="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl" data-i18n="previewAdmin">Preview as Admin</button>
         </div>
       </div>
-      <div class="mt-2 text-xs text-gray-500">Share the guest link with your friends and family!<br>Keep the admin link private to control the reveal.</div>
+      <div class="mt-2 text-xs text-gray-500" data-i18n="shareDesc">Share the guest link with your friends and family!<br>Keep the admin link private to control the reveal.</div>
     </div>
   </div>
   <!-- SCRIPTS: Firebase config, SDKs, QRCode, then app code -->
@@ -101,5 +105,30 @@
   <script src="js/qrcode.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/wizard.js"></script>
+  <script src="translations.js"></script>
+  <script>
+    // Language switching logic
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const i18nEls = document.querySelectorAll('[data-i18n]');
+    function setLang(lang) {
+      localStorage.setItem('lang', lang);
+      const t = window.TRANSLATIONS[lang] || window.TRANSLATIONS['en'];
+      i18nEls.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerHTML = t[key];
+      });
+      langBtns.forEach(btn => {
+        if (btn.getAttribute('data-lang') === lang) {
+          btn.classList.add('ring-2', 'ring-pink-400');
+        } else {
+          btn.classList.remove('ring-2', 'ring-pink-400');
+        }
+      });
+    }
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
+    });
+    setLang(localStorage.getItem('lang') || 'en');
+  </script>
 </body>
 </html> 

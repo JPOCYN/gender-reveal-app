@@ -7,8 +7,12 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col items-center justify-center">
+  <div id="langSwitcher" class="absolute top-4 right-4 z-50">
+    <button data-lang="en" class="lang-btn px-3 py-1 rounded-full font-bold bg-white bg-opacity-80 text-blue-700 mr-1">EN</button>
+    <button data-lang="zh" class="lang-btn px-3 py-1 rounded-full font-bold bg-white bg-opacity-80 text-pink-700">繁體</button>
+  </div>
   <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center mt-8">
-    <h1 class="text-2xl font-bold mb-4">Live Results</h1>
+    <h1 class="text-2xl font-bold mb-4" data-i18n="liveResults">Live Results</h1>
     <div class="mb-6">
       <div class="flex items-center mb-2">
         <span class="text-blue-500 text-2xl mr-2">💙</span>
@@ -26,14 +30,14 @@
       </div>
     </div>
     <div class="mb-4">
-      <h2 class="text-lg font-semibold mb-2">Guest Votes</h2>
+      <h2 class="text-lg font-semibold mb-2" data-i18n="guestVotes">Guest Votes</h2>
       <ul id="guestList" class="text-left text-sm max-h-40 overflow-y-auto"></ul>
     </div>
-    <button id="revealGenderBtn" class="bg-yellow-400 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mb-4">Reveal Gender</button>
+    <button id="revealGenderBtn" class="bg-yellow-400 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mb-4" data-i18n="revealGender">Reveal Gender</button>
     <div id="revealSection" class="hidden mt-4">
-      <p class="mb-2 font-bold">Select the actual gender:</p>
-      <button id="actualBoyBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">Boy 💙</button>
-      <button id="actualGirlBtn" class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">Girl 💖</button>
+      <p class="mb-2 font-bold" data-i18n="selectActual">Select the actual gender:</p>
+      <button id="actualBoyBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2" data-i18n="boy">Boy 💙</button>
+      <button id="actualGirlBtn" class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded" data-i18n="girl">Girl 💖</button>
     </div>
     <div id="confettiSection" class="hidden mt-6">
       <h3 id="revealMsg" class="text-3xl font-extrabold mb-4"></h3>
@@ -46,5 +50,30 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/result.js"></script>
+  <script src="translations.js"></script>
+  <script>
+    // Language switching logic
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const i18nEls = document.querySelectorAll('[data-i18n]');
+    function setLang(lang) {
+      localStorage.setItem('lang', lang);
+      const t = window.TRANSLATIONS[lang] || window.TRANSLATIONS['en'];
+      i18nEls.forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key]) el.innerHTML = t[key];
+      });
+      langBtns.forEach(btn => {
+        if (btn.getAttribute('data-lang') === lang) {
+          btn.classList.add('ring-2', 'ring-pink-400');
+        } else {
+          btn.classList.remove('ring-2', 'ring-pink-400');
+        }
+      });
+    }
+    langBtns.forEach(btn => {
+      btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
+    });
+    setLang(localStorage.getItem('lang') || 'en');
+  </script>
 </body>
 </html> 
