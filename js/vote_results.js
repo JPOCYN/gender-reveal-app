@@ -1,5 +1,5 @@
 // js/vote_results.js
-// Improved guest flow, voting/results, reveal logic (secure adminToken, cute badges, robust admin mode)
+// Strict admin/guest separation, admin QR, no admin voting
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -40,8 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const finalRevealMsg = document.getElementById('finalRevealMsg');
   const finalConfetti = document.getElementById('finalConfetti');
 
-  // Admin badge
+  // Admin badge and QR
   let adminBadge = null;
+  let adminQR = null;
   function showAdminBadge() {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
@@ -54,6 +55,26 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminBadge) {
       adminBadge.remove();
       adminBadge = null;
+    }
+  }
+  function showAdminQR(roomId) {
+    if (!adminQR) {
+      adminQR = document.createElement('div');
+      adminQR.className = 'flex flex-col items-center mt-6';
+      adminQR.innerHTML = '<div class="font-bold mb-2 text-lg">Scan to Join and Vote</div><div id="adminGuestQR"></div><div class="text-xs text-gray-500 mt-1">Share this QR code with guests</div>';
+      resultsSection.parentNode.insertBefore(adminQR, resultsSection.nextSibling);
+    }
+    const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
+    const qrDiv = adminQR.querySelector('#adminGuestQR');
+    qrDiv.innerHTML = '';
+    QRCode.toCanvas(document.createElement('canvas'), guestLink, (err, canvas) => {
+      if (!err) qrDiv.appendChild(canvas);
+    });
+  }
+  function hideAdminQR() {
+    if (adminQR) {
+      adminQR.remove();
+      adminQR = null;
     }
   }
 
@@ -105,11 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (adminTokenParam) {
       adminTokenRef.once('value').then(snap => {
         const token = snap.val();
-        console.log('[ADMIN CHECK] Token in DB:', token, 'Token in URL:', adminTokenParam);
         if (token && token === adminTokenParam && revealGenderBtn) {
           isAdmin = true;
           revealGenderBtn.classList.remove('hidden');
           showAdminBadge();
+          showAdminQR(roomId);
+          // Hide guest UI
+          if (nameSection) nameSection.classList.add('hidden');
+          if (voteSection) voteSection.classList.add('hidden');
+          if (submitNameBtn) submitNameBtn.disabled = true;
+          if (voteBoyBtn) voteBoyBtn.disabled = true;
+          if (voteGirlBtn) voteGirlBtn.disabled = true;
+          // Only show results and reveal
+          resultsSection.classList.remove('hidden');
           revealGenderBtn.onclick = () => {
             revealPopup.classList.remove('hidden');
           };
@@ -128,11 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
           hideAdminBadge();
+          hideAdminQR();
         }
       });
     } else {
       if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
       hideAdminBadge();
+      hideAdminQR();
     }
   }
   checkAdminMode();
@@ -146,21 +177,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Guest flow: skip name input if guest param is present
-  if (guestName) {
-    nameSection.classList.add('hidden');
-    voteSection.classList.remove('hidden');
-    localStorage.setItem(nameKey, guestName);
-    resultsSection.classList.add('hidden');
-    checkAdminMode();
-  } else {
-    nameSection.classList.remove('hidden');
-    voteSection.classList.add('hidden');
-    resultsSection.classList.add('hidden');
-    checkAdminMode();
+  if (!adminTokenParam) {
+    if (guestName) {
+      nameSection.classList.add('hidden');
+      voteSection.classList.remove('hidden');
+      localStorage.setItem(nameKey, guestName);
+      resultsSection.classList.add('hidden');
+      checkAdminMode();
+    } else {
+      nameSection.classList.remove('hidden');
+      voteSection.classList.add('hidden');
+      resultsSection.classList.add('hidden');
+      checkAdminMode();
+    }
   }
 
   // Name submit
-  if (submitNameBtn) {
+  if (submitNameBtn && !adminTokenParam) {
     submitNameBtn.addEventListener('click', () => {
       const name = guestNameInput.value.trim();
       nameError.textContent = '';
@@ -175,9 +208,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Voting logic
+  // Voting logic (guests only)
   function castVote(vote) {
-    if (!guestName) return;
+    if (!guestName || adminTokenParam) return;
     if (!userVoteId) {
       const newVoteRef = votesRef.push();
       newVoteRef.set({ name: guestName, vote, timestamp: Date.now() }, (err) => {
@@ -207,40 +240,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  voteBoyBtn.addEventListener('click', () => castVote('boy'));
-  voteGirlBtn.addEventListener('click', () => castVote('girl'));
+  if (!adminTokenParam) {
+    voteBoyBtn.addEventListener('click', () => castVote('boy'));
+    voteGirlBtn.addEventListener('click', () => castVote('girl'));
+  }
 
-  confirmChangeBtn.addEventListener('click', () => {
-    if (!userVoteId || pendingVote === null) return;
-    votesRef.child(userVoteId).set({ name: guestName, vote: pendingVote, timestamp: Date.now() }, (err) => {
-      if (!err) {
-        localStorage.setItem(votedKey, pendingVote);
-        localStorage.setItem(changeKey, '1');
-        voteMsg.textContent = `Vote changed to ${pendingVote === 'boy' ? 'Boy 💙' : 'Girl 💖'}!`;
-        voteBoyBtn.disabled = true;
-        voteGirlBtn.disabled = true;
-        userChanged = true;
-        hasVoted = true;
-        showResults();
-        checkAdminMode();
-      } else {
-        voteMsg.textContent = 'Error changing vote. Try again!';
-      }
+  if (!adminTokenParam) {
+    confirmChangeBtn.addEventListener('click', () => {
+      if (!userVoteId || pendingVote === null) return;
+      votesRef.child(userVoteId).set({ name: guestName, vote: pendingVote, timestamp: Date.now() }, (err) => {
+        if (!err) {
+          localStorage.setItem(votedKey, pendingVote);
+          localStorage.setItem(changeKey, '1');
+          voteMsg.textContent = `Vote changed to ${pendingVote === 'boy' ? 'Boy 💙' : 'Girl 💖'}!`;
+          voteBoyBtn.disabled = true;
+          voteGirlBtn.disabled = true;
+          userChanged = true;
+          hasVoted = true;
+          showResults();
+          checkAdminMode();
+        } else {
+          voteMsg.textContent = 'Error changing vote. Try again!';
+        }
+        changePopup.classList.add('hidden');
+        pendingVote = null;
+      });
+    });
+    cancelChangeBtn.addEventListener('click', () => {
       changePopup.classList.add('hidden');
       pendingVote = null;
     });
-  });
-  cancelChangeBtn.addEventListener('click', () => {
-    changePopup.classList.add('hidden');
-    pendingVote = null;
-  });
+  }
 
   function showResults() {
     resultsSection.classList.remove('hidden');
     checkAdminMode();
   }
 
-  if (guestName && localStorage.getItem(votedKey)) {
+  if (!adminTokenParam && guestName && localStorage.getItem(votedKey)) {
     hasVoted = true;
     showResults();
     checkAdminMode();
@@ -264,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cute pill badges with emoji
     boyNames.innerHTML = boyList.map(n => `<span class='pill-badge pill-boy'>${emojiForName(n)} ${n}</span>`).join('');
     girlNames.innerHTML = girlList.map(n => `<span class='pill-badge pill-girl'>${emojiForName(n)} ${n}</span>`).join('');
-    if (hasVoted) showResults();
-    checkAdminMode();
+    if (!adminTokenParam && hasVoted) showResults();
+    if (adminTokenParam) checkAdminMode();
   });
 
   revealRef.on('value', (snapshot) => {
@@ -278,6 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
       confetti += data.actual === 'boy' ? '💙' : '💖';
     }
     finalConfetti.innerHTML = confetti;
-    checkAdminMode();
+    if (adminTokenParam) checkAdminMode();
   });
 }); 
