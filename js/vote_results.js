@@ -121,39 +121,51 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // --- Admin UI encapsulation ---
+  function showAdminUI() {
+    isAdmin = true;
+    // Hide guest UI
+    if (nameSection) nameSection.classList.add('hidden');
+    if (voteSection) voteSection.classList.add('hidden');
+    if (submitNameBtn) submitNameBtn.disabled = true;
+    if (voteBoyBtn) voteBoyBtn.disabled = true;
+    if (voteGirlBtn) voteGirlBtn.disabled = true;
+    // Show results and reveal
+    if (resultsSection) resultsSection.classList.remove('hidden');
+    if (revealGenderBtn) revealGenderBtn.classList.remove('hidden');
+    showAdminBadge();
+    showAdminQR(roomId);
+    // Reveal button logic
+    if (revealGenderBtn) {
+      revealGenderBtn.onclick = () => {
+        revealPopup.classList.remove('hidden');
+      };
+    }
+    if (confirmRevealBtn) {
+      confirmRevealBtn.onclick = () => {
+        infoRef.once('value').then(snap => {
+          const info = snap.val();
+          if (info && info.prediction) {
+            revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
+          }
+        });
+        revealPopup.classList.add('hidden');
+      };
+    }
+    if (cancelRevealBtn) {
+      cancelRevealBtn.onclick = () => {
+        revealPopup.classList.add('hidden');
+      };
+    }
+  }
+
   // Robust Admin token check (always run on load, never hidden by guest logic)
   function checkAdminMode() {
     if (adminTokenParam) {
       adminTokenRef.once('value').then(snap => {
         const token = snap.val();
-        if (token && token === adminTokenParam && revealGenderBtn) {
-          isAdmin = true;
-          revealGenderBtn.classList.remove('hidden');
-          showAdminBadge();
-          showAdminQR(roomId);
-          // Hide guest UI
-          if (nameSection) nameSection.classList.add('hidden');
-          if (voteSection) voteSection.classList.add('hidden');
-          if (submitNameBtn) submitNameBtn.disabled = true;
-          if (voteBoyBtn) voteBoyBtn.disabled = true;
-          if (voteGirlBtn) voteGirlBtn.disabled = true;
-          // Only show results and reveal
-          resultsSection.classList.remove('hidden');
-          revealGenderBtn.onclick = () => {
-            revealPopup.classList.remove('hidden');
-          };
-          confirmRevealBtn.onclick = () => {
-            infoRef.once('value').then(snap => {
-              const info = snap.val();
-              if (info && info.prediction) {
-                revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
-              }
-            });
-            revealPopup.classList.add('hidden');
-          };
-          cancelRevealBtn.onclick = () => {
-            revealPopup.classList.add('hidden');
-          };
+        if (token && token === adminTokenParam) {
+          showAdminUI();
         } else {
           if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
           hideAdminBadge();
@@ -176,23 +188,22 @@ document.addEventListener('DOMContentLoaded', () => {
     return '';
   }
 
-  // Guest flow: skip name input if guest param is present
+  // --- Guest flow ---
+  // Only run guest logic if NOT admin
   if (!adminTokenParam) {
     if (guestName) {
       nameSection.classList.add('hidden');
       voteSection.classList.remove('hidden');
       localStorage.setItem(nameKey, guestName);
       resultsSection.classList.add('hidden');
-      checkAdminMode();
     } else {
       nameSection.classList.remove('hidden');
       voteSection.classList.add('hidden');
       resultsSection.classList.add('hidden');
-      checkAdminMode();
     }
   }
 
-  // Name submit
+  // Name submit (guests only)
   if (submitNameBtn && !adminTokenParam) {
     submitNameBtn.addEventListener('click', () => {
       const name = guestNameInput.value.trim();
