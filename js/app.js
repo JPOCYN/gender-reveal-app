@@ -235,11 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Party creation flow
-  const partyForm = document.getElementById('partyForm');
-  const partyNameInput = document.getElementById('partyName');
-  const partyError = document.getElementById('partyError');
-  const startPartyBtn = document.getElementById('startPartyBtn');
-
   if (partyForm) {
     partyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
