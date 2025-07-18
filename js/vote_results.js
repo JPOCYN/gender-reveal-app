@@ -1,5 +1,5 @@
 // js/vote_results.js
-// Improved guest flow, voting/results, reveal logic (secure adminToken, cute badges)
+// Improved guest flow, voting/results, reveal logic (secure adminToken, cute badges, robust admin mode)
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -39,6 +39,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const finalReveal = document.getElementById('finalReveal');
   const finalRevealMsg = document.getElementById('finalRevealMsg');
   const finalConfetti = document.getElementById('finalConfetti');
+
+  // Admin badge
+  let adminBadge = null;
+  function showAdminBadge() {
+    if (!adminBadge) {
+      adminBadge = document.createElement('div');
+      adminBadge.textContent = 'Admin Mode';
+      adminBadge.className = 'fixed top-2 right-2 bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full shadow text-xs font-bold z-50';
+      document.body.appendChild(adminBadge);
+    }
+  }
+  function hideAdminBadge() {
+    if (adminBadge) {
+      adminBadge.remove();
+      adminBadge = null;
+    }
+  }
 
   // LocalStorage keys
   const votedKey = `voted_${roomId}`;
@@ -81,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Admin token check (always run on load)
+  // Robust Admin token check (always run on load, never hidden by guest logic)
   function checkAdminMode() {
     if (adminTokenParam) {
       adminTokenRef.once('value').then(snap => {
@@ -89,10 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (token && token === adminTokenParam && revealGenderBtn) {
           isAdmin = true;
           revealGenderBtn.classList.remove('hidden');
-          revealGenderBtn.addEventListener('click', () => {
+          showAdminBadge();
+          revealGenderBtn.onclick = () => {
             revealPopup.classList.remove('hidden');
-          });
-          confirmRevealBtn.addEventListener('click', () => {
+          };
+          confirmRevealBtn.onclick = () => {
             infoRef.once('value').then(snap => {
               const info = snap.val();
               if (info && info.prediction) {
@@ -100,17 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             });
             revealPopup.classList.add('hidden');
-          });
-          cancelRevealBtn.addEventListener('click', () => {
+          };
+          cancelRevealBtn.onclick = () => {
             revealPopup.classList.add('hidden');
-          });
+          };
         } else {
-          // Hide admin UI if token is invalid
           if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
+          hideAdminBadge();
         }
       });
     } else {
       if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
+      hideAdminBadge();
     }
   }
   checkAdminMode();
