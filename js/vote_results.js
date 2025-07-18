@@ -194,13 +194,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --- Guest flow ---
-  // Only run guest logic if NOT admin
+  // Guest flow: skip name input if guest param is present
   if (!adminTokenParam) {
     if (guestName) {
       nameSection.classList.add('hidden');
       voteSection.classList.remove('hidden');
       localStorage.setItem(nameKey, guestName);
-      resultsSection.classList.add('hidden');
+      // Only hide results if the guest hasn't voted yet
+      if (!localStorage.getItem(votedKey)) {
+        resultsSection.classList.add('hidden');
+      } else {
+        resultsSection.classList.remove('hidden');
+      }
     } else {
       nameSection.classList.remove('hidden');
       voteSection.classList.add('hidden');
@@ -238,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
           voteGirlBtn.disabled = false;
           userVoteId = newVoteRef.key;
           hasVoted = true;
+          resultsSection.classList.remove('hidden');
           showResults();
           checkAdminMode();
         } else {
