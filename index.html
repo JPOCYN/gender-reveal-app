@@ -2,160 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gender Reveal Party App</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Quicksand', 'Nunito', Arial, sans-serif; min-width: 320px; }
-    .fadeInUp { animation: fadeInUp 1s cubic-bezier(.23,1.01,.32,1) both; }
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(40px); }
-      100% { opacity: 1; transform: none; }
-    }
-    .floaty { animation: floaty 3.2s ease-in-out infinite alternate; }
-    @keyframes floaty {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-18px); }
-    }
-    .card-fade { opacity: 0; transform: translateY(30px); transition: opacity 0.7s, transform 0.7s; }
-    .card-fade.visible { opacity: 1; transform: none; }
-    .card-hover { transition: transform 0.18s cubic-bezier(.23,1.01,.32,1), box-shadow 0.18s; }
-    .card-hover:hover { transform: translateY(-8px) scale(1.03); box-shadow: 0 8px 32px 0 rgba(236,72,153,0.13); }
-    .cta-animate { transition: transform 0.18s cubic-bezier(.23,1.01,.32,1), box-shadow 0.18s; }
-    .cta-animate:hover { transform: scale(1.05); box-shadow: 0 6px 32px 0 rgba(236,72,153,0.18); }
-    .timeline-icon { transition: transform 0.18s, filter 0.18s; filter: drop-shadow(0 2px 8px rgba(59,130,246,0.08)); }
-    .timeline-icon:hover { transform: scale(1.15) rotate(-8deg); filter: drop-shadow(0 4px 16px rgba(236,72,153,0.18)); }
-    .timeline-dot { width: 18px; height: 18px; background: #fbcfe8; border-radius: 50%; position: absolute; left: -35px; top: 8px; border: 3px solid #f9a8d4; z-index: 1; }
-    @media (min-width: 1024px) {
-      .hero-align { flex-direction: row; align-items: center; text-align: left; }
-      .hero-text { text-align: left; align-items: flex-start; }
-    }
-    @media (max-width: 1023px) {
-      .hero-align { flex-direction: column; text-align: center; }
-      .hero-text { text-align: center; align-items: center; }
-    }
-    @media (max-width: 767px) {
-      .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .footer-lang { justify-content: center; margin-top: 1rem; }
-    }
-    @media (max-width: 480px) {
-      .feature-grid { grid-template-columns: 1fr; }
-    }
+    body { font-family: 'Quicksand', 'Nunito', Arial, sans-serif; }
   </style>
-  <!-- LottieFiles CDN for animation -->
-  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 </head>
-<body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col relative overflow-x-hidden">
-  <!-- Confetti background placeholder -->
-  <div id="confetti-bg" class="absolute inset-0 pointer-events-none z-0"></div>
-  <main class="flex-1 w-full flex flex-col items-center justify-center text-center px-2 md:px-4 z-10">
+<body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col">
+  <main class="flex-1 w-full flex flex-col items-center justify-center text-center px-4">
     <!-- Hero -->
-    <div class="hero-align flex w-full max-w-6xl mx-auto mb-12 mt-12 gap-8 fadeInUp">
-      <div class="flex-1 flex flex-col hero-text justify-center">
-        <h1 class="text-5xl md:text-6xl font-extrabold mb-4 text-blue-700 drop-shadow-sm" style="line-height:1.1;">Gender Reveal Party App</h1>
-        <p class="text-xl md:text-2xl text-blue-900 mb-7 max-w-xl">Create your own magical gender reveal experience. Invite guests, gather predictions, and reveal in style!</p>
-        <a href="wizard.html" class="inline-block bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg cta-animate fadeInUp" style="animation-delay:0.2s;">Create My Party</a>
-      </div>
-      <div class="flex-1 flex items-center justify-center">
-        <!-- Soft, floating Lottie balloon animation -->
-        <lottie-player class="floaty" src="https://lottie.host/6e7e2e2b-2e2a-4e7e-8b2e-2e2a4e7e8b2e/balloon.json" background="transparent" speed="1" style="width: 260px; height: 260px;" loop autoplay></lottie-player>
-      </div>
+    <div class="mb-12 mt-12">
+      <span class="text-7xl md:text-8xl block mb-4 select-none">🎈👶🏻</span>
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-3 text-blue-700 drop-shadow">Gender Reveal Party App</h1>
+      <p class="text-lg md:text-xl text-blue-900 mb-6 max-w-xl mx-auto">Create your own magical gender reveal experience. Invite guests, gather predictions, and reveal in style!</p>
+      <a href="wizard.html" class="inline-block bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-300">Create My Party</a>
     </div>
     <!-- Features -->
-    <section class="w-full max-w-6xl mx-auto mb-12 grid feature-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <div class="bg-white bg-opacity-80 rounded-xl p-8 shadow flex flex-col items-center card-fade card-hover" style="animation-delay:0.1s;">
-        <span class="text-4xl mb-3">📱</span>
-        <h3 class="font-bold text-lg mb-2">Mobile Friendly</h3>
-        <p class="text-blue-900">Beautiful on any device. Guests can join and vote from their phones in seconds.</p>
-      </div>
-      <div class="bg-white bg-opacity-80 rounded-xl p-8 shadow flex flex-col items-center card-fade card-hover" style="animation-delay:0.2s;">
-        <span class="text-4xl mb-3">🔒</span>
-        <h3 class="font-bold text-lg mb-2">Private & Secure</h3>
-        <p class="text-blue-900">Only you control the reveal. Admin and guest links are separate and secure.</p>
-      </div>
-      <div class="bg-white bg-opacity-80 rounded-xl p-8 shadow flex flex-col items-center card-fade card-hover" style="animation-delay:0.3s;">
-        <span class="text-4xl mb-3">🎉</span>
-        <h3 class="font-bold text-lg mb-2">Live Results</h3>
-        <p class="text-blue-900">See votes update in real time. Celebrate with confetti and fun animations!</p>
-      </div>
-      <div class="bg-white bg-opacity-80 rounded-xl p-8 shadow flex flex-col items-center card-fade card-hover" style="animation-delay:0.4s;">
-        <span class="text-4xl mb-3">🆓</span>
-        <h3 class="font-bold text-lg mb-2">Free & No Signup</h3>
-        <p class="text-blue-900">No accounts, no hassle. Just create, share, and celebrate!</p>
+    <section class="w-full max-w-2xl mx-auto mb-12">
+      <h2 class="text-2xl font-bold text-blue-800 mb-4">Why use our app?</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white bg-opacity-80 rounded-xl p-6 shadow flex flex-col items-center">
+          <span class="text-3xl mb-2">📱</span>
+          <h3 class="font-bold text-lg mb-1">Mobile Friendly</h3>
+          <p class="text-blue-900">Beautiful on any device. Guests can join and vote from their phones in seconds.</p>
+        </div>
+        <div class="bg-white bg-opacity-80 rounded-xl p-6 shadow flex flex-col items-center">
+          <span class="text-3xl mb-2">🔒</span>
+          <h3 class="font-bold text-lg mb-1">Private & Secure</h3>
+          <p class="text-blue-900">Only you control the reveal. Admin and guest links are separate and secure.</p>
+        </div>
+        <div class="bg-white bg-opacity-80 rounded-xl p-6 shadow flex flex-col items-center">
+          <span class="text-3xl mb-2">🎉</span>
+          <h3 class="font-bold text-lg mb-1">Live Results</h3>
+          <p class="text-blue-900">See votes update in real time. Celebrate with confetti and fun animations!</p>
+        </div>
+        <div class="bg-white bg-opacity-80 rounded-xl p-6 shadow flex flex-col items-center">
+          <span class="text-3xl mb-2">🆓</span>
+          <h3 class="font-bold text-lg mb-1">Free & No Signup</h3>
+          <p class="text-blue-900">No accounts, no hassle. Just create, share, and celebrate!</p>
+        </div>
       </div>
     </section>
-    <!-- How it works timeline -->
-    <section class="w-full max-w-2xl mx-auto mb-16 px-2">
-      <h2 class="text-2xl font-bold text-blue-800 mb-6">How it works</h2>
-      <div class="relative border-l-4 border-blue-200 pl-8 space-y-8 md:space-y-10">
-        <div class="flex items-start gap-4 fadeInUp relative" style="animation-delay:0.1s;">
-          <span class="timeline-dot"></span>
-          <span class="text-2xl timeline-icon absolute -left-7 top-0">🎯</span>
-          <div>
-            <div class="font-bold text-blue-700 text-lg mb-1">Create your party</div>
-            <div class="text-blue-900">Click "Create My Party" and set your party name and the real answer.</div>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 fadeInUp relative" style="animation-delay:0.2s;">
-          <span class="timeline-dot"></span>
-          <span class="text-2xl timeline-icon absolute -left-7 top-0">🔗</span>
-          <div>
-            <div class="font-bold text-blue-700 text-lg mb-1">Share the link</div>
-            <div class="text-blue-900">Send the guest link or QR code to friends and family.</div>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 fadeInUp relative" style="animation-delay:0.3s;">
-          <span class="timeline-dot"></span>
-          <span class="text-2xl timeline-icon absolute -left-7 top-0">👨‍👩‍👧‍👦</span>
-          <div>
-            <div class="font-bold text-blue-700 text-lg mb-1">Guests vote</div>
-            <div class="text-blue-900">Everyone predicts boy or girl, live from their phones.</div>
-          </div>
-        </div>
-        <div class="flex items-start gap-4 fadeInUp relative" style="animation-delay:0.4s;">
-          <span class="timeline-dot"></span>
-          <span class="text-2xl timeline-icon absolute -left-7 top-0">🎉</span>
-          <div>
-            <div class="font-bold text-blue-700 text-lg mb-1">Reveal the result</div>
-            <div class="text-blue-900">When ready, hit "Reveal Gender" and celebrate together!</div>
-          </div>
-        </div>
-      </div>
+    <!-- How it works -->
+    <section class="w-full max-w-2xl mx-auto mb-16">
+      <h2 class="text-2xl font-bold text-blue-800 mb-4">How it works</h2>
+      <ol class="list-decimal list-inside text-left text-blue-900 space-y-2">
+        <li><span class="font-bold">Create your party:</span> Click "Create My Party" and set your party name and the real answer.</li>
+        <li><span class="font-bold">Share the link:</span> Send the guest link or QR code to friends and family.</li>
+        <li><span class="font-bold">Guests vote:</span> Everyone predicts boy or girl, live from their phones.</li>
+        <li><span class="font-bold">Reveal the result:</span> When ready, hit "Reveal Gender" and celebrate together!</li>
+      </ol>
     </section>
   </main>
-  <footer class="w-full py-6 bg-white bg-opacity-80 text-center text-blue-800 text-sm mt-auto border-t border-blue-100 z-10 flex flex-col items-center">
-    <div class="flex items-center justify-center gap-4 mb-2">
-      <a href="#" class="hover:text-pink-400 transition-colors" title="Facebook"><i class="fab fa-facebook fa-lg"></i></a>
-      <a href="#" class="hover:text-pink-400 transition-colors" title="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
-      <a href="#" onclick="navigator.clipboard.writeText(window.location.href);return false;" class="hover:text-pink-400 transition-colors" title="Copy link"><i class="fa fa-link fa-lg"></i></a>
-    </div>
+  <footer class="w-full py-6 bg-white bg-opacity-80 text-center text-blue-800 text-sm mt-auto border-t border-blue-100">
     <div>Made with <span class="text-pink-400">♥</span> for families & friends. | Creator: <span class="font-bold">OC</span></div>
-    <div class="footer-lang flex gap-2 mt-2 md:mt-0">
-      <button class="bg-white bg-opacity-80 rounded-full px-4 py-1 text-blue-700 font-bold shadow hover:bg-blue-50 transition-all text-sm mr-2">EN</button>
-      <button class="bg-white bg-opacity-80 rounded-full px-4 py-1 text-blue-700 font-bold shadow hover:bg-blue-50 transition-all text-sm">繁</button>
-    </div>
   </footer>
-  <script>
-    // Animate feature cards on scroll
-    function onScrollFadeIn() {
-      document.querySelectorAll('.card-fade').forEach((el, i) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top < window.innerHeight - 40) {
-          setTimeout(() => el.classList.add('visible'), i * 120);
-        }
-      });
-    }
-    window.addEventListener('scroll', onScrollFadeIn);
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        document.querySelectorAll('.card-fade').forEach((el, i) => {
-          setTimeout(() => el.classList.add('visible'), i * 120);
-        });
-      }, 200);
-    });
-  </script>
-  <!-- Optionally, add a confetti background script here in the future -->
 </body>
 </html> 
