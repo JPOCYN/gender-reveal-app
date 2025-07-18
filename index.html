@@ -5,31 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gender Reveal Party</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Quicksand', 'Nunito', Arial, sans-serif; }
+    .step-active { background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%); color: #fff; }
+    .step { background: #f3f4f6; color: #a0aec0; }
+    .wizard-card { transition: box-shadow 0.2s; box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08); }
+    .emoji-bounce { animation: bounce 1s infinite alternate; }
+    @keyframes bounce { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col items-center justify-center">
-  <div id="landingPage" class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center mt-8">
-    <h1 class="text-3xl font-extrabold mb-2">🎉 Gender Reveal Party 🎉</h1>
-    <p class="mb-2 text-lg font-semibold text-blue-700">Create a party, invite guests to vote, and reveal the gender in real-time!</p>
-    <p class="mb-4 text-pink-600">Fun, interactive, and perfect for sharing the excitement with friends and family!</p>
-    <form id="partyForm" class="mb-4">
-      <input id="partyName" type="text" placeholder="Enter party name (e.g. Emma's Reveal Party)" class="w-full px-4 py-2 border rounded mb-2" required />
-      <div class="flex justify-center gap-4 mb-2">
-        <label class="flex items-center cursor-pointer">
-          <input type="radio" name="hostPrediction" value="boy" class="form-radio text-blue-500" required />
-          <span class="ml-2 text-blue-500 font-bold">Boy 💙</span>
+  <div id="landingPage" class="w-full max-w-md mx-auto p-4 bg-white rounded-2xl shadow-xl text-center mt-8 wizard-card">
+    <div class="flex justify-center gap-2 mb-6">
+      <div id="step1" class="step step-active rounded-full w-8 h-8 flex items-center justify-center font-bold">1</div>
+      <div class="w-8 h-1 bg-gray-200 self-center"></div>
+      <div id="step2" class="step rounded-full w-8 h-8 flex items-center justify-center font-bold">2</div>
+      <div class="w-8 h-1 bg-gray-200 self-center"></div>
+      <div id="step3" class="step rounded-full w-8 h-8 flex items-center justify-center font-bold">3</div>
+    </div>
+    <div id="wizardStep1">
+      <div class="text-3xl mb-2 emoji-bounce">👶🎈</div>
+      <h1 class="text-2xl font-extrabold mb-2">Welcome to the Gender Reveal Party Wizard!</h1>
+      <p class="mb-4 text-blue-700">Let's get started by naming your party.</p>
+      <input id="partyName" type="text" placeholder="e.g. Emma's Reveal Party" class="w-full px-4 py-3 border-2 border-pink-200 rounded-xl mb-4 text-lg" required />
+      <button id="toStep2Btn" class="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-2 px-4 rounded-xl transition-all">Next</button>
+      <div id="partyNameError" class="text-red-500 text-sm mt-2"></div>
+    </div>
+    <div id="wizardStep2" class="hidden">
+      <div class="text-3xl mb-2 emoji-bounce">🤔💭</div>
+      <h2 class="text-xl font-bold mb-2">What's your prediction?</h2>
+      <div class="flex justify-center gap-4 mb-4">
+        <label class="flex flex-col items-center cursor-pointer">
+          <input type="radio" name="hostPrediction" value="boy" class="form-radio text-blue-500 mb-2" />
+          <span class="text-blue-500 font-bold text-lg">Boy 💙</span>
         </label>
-        <label class="flex items-center cursor-pointer">
-          <input type="radio" name="hostPrediction" value="girl" class="form-radio text-pink-500" required />
-          <span class="ml-2 text-pink-500 font-bold">Girl 💖</span>
+        <label class="flex flex-col items-center cursor-pointer">
+          <input type="radio" name="hostPrediction" value="girl" class="form-radio text-pink-500 mb-2" />
+          <span class="text-pink-500 font-bold text-lg">Girl 💖</span>
         </label>
       </div>
-      <button id="startPartyBtn" type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Start Party</button>
-      <div id="partyError" class="text-red-500 text-sm mt-1"></div>
-    </form>
+      <button id="toStep3Btn" class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl transition-all">Next</button>
+      <div id="predictionError" class="text-red-500 text-sm mt-2"></div>
+    </div>
+    <div id="wizardStep3" class="hidden">
+      <div class="text-3xl mb-2 emoji-bounce">🥳🎉</div>
+      <h2 class="text-xl font-bold mb-2">Ready to start the party?</h2>
+      <p class="mb-4 text-gray-700">Review your details and click below to create your party room!</p>
+      <div class="mb-2 p-3 rounded-xl bg-blue-50 text-left">
+        <div><span class="font-semibold">Party Name:</span> <span id="reviewPartyName"></span></div>
+        <div><span class="font-semibold">Prediction:</span> <span id="reviewPrediction"></span></div>
+      </div>
+      <button id="startPartyBtn" class="w-full bg-green-400 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-xl transition-all">Start Party 🎈</button>
+      <div id="partyError" class="text-red-500 text-sm mt-2"></div>
+    </div>
   </div>
   <div id="partyPanel" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto text-center relative">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-auto text-center relative">
       <button id="closePanelBtn" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+      <div class="text-4xl mb-2">🎊👶</div>
       <h2 class="text-2xl font-bold mb-2" id="panelPartyName"></h2>
       <div class="mb-4">
         <div id="panelQrCode" class="flex justify-center mb-2"></div>
@@ -44,21 +78,15 @@
           <button id="copyAdminLinkBtn" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded text-xs mb-2">Copy Admin Link</button>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 mt-2">
-          <button id="openGuestLinkBtn" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Open Vote Page</button>
-          <button id="openAdminLinkBtn" class="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Preview as Admin</button>
+          <button id="openGuestLinkBtn" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-xl">Open Vote Page</button>
+          <button id="openAdminLinkBtn" class="flex-1 bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl">Preview as Admin</button>
         </div>
       </div>
+      <div class="mt-2 text-xs text-gray-500">Share the guest link with your friends and family!<br>Keep the admin link private to control the reveal.</div>
     </div>
   </div>
-  <div id="voteResultsPage" class="hidden w-full max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg text-center mt-4"></div>
-  <div id="notFound" class="hidden flex flex-col items-center justify-center min-h-screen">
-    <h2 class="text-xl font-bold text-red-600 mb-4">Party not found</h2>
-    <button onclick="window.location.href='index.html'" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Return to Homepage</button>
-  </div>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-  <script src="firebaseConfig.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/wizard.js"></script>
 </body>
 </html> 

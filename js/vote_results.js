@@ -1,5 +1,5 @@
 // js/vote_results.js
-// Improved guest flow, voting/results, reveal logic (secure adminToken)
+// Improved guest flow, voting/results, reveal logic (secure adminToken, cute badges)
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -45,6 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const nameKey = `name_${roomId}`;
   const changeKey = `changed_${roomId}`;
   const voteIdKey = `voteId_${roomId}`;
+
+  // Cute emoji for badges
+  const badgeEmojis = ['👶','🍼','🎈','🎉','🧸','🎀','🦄','🐣','🐥','🦋','🌈','⭐','💫','🍭','🍬','🎂','🥳','😻','🐻','🐰'];
+  function emojiForName(name) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return badgeEmojis[Math.abs(hash) % badgeEmojis.length];
+  }
 
   // Firebase
   firebase.initializeApp(firebaseConfig);
@@ -217,8 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
     girlCount.textContent = girlList.length;
     boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
     girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
-    boyNames.innerHTML = boyList.map(n => `<div class='truncate'>${n}</div>`).join('');
-    girlNames.innerHTML = girlList.map(n => `<div class='truncate'>${n}</div>`).join('');
+    // Cute pill badges with emoji
+    boyNames.innerHTML = boyList.map(n => `<span class='pill-badge pill-boy'>${emojiForName(n)} ${n}</span>`).join('');
+    girlNames.innerHTML = girlList.map(n => `<span class='pill-badge pill-girl'>${emojiForName(n)} ${n}</span>`).join('');
     if (hasVoted) showResults();
   });
 
