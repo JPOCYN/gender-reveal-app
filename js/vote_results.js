@@ -81,31 +81,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Admin token check
-  if (adminTokenParam) {
-    adminTokenRef.once('value').then(snap => {
-      const token = snap.val();
-      if (token && token === adminTokenParam && revealGenderBtn) {
-        isAdmin = true;
-        revealGenderBtn.classList.remove('hidden');
-        revealGenderBtn.addEventListener('click', () => {
-          revealPopup.classList.remove('hidden');
-        });
-        confirmRevealBtn.addEventListener('click', () => {
-          infoRef.once('value').then(snap => {
-            const info = snap.val();
-            if (info && info.prediction) {
-              revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
-            }
+  // Admin token check (always run on load)
+  function checkAdminMode() {
+    if (adminTokenParam) {
+      adminTokenRef.once('value').then(snap => {
+        const token = snap.val();
+        if (token && token === adminTokenParam && revealGenderBtn) {
+          isAdmin = true;
+          revealGenderBtn.classList.remove('hidden');
+          revealGenderBtn.addEventListener('click', () => {
+            revealPopup.classList.remove('hidden');
           });
-          revealPopup.classList.add('hidden');
-        });
-        cancelRevealBtn.addEventListener('click', () => {
-          revealPopup.classList.add('hidden');
-        });
-      }
-    });
+          confirmRevealBtn.addEventListener('click', () => {
+            infoRef.once('value').then(snap => {
+              const info = snap.val();
+              if (info && info.prediction) {
+                revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
+              }
+            });
+            revealPopup.classList.add('hidden');
+          });
+          cancelRevealBtn.addEventListener('click', () => {
+            revealPopup.classList.add('hidden');
+          });
+        } else {
+          // Hide admin UI if token is invalid
+          if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
+        }
+      });
+    } else {
+      if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
+    }
   }
+  checkAdminMode();
 
   // Name validation
   function validateName(name) {
