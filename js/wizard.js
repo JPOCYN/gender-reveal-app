@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     partyNameInput.value = partyName;
     document.querySelector(`input[name="hostPrediction"][value="${prediction}"]`).checked = true;
-    // Use native form submission
-    document.getElementById('partyForm').submit();
+    // Let app.js handle the submit (no reload)
+    document.getElementById('partyForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
   });
 }); 
