@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col items-center justify-center">
-  <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center mt-8">
+  <div id="landingPage" class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center mt-8">
     <h1 class="text-3xl font-extrabold mb-2">🎉 Gender Reveal Party 🎉</h1>
     <p class="mb-2 text-lg font-semibold text-blue-700">Create a party, invite guests to vote, and reveal the gender in real-time!</p>
     <p class="mb-4 text-pink-600">Fun, interactive, and perfect for sharing the excitement with friends and family!</p>
@@ -37,7 +37,15 @@
       <div id="copyMsg" class="text-green-600 text-xs mt-1"></div>
     </div>
   </div>
+  <div id="voteResultsPage" class="hidden w-full max-w-md mx-auto p-4 bg-white rounded-lg shadow-lg text-center mt-4"></div>
+  <div id="notFound" class="hidden flex flex-col items-center justify-center min-h-screen">
+    <h2 class="text-xl font-bold text-red-600 mb-4">Party not found</h2>
+    <button onclick="window.location.href='index.html'" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Return to Homepage</button>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="firebaseConfig.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html> 
