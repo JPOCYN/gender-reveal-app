@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const wizardStep3 = document.getElementById('wizardStep3');
   const toStep2Btn = document.getElementById('toStep2Btn');
   const toStep3Btn = document.getElementById('toStep3Btn');
+  const backToStep1Btn = document.getElementById('backToStep1Btn');
   const backToStep2Btn = document.getElementById('backToStep2Btn');
   const partyNameInput = document.getElementById('partyName');
   const partyNameError = document.getElementById('partyNameError');
@@ -54,7 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     goToStep(3);
   });
 
-  // Back button on Step 3
+  // Back buttons
+  if (backToStep1Btn) {
+    backToStep1Btn.addEventListener('click', () => {
+      goToStep(1);
+    });
+  }
   if (backToStep2Btn) {
     backToStep2Btn.addEventListener('click', () => {
       goToStep(2);
@@ -62,17 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // When Start Party is clicked, let app.js handle the actual creation
-  startPartyBtn.addEventListener('click', () => {
+  startPartyBtn.addEventListener('click', (e) => {
+    e.preventDefault();
     partyNameInput.value = partyName;
     document.querySelector(`input[name="hostPrediction"][value="${prediction}"]`).checked = true;
     // Let app.js handle the submit
     document.getElementById('partyForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-  });
-
-  // Listen for partyPanel event to redirect to admin page
-  window.addEventListener('partyCreated', function(e) {
-    if (e.detail && e.detail.roomId && e.detail.adminToken) {
-      window.location.href = `/vote.html?roomId=${e.detail.roomId}&adminToken=${e.detail.adminToken}`;
-    }
   });
 }); 
