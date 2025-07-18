@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const roomId = params.get('roomId');
   if (!roomId) {
-    alert('No roomId specified in URL.');
+    document.body.innerHTML = '<div class="flex flex-col items-center justify-center min-h-screen"><h2 class="text-xl font-bold text-red-600">No party found. Please use a valid invite link.</h2></div>';
     return;
   }
 
@@ -164,6 +164,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   }
+
+  // Always show voting/results UI if roomId is present
+  nameSection.classList.remove('hidden');
+  voteSection.classList.add('hidden');
+  resultsSection.classList.add('hidden');
 
   // Live results
   votesRef.on('value', (snapshot) => {

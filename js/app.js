@@ -1,12 +1,15 @@
 // js/app.js for improved landing page
-// Handles: party name, host prediction, QR code, Firebase save
+// Handles: party name, host prediction, QR code, Firebase save, copy link
 
 document.addEventListener('DOMContentLoaded', () => {
   const partyForm = document.getElementById('partyForm');
   const partyNameInput = document.getElementById('partyName');
+  const partyError = document.getElementById('partyError');
   const qrSection = document.getElementById('qrSection');
   const qrCode = document.getElementById('qrCode');
   const roomLink = document.getElementById('roomLink');
+  const copyLinkBtn = document.getElementById('copyLinkBtn');
+  const copyMsg = document.getElementById('copyMsg');
 
   // Helper to generate a random room ID
   function generateRoomId() {
@@ -23,6 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     roomLink.textContent = voteUrl;
     roomLink.onclick = () => { window.open(voteUrl, '_blank'); };
+    copyLinkBtn.onclick = () => {
+      navigator.clipboard.writeText(voteUrl).then(() => {
+        copyMsg.textContent = 'Link copied!';
+        setTimeout(() => { copyMsg.textContent = ''; }, 1500);
+      });
+    };
   }
 
   // Firebase (optional: only if you want to save party info)
@@ -32,10 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   partyForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    partyError.textContent = '';
     const partyName = partyNameInput.value.trim();
     const prediction = partyForm.hostPrediction.value;
     if (!partyName) {
+      partyError.textContent = 'Please enter a party name.';
       partyNameInput.classList.add('border-red-500');
+      return;
+    }
+    if (!prediction) {
+      partyError.textContent = 'Please select a gender prediction.';
       return;
     }
     // Generate roomId

@@ -24,11 +24,17 @@
         </label>
       </div>
       <button id="startPartyBtn" type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Start Party</button>
+      <div id="partyError" class="text-red-500 text-sm mt-1"></div>
     </form>
     <div id="qrSection" class="hidden mt-4">
       <p class="mb-2">Share this QR code to let guests vote!</p>
-      <div id="qrCode" class="flex justify-center"></div>
-      <p class="mt-2 text-sm text-gray-500">Or share this link: <span id="roomLink" class="underline text-blue-600 cursor-pointer"></span></p>
+      <div id="qrCode" class="flex justify-center mb-2"></div>
+      <div class="flex items-center justify-center gap-2">
+        <span class="text-sm text-gray-500">Or share this link:</span>
+        <span id="roomLink" class="underline text-blue-600 cursor-pointer break-all"></span>
+        <button id="copyLinkBtn" class="ml-2 bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs">Copy</button>
+      </div>
+      <div id="copyMsg" class="text-green-600 text-xs mt-1"></div>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
