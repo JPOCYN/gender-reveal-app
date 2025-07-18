@@ -288,9 +288,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Add animation classes for vote bars and reveal button
+  const style = document.createElement('style');
+  style.innerHTML = `
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.3); }
+      50% { box-shadow: 0 0 16px 8px rgba(59,130,246,0.15); }
+    }
+    @keyframes pulseGlowPink {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(236,72,153,0.3); }
+      50% { box-shadow: 0 0 16px 8px rgba(236,72,153,0.15); }
+    }
+    .boy-bar-animate { animation: pulseGlow 1.5s infinite; }
+    .girl-bar-animate { animation: pulseGlowPink 1.5s infinite; }
+    @keyframes bounceIn {
+      0% { transform: scale(0.7); opacity: 0.5; }
+      60% { transform: scale(1.15); opacity: 1; }
+      80% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    .vote-bounce { animation: bounceIn 0.5s; }
+    @keyframes revealPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0.3); }
+      50% { box-shadow: 0 0 16px 8px rgba(251,191,36,0.15); }
+    }
+    .reveal-animate { animation: revealPulse 2s infinite; }
+    .reveal-hover:hover { transform: scale(1.07) rotate(-2deg); box-shadow: 0 4px 24px 0 rgba(251,191,36,0.25); }
+  `;
+  document.head.appendChild(style);
+
+  // Add animation classes to vote bars
+  if (boyBar) boyBar.classList.add('boy-bar-animate');
+  if (girlBar) girlBar.classList.add('girl-bar-animate');
+  if (revealGenderBtn) {
+    revealGenderBtn.classList.add('reveal-animate', 'transition', 'duration-300', 'reveal-hover');
+  }
+
+  // Animate new votes in showResults
   function showResults() {
-    resultsSection.classList.remove('hidden');
-    checkAdminMode();
+    votesRef.once('value').then(snap => {
+      const votes = snap.val() || {};
+      allVotes = Object.entries(votes).map(([id, v]) => ({ id, ...v }));
+      const boyVotes = allVotes.filter(v => v.vote === 'boy');
+      const girlVotes = allVotes.filter(v => v.vote === 'girl');
+      const total = boyVotes.length + girlVotes.length;
+      const boyPercent = total ? (boyVotes.length / total) * 100 : 0;
+      const girlPercent = total ? (girlVotes.length / total) * 100 : 0;
+      boyBar.style.width = boyPercent + '%';
+      girlBar.style.width = girlPercent + '%';
+      boyCount.textContent = boyVotes.length;
+      girlCount.textContent = girlVotes.length;
+      // Animate bars
+      boyBar.classList.remove('vote-bounce');
+      girlBar.classList.remove('vote-bounce');
+      void boyBar.offsetWidth; // force reflow
+      void girlBar.offsetWidth;
+      if (boyVotes.length) boyBar.classList.add('vote-bounce');
+      if (girlVotes.length) girlBar.classList.add('vote-bounce');
+      // Animate new names
+      boyNames.innerHTML = '';
+      girlNames.innerHTML = '';
+      boyVotes.forEach(v => {
+        const badge = document.createElement('span');
+        badge.className = 'pill-badge pill-boy vote-bounce';
+        badge.textContent = emojiForName(v.name) + ' ' + v.name;
+        boyNames.appendChild(badge);
+        setTimeout(() => badge.classList.remove('vote-bounce'), 600);
+      });
+      girlVotes.forEach(v => {
+        const badge = document.createElement('span');
+        badge.className = 'pill-badge pill-girl vote-bounce';
+        badge.textContent = emojiForName(v.name) + ' ' + v.name;
+        girlNames.appendChild(badge);
+        setTimeout(() => badge.classList.remove('vote-bounce'), 600);
+      });
+    });
   }
 
   if (!adminTokenParam && guestName && localStorage.getItem(votedKey)) {
