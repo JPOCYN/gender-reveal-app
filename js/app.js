@@ -103,12 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
-        await db.ref(`parties/${newRoomId}/info`).set({
+        await db.ref(`parties/${newRoomId}`).set({
           partyName,
           prediction,
+          adminToken,
           createdAt: firebase.database.ServerValue.TIMESTAMP
         });
-        await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
       showPartyPanel({ partyName, roomId: newRoomId, adminToken });
       // Reset Start Party button
@@ -262,12 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
-        await db.ref(`parties/${newRoomId}/info`).set({
+        await db.ref(`parties/${newRoomId}`).set({
           partyName,
           prediction,
+          adminToken,
           createdAt: firebase.database.ServerValue.TIMESTAMP
         });
-        await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
       showPartyPanel({ partyName, roomId: newRoomId, adminToken });
       // Reset Start Party button
