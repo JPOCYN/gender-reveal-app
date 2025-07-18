@@ -76,10 +76,10 @@ document.addEventListener('DOMContentLoaded', () => {
     panel.classList.remove('hidden');
   }
 
+  // Remove any duplicate partyForm submit handlers and keep only one:
   if (partyForm) {
     partyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      // No need to revalidate here, already handled in wizard
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
         const roomId = db.ref('parties').push().key;
@@ -212,23 +212,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Party creation flow
-  if (partyForm) {
-    partyForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (typeof firebase !== 'undefined') {
-        const db = firebase.database();
-        const roomId = db.ref('parties').push().key;
-        const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
-        const partyName = partyNameInput.value.trim();
-        const prediction = partyForm.hostPrediction.value;
-        await db.ref(`parties/${roomId}/info`).set({
-          partyName,
-          prediction,
-          createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
-        await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
-        showPartyPanel({ partyName, roomId, adminToken });
-      }
-    });
-  }
+  // This block is now redundant as the partyForm submit handler handles party creation.
+  // Keeping it for now, but it will be removed if the partyForm is always present.
+  // if (partyForm) {
+  //   partyForm.addEventListener('submit', async (e) => {
+  //     e.preventDefault();
+  //     if (typeof firebase !== 'undefined') {
+  //       const db = firebase.database();
+  //       const roomId = db.ref('parties').push().key;
+  //       const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
+  //       const partyName = partyNameInput.value.trim();
+  //       const prediction = partyForm.hostPrediction.value;
+  //       await db.ref(`parties/${roomId}/info`).set({
+  //         partyName,
+  //         prediction,
+  //         createdAt: firebase.database.ServerValue.TIMESTAMP
+  //       });
+  //       await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
+  //       showPartyPanel({ partyName, roomId, adminToken });
+  //     }
+  //   });
+  // }
 }); 
