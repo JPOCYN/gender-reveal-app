@@ -5,8 +5,67 @@ document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const roomId = params.get('roomId');
   const landingPage = document.getElementById('landingPage');
-  const voteResultsPage = document.getElementById('voteResultsPage');
+  const partyPanel = document.getElementById('partyPanel');
   const notFound = document.getElementById('notFound');
+
+  // Helper to generate a random room ID
+  function generateRoomId() {
+    return 'party-' + Math.random().toString(36).substr(2, 8);
+  }
+  // Helper to generate a secure admin token
+  function generateAdminToken() {
+    if (window.crypto && window.crypto.randomUUID) {
+      return window.crypto.randomUUID();
+    }
+    // Fallback for browsers without crypto.randomUUID
+    return Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
+  }
+
+  // Show party panel modal
+  function showPartyPanel({ partyName, roomId, adminToken }) {
+    const panel = partyPanel;
+    const panelPartyName = document.getElementById('panelPartyName');
+    const panelQrCode = document.getElementById('panelQrCode');
+    const panelGuestLink = document.getElementById('panelGuestLink');
+    const panelAdminLink = document.getElementById('panelAdminLink');
+    const copyGuestLinkBtn = document.getElementById('copyGuestLinkBtn');
+    const copyAdminLinkBtn = document.getElementById('copyAdminLinkBtn');
+    const openGuestLinkBtn = document.getElementById('openGuestLinkBtn');
+    const openAdminLinkBtn = document.getElementById('openAdminLinkBtn');
+    const closePanelBtn = document.getElementById('closePanelBtn');
+
+    const baseUrl = window.location.origin;
+    const guestLink = `${baseUrl}/vote.html?roomId=${roomId}`;
+    const adminLink = `${baseUrl}/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
+
+    panelPartyName.textContent = partyName;
+    panelGuestLink.textContent = guestLink;
+    panelAdminLink.textContent = adminLink;
+    panelQrCode.innerHTML = '';
+    QRCode.toCanvas(document.createElement('canvas'), guestLink, (err, canvas) => {
+      if (!err) panelQrCode.appendChild(canvas);
+    });
+    copyGuestLinkBtn.onclick = () => {
+      navigator.clipboard.writeText(guestLink);
+      copyGuestLinkBtn.textContent = 'Copied!';
+      setTimeout(() => { copyGuestLinkBtn.textContent = 'Copy Guest Link'; }, 1200);
+    };
+    copyAdminLinkBtn.onclick = () => {
+      navigator.clipboard.writeText(adminLink);
+      copyAdminLinkBtn.textContent = 'Copied!';
+      setTimeout(() => { copyAdminLinkBtn.textContent = 'Copy Admin Link'; }, 1200);
+    };
+    openGuestLinkBtn.onclick = () => {
+      window.open(guestLink, '_blank');
+    };
+    openAdminLinkBtn.onclick = () => {
+      window.open(adminLink, '_blank');
+    };
+    closePanelBtn.onclick = () => {
+      panel.classList.add('hidden');
+    };
+    panel.classList.remove('hidden');
+  }
 
   // If roomId is present, show guest name input UI
   if (roomId) {
@@ -24,6 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       // Show guest name input UI
+      // This part of the code is not directly modified by the new_code,
+      // so it remains as is, including the guest name logic.
+      // The new_code only added the partyPanel modal and its logic.
+      // The guest name input UI and its logic are kept as they were.
+      const voteResultsPage = document.getElementById('voteResultsPage');
       voteResultsPage.innerHTML = `
         <div id="partyInfo" class="mb-4">
           <h1 id="partyName" class="text-2xl font-extrabold mb-1">${info.partyName || 'Gender Reveal Party'}</h1>
@@ -82,45 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Helper to generate a random room ID
-  function generateRoomId() {
-    return 'party-' + Math.random().toString(36).substr(2, 8);
-  }
-
+  // Party creation flow
   const partyForm = document.getElementById('partyForm');
   const partyNameInput = document.getElementById('partyName');
   const partyError = document.getElementById('partyError');
-  const qrSection = document.getElementById('qrSection');
-  const qrCode = document.getElementById('qrCode');
-  const roomLink = document.getElementById('roomLink');
-  const copyLinkBtn = document.getElementById('copyLinkBtn');
-  const copyMsg = document.getElementById('copyMsg');
-
-  // Show QR section
-  function showQR(roomId) {
-    qrSection.classList.remove('hidden');
-    const voteUrl = `${window.location.origin}${window.location.pathname.replace('index.html','')}?roomId=${roomId}`;
-    qrCode.innerHTML = '';
-    QRCode.toCanvas(document.createElement('canvas'), voteUrl, (err, canvas) => {
-      if (!err) qrCode.appendChild(canvas);
-    });
-    roomLink.textContent = voteUrl;
-    roomLink.onclick = () => { window.open(voteUrl, '_blank'); };
-    copyLinkBtn.onclick = () => {
-      navigator.clipboard.writeText(voteUrl).then(() => {
-        copyMsg.textContent = 'Link copied!';
-        setTimeout(() => { copyMsg.textContent = ''; }, 1500);
-      });
-    };
-  }
-
-  // Firebase (optional: only if you want to save party info)
-  if (typeof firebaseConfig !== 'undefined' && !roomId) {
-    firebase.initializeApp(firebaseConfig);
-  }
 
   if (partyForm) {
-    partyForm.addEventListener('submit', (e) => {
+    partyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       partyError.textContent = '';
       const partyName = partyNameInput.value.trim();
@@ -134,21 +166,22 @@ document.addEventListener('DOMContentLoaded', () => {
         partyError.textContent = 'Please select a gender prediction.';
         return;
       }
-      // Generate roomId
       const newRoomId = generateRoomId();
-      // Save party info to Firebase (optional)
+      const adminToken = generateAdminToken();
+      if (typeof firebaseConfig !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+      }
       if (typeof firebase !== 'undefined') {
         const db = firebase.database();
-        db.ref(`rooms/${newRoomId}/info`).set({
+        await db.ref(`parties/${newRoomId}/info`).set({
           partyName,
           prediction,
-          createdAt: Date.now()
+          createdAt: Date.now(),
         });
+        await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
-      // Show QR code and link
-      showQR(newRoomId);
-      // Optionally, disable form after start
-      partyForm.querySelectorAll('input,button').forEach(el => el.disabled = true);
+      showPartyPanel({ partyName, roomId: newRoomId, adminToken });
+      partyForm.querySelectorAll('input,button').forEach(el => el.disabled = false);
     });
   }
 }); 

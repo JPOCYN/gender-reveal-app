@@ -1,11 +1,11 @@
 // js/vote_results.js
-// Improved guest flow, voting/results, reveal logic (no host prediction)
+// Improved guest flow, voting/results, reveal logic (secure adminToken)
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
   const roomId = params.get('roomId');
   const guestParam = params.get('guest');
-  const isOwner = params.get('admin') === '1';
+  const adminTokenParam = params.get('adminToken');
 
   if (!roomId) {
     document.body.innerHTML = '<div class="flex flex-col items-center justify-center min-h-screen"><h2 class="text-xl font-bold text-red-600">No party found. Please use a valid invite link.</h2></div>';
@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Elements
   const partyNameEl = document.getElementById('partyName');
-  // const hostPredictionEl = document.getElementById('hostPrediction'); // REMOVED
   const nameSection = document.getElementById('nameSection');
   const guestNameInput = document.getElementById('guestName');
   const submitNameBtn = document.getElementById('submitNameBtn');
@@ -50,9 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
-  const infoRef = db.ref(`rooms/${roomId}/info`);
-  const votesRef = db.ref(`rooms/${roomId}/votes`);
-  const revealRef = db.ref(`rooms/${roomId}/reveal`);
+  const infoRef = db.ref(`parties/${roomId}/info`);
+  const votesRef = db.ref(`parties/${roomId}/votes`);
+  const revealRef = db.ref(`parties/${roomId}/reveal`);
+  const adminTokenRef = db.ref(`parties/${roomId}/adminToken`);
 
   // State
   let userVoteId = localStorage.getItem(voteIdKey) || null;
@@ -61,23 +61,47 @@ document.addEventListener('DOMContentLoaded', () => {
   let allVotes = [];
   let guestName = guestParam ? decodeURIComponent(guestParam) : localStorage.getItem(nameKey);
   let hasVoted = false;
+  let isAdmin = false;
 
   // Fetch and show party info
   infoRef.once('value').then(snap => {
     const info = snap.val();
     if (info) {
       partyNameEl.textContent = info.partyName || 'Gender Reveal Party';
-      // hostPredictionEl.innerHTML = ... // REMOVED
     } else {
       partyNameEl.textContent = 'Gender Reveal Party';
-      // hostPredictionEl.textContent = ''; // REMOVED
     }
   });
+
+  // Admin token check
+  if (adminTokenParam) {
+    adminTokenRef.once('value').then(snap => {
+      const token = snap.val();
+      if (token && token === adminTokenParam && revealGenderBtn) {
+        isAdmin = true;
+        revealGenderBtn.classList.remove('hidden');
+        revealGenderBtn.addEventListener('click', () => {
+          revealPopup.classList.remove('hidden');
+        });
+        confirmRevealBtn.addEventListener('click', () => {
+          infoRef.once('value').then(snap => {
+            const info = snap.val();
+            if (info && info.prediction) {
+              revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
+            }
+          });
+          revealPopup.classList.add('hidden');
+        });
+        cancelRevealBtn.addEventListener('click', () => {
+          revealPopup.classList.add('hidden');
+        });
+      }
+    });
+  }
 
   // Name validation
   function validateName(name) {
     if (!name.trim()) return 'Name cannot be empty.';
-    // Check for duplicate name in Firebase
     const lower = name.trim().toLowerCase();
     if (allVotes.some(v => v.name.trim().toLowerCase() === lower)) return 'This name has already voted.';
     return '';
@@ -87,7 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (guestName) {
     nameSection.classList.add('hidden');
     voteSection.classList.remove('hidden');
-    // Save to localStorage for later
     localStorage.setItem(nameKey, guestName);
     resultsSection.classList.add('hidden');
   } else {
@@ -108,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       localStorage.setItem(nameKey, name);
-      // Redirect to self with guest param
       window.location.href = `${window.location.pathname}?roomId=${roomId}&guest=${encodeURIComponent(name)}`;
     });
   }
@@ -116,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Voting logic
   function castVote(vote) {
     if (!guestName) return;
-    // If never voted, create new
     if (!userVoteId) {
       const newVoteRef = votesRef.push();
       newVoteRef.set({ name: guestName, vote, timestamp: Date.now() }, (err) => {
@@ -134,14 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
     } else {
-      // If already changed once, block
       if (userChanged) {
         voteMsg.textContent = 'You have already changed your vote once.';
         voteBoyBtn.disabled = true;
         voteGirlBtn.disabled = true;
         return;
       }
-      // Show popup to confirm change
       pendingVote = vote;
       changePopup.classList.remove('hidden');
     }
@@ -150,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
   voteBoyBtn.addEventListener('click', () => castVote('boy'));
   voteGirlBtn.addEventListener('click', () => castVote('girl'));
 
-  // Popup logic
   confirmChangeBtn.addEventListener('click', () => {
     if (!userVoteId || pendingVote === null) return;
     votesRef.child(userVoteId).set({ name: guestName, vote: pendingVote, timestamp: Date.now() }, (err) => {
@@ -175,18 +193,15 @@ document.addEventListener('DOMContentLoaded', () => {
     pendingVote = null;
   });
 
-  // Hide results until voted
   function showResults() {
     resultsSection.classList.remove('hidden');
   }
 
-  // On load, check if already voted
   if (guestName && localStorage.getItem(votedKey)) {
     hasVoted = true;
     showResults();
   }
 
-  // Live results
   votesRef.on('value', (snapshot) => {
     let boy = 0, girl = 0;
     let boyList = [], girlList = [];
@@ -200,38 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const total = boyList.length + girlList.length;
     boyCount.textContent = boyList.length;
     girlCount.textContent = girlList.length;
-    // Animate bars
     boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
     girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
-    // Scrollable name lists
     boyNames.innerHTML = boyList.map(n => `<div class='truncate'>${n}</div>`).join('');
     girlNames.innerHTML = girlList.map(n => `<div class='truncate'>${n}</div>`).join('');
-    // Only show results if guest has voted
     if (hasVoted) showResults();
   });
 
-  // Reveal Gender logic (admin/owner only)
-  if (isOwner && revealGenderBtn) {
-    revealGenderBtn.classList.remove('hidden');
-    revealGenderBtn.addEventListener('click', () => {
-      revealPopup.classList.remove('hidden');
-    });
-    confirmRevealBtn.addEventListener('click', () => {
-      // Set reveal in Firebase
-      infoRef.once('value').then(snap => {
-        const info = snap.val();
-        if (info && info.prediction) {
-          revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
-        }
-      });
-      revealPopup.classList.add('hidden');
-    });
-    cancelRevealBtn.addEventListener('click', () => {
-      revealPopup.classList.add('hidden');
-    });
-  }
-
-  // Listen for reveal
   revealRef.on('value', (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
