@@ -52,8 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
     panelGuestLink.textContent = guestLink;
     panelAdminLink.textContent = adminLink;
     panelQrCode.innerHTML = '';
-    QRCode.toCanvas(document.createElement('canvas'), guestLink, (err, canvas) => {
-      if (!err) panelQrCode.appendChild(canvas);
+    new QRCode(panelQrCode, {
+      text: guestLink,
+      width: 192,
+      height: 192,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
     });
     copyGuestLinkBtn.onclick = () => {
       navigator.clipboard.writeText(guestLink);
