@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const predictionError = document.getElementById('predictionError');
   const reviewPartyName = document.getElementById('reviewPartyName');
   const reviewPrediction = document.getElementById('reviewPrediction');
-  const startPartyBtn = document.getElementById('startPartyBtn');
+  // const startPartyBtn = document.getElementById('startPartyBtn');
   let partyName = '';
   let prediction = '';
 
@@ -67,12 +67,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // When Start Party is clicked, let app.js handle the actual creation
-  startPartyBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    partyNameInput.value = partyName;
-    document.querySelector(`input[name="hostPrediction"][value="${prediction}"]`).checked = true;
-    // Let app.js handle the submit (no reload)
-    document.getElementById('partyForm').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-  });
+  // No click handler for startPartyBtn: let the form submit naturally
 }); 
