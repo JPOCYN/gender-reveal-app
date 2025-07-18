@@ -1,64 +1,57 @@
-// Homepage logic for Gender Reveal Party
-// Handles: Start Party, QR code, navigation
+// js/app.js for improved landing page
+// Handles: party name, host prediction, QR code, Firebase save
 
 document.addEventListener('DOMContentLoaded', () => {
-  const homepage = document.getElementById('homepage');
-  const votingPage = document.getElementById('votingPage');
-  const resultsPage = document.getElementById('resultsPage');
-  const startPartyBtn = document.getElementById('startPartyBtn');
+  const partyForm = document.getElementById('partyForm');
+  const partyNameInput = document.getElementById('partyName');
   const qrSection = document.getElementById('qrSection');
   const qrCode = document.getElementById('qrCode');
   const roomLink = document.getElementById('roomLink');
-  const goToResultsBtn = document.getElementById('goToResultsBtn');
 
   // Helper to generate a random room ID
   function generateRoomId() {
     return 'party-' + Math.random().toString(36).substr(2, 8);
   }
 
-  // Show only the homepage
-  function showHomepage() {
-    homepage.classList.remove('hidden');
-    votingPage.classList.add('hidden');
-    resultsPage.classList.add('hidden');
-  }
-
-  // Start Party button click
-  startPartyBtn.addEventListener('click', () => {
-    const roomId = generateRoomId();
-    const voteUrl = `${window.location.origin}${window.location.pathname}?room=${roomId}&vote=1`;
-    const resultsUrl = `${window.location.origin}${window.location.pathname}?room=${roomId}&results=1`;
+  // Show QR section
+  function showQR(roomId) {
     qrSection.classList.remove('hidden');
-    // Generate QR code for voting page
+    const voteUrl = `${window.location.origin}${window.location.pathname.replace('index.html','vote.html')}?roomId=${roomId}`;
     qrCode.innerHTML = '';
     QRCode.toCanvas(document.createElement('canvas'), voteUrl, (err, canvas) => {
       if (!err) qrCode.appendChild(canvas);
     });
     roomLink.textContent = voteUrl;
     roomLink.onclick = () => { window.open(voteUrl, '_blank'); };
-    // Go to results page
-    goToResultsBtn.onclick = () => {
-      window.location.href = resultsUrl;
-    };
-    // Store roomId in sessionStorage for host
-    sessionStorage.setItem('hostRoomId', roomId);
-  });
-
-  // Routing based on URL params
-  function route() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('room') && params.has('vote')) {
-      homepage.classList.add('hidden');
-      votingPage.classList.remove('hidden');
-      resultsPage.classList.add('hidden');
-    } else if (params.has('room') && params.has('results')) {
-      homepage.classList.add('hidden');
-      votingPage.classList.add('hidden');
-      resultsPage.classList.remove('hidden');
-    } else {
-      showHomepage();
-    }
   }
 
-  route();
+  // Firebase (optional: only if you want to save party info)
+  if (typeof firebaseConfig !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  partyForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const partyName = partyNameInput.value.trim();
+    const prediction = partyForm.hostPrediction.value;
+    if (!partyName) {
+      partyNameInput.classList.add('border-red-500');
+      return;
+    }
+    // Generate roomId
+    const roomId = generateRoomId();
+    // Save party info to Firebase (optional)
+    if (typeof firebase !== 'undefined') {
+      const db = firebase.database();
+      db.ref(`rooms/${roomId}/info`).set({
+        partyName,
+        prediction,
+        createdAt: Date.now()
+      });
+    }
+    // Show QR code and link
+    showQR(roomId);
+    // Optionally, disable form after start
+    partyForm.querySelectorAll('input,button').forEach(el => el.disabled = true);
+  });
 }); 

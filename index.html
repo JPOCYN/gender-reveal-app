@@ -7,65 +7,31 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col items-center justify-center">
-  <!-- Homepage -->
-  <div id="homepage" class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center">
-    <h1 class="text-3xl font-bold mb-4">🎉 Gender Reveal Party 🎉</h1>
-    <button id="startPartyBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4">Start Party</button>
+  <div class="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center mt-8">
+    <h1 class="text-3xl font-extrabold mb-2">🎉 Gender Reveal Party 🎉</h1>
+    <p class="mb-2 text-lg font-semibold text-blue-700">Create a party, invite guests to vote, and reveal the gender in real-time!</p>
+    <p class="mb-4 text-pink-600">Fun, interactive, and perfect for sharing the excitement with friends and family!</p>
+    <form id="partyForm" class="mb-4">
+      <input id="partyName" type="text" placeholder="Enter party name (e.g. Emma's Reveal Party)" class="w-full px-4 py-2 border rounded mb-2" required />
+      <div class="flex justify-center gap-4 mb-2">
+        <label class="flex items-center cursor-pointer">
+          <input type="radio" name="hostPrediction" value="boy" class="form-radio text-blue-500" required />
+          <span class="ml-2 text-blue-500 font-bold">Boy 💙</span>
+        </label>
+        <label class="flex items-center cursor-pointer">
+          <input type="radio" name="hostPrediction" value="girl" class="form-radio text-pink-500" required />
+          <span class="ml-2 text-pink-500 font-bold">Girl 💖</span>
+        </label>
+      </div>
+      <button id="startPartyBtn" type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Start Party</button>
+    </form>
     <div id="qrSection" class="hidden mt-4">
       <p class="mb-2">Share this QR code to let guests vote!</p>
       <div id="qrCode" class="flex justify-center"></div>
       <p class="mt-2 text-sm text-gray-500">Or share this link: <span id="roomLink" class="underline text-blue-600 cursor-pointer"></span></p>
-      <button id="goToResultsBtn" class="mt-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Go to Live Results</button>
     </div>
   </div>
-
-  <!-- Voting Page -->
-  <div id="votingPage" class="hidden w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center">
-    <h2 class="text-2xl font-bold mb-4">Cast Your Vote!</h2>
-    <div class="flex justify-center gap-4 mb-6">
-      <button id="voteBoyBtn" class="bg-blue-400 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded text-lg">Boy 💙</button>
-      <button id="voteGirlBtn" class="bg-pink-400 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded text-lg">Girl 💖</button>
-    </div>
-    <div id="voteMsg" class="text-green-600 font-semibold"></div>
-  </div>
-
-  <!-- Results Page -->
-  <div id="resultsPage" class="hidden w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg text-center">
-    <h2 class="text-2xl font-bold mb-4">Live Results</h2>
-    <div class="mb-6">
-      <div class="flex items-center mb-2">
-        <span class="text-blue-500 text-2xl mr-2">💙</span>
-        <div class="w-full bg-blue-100 rounded h-8 flex items-center">
-          <div id="boyBar" class="bg-blue-400 h-8 rounded-l transition-all duration-500" style="width:0%"></div>
-          <span id="boyCount" class="ml-2 text-blue-700 font-bold"></span>
-        </div>
-      </div>
-      <div class="flex items-center">
-        <span class="text-pink-500 text-2xl mr-2">💖</span>
-        <div class="w-full bg-pink-100 rounded h-8 flex items-center">
-          <div id="girlBar" class="bg-pink-400 h-8 rounded-l transition-all duration-500" style="width:0%"></div>
-          <span id="girlCount" class="ml-2 text-pink-700 font-bold"></span>
-        </div>
-      </div>
-    </div>
-    <button id="revealGenderBtn" class="bg-yellow-400 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mb-4">Reveal Gender</button>
-    <div id="revealSection" class="hidden mt-4">
-      <p class="mb-2 font-bold">Select the actual gender:</p>
-      <button id="actualBoyBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">Boy 💙</button>
-      <button id="actualGirlBtn" class="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded">Girl 💖</button>
-    </div>
-    <div id="confettiSection" class="hidden mt-6">
-      <h3 id="revealMsg" class="text-3xl font-extrabold mb-4"></h3>
-      <div id="winnerEmojis" class="text-4xl"></div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
-  <script src="firebaseConfig.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/voting.js"></script>
-  <script src="js/results.js"></script>
 </body>
 </html> 

@@ -1,5 +1,5 @@
 // js/vote_results.js
-// Combined voting and live results logic with one allowed vote change
+// Voting + results page with party info, name validation, live bars, scrollable name lists
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);
@@ -9,11 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Elements
+  const partyNameEl = document.getElementById('partyName');
+  const hostPredictionEl = document.getElementById('hostPrediction');
   const nameSection = document.getElementById('nameSection');
-  const voteSection = document.getElementById('voteSection');
   const guestNameInput = document.getElementById('guestName');
   const submitNameBtn = document.getElementById('submitNameBtn');
-  const displayName = document.getElementById('displayName');
+  const nameError = document.getElementById('nameError');
+  const voteSection = document.getElementById('voteSection');
   const voteBoyBtn = document.getElementById('voteBoyBtn');
   const voteGirlBtn = document.getElementById('voteGirlBtn');
   const voteMsg = document.getElementById('voteMsg');
@@ -22,7 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const girlBar = document.getElementById('girlBar');
   const boyCount = document.getElementById('boyCount');
   const girlCount = document.getElementById('girlCount');
-  const guestList = document.getElementById('guestList');
+  const boyNames = document.getElementById('boyNames');
+  const girlNames = document.getElementById('girlNames');
   const changePopup = document.getElementById('changePopup');
   const confirmChangeBtn = document.getElementById('confirmChangeBtn');
   const cancelChangeBtn = document.getElementById('cancelChangeBtn');
@@ -36,38 +40,57 @@ document.addEventListener('DOMContentLoaded', () => {
   // Firebase
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+  const infoRef = db.ref(`rooms/${roomId}/info`);
   const votesRef = db.ref(`rooms/${roomId}/votes`);
 
   // State
   let userVoteId = localStorage.getItem(voteIdKey) || null;
   let userChanged = localStorage.getItem(changeKey) === '1';
   let pendingVote = null;
+  let allVotes = [];
 
-  // Show results section always after name
-  function showResults() {
-    resultsSection.classList.remove('hidden');
+  // Fetch and show party info
+  infoRef.once('value').then(snap => {
+    const info = snap.val();
+    if (info) {
+      partyNameEl.textContent = info.partyName || 'Gender Reveal Party';
+      hostPredictionEl.innerHTML = `Host predicts: <span class="${info.prediction==='boy'?'text-blue-500':'text-pink-500'} font-bold">${info.prediction==='boy'?'Boy 💙':'Girl 💖'}</span>`;
+    } else {
+      partyNameEl.textContent = 'Gender Reveal Party';
+      hostPredictionEl.textContent = '';
+    }
+  });
+
+  // Name validation
+  function validateName(name) {
+    if (!name.trim()) return 'Name cannot be empty.';
+    // Check for duplicate name in Firebase
+    const lower = name.trim().toLowerCase();
+    if (allVotes.some(v => v.name.trim().toLowerCase() === lower)) return 'This name has already voted.';
+    return '';
   }
 
   // Name submit
   submitNameBtn.addEventListener('click', () => {
     const name = guestNameInput.value.trim();
-    if (!name) {
+    nameError.textContent = '';
+    const err = validateName(name);
+    if (err) {
+      nameError.textContent = err;
       guestNameInput.classList.add('border-red-500');
       return;
     }
     localStorage.setItem(nameKey, name);
     nameSection.classList.add('hidden');
     voteSection.classList.remove('hidden');
-    displayName.textContent = name;
-    showResults();
+    resultsSection.classList.remove('hidden');
   });
 
   // If already voted, show name and results
   function setupAfterName() {
     nameSection.classList.add('hidden');
     voteSection.classList.remove('hidden');
-    displayName.textContent = localStorage.getItem(nameKey) || 'Guest';
-    showResults();
+    resultsSection.classList.remove('hidden');
   }
 
   // Voting logic
@@ -145,18 +168,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Live results
   votesRef.on('value', (snapshot) => {
     let boy = 0, girl = 0;
-    let guests = [];
+    let boyList = [], girlList = [];
+    allVotes = [];
     snapshot.forEach(child => {
       const v = child.val();
-      guests.push(v);
-      if (v.vote === 'boy') boy++;
-      if (v.vote === 'girl') girl++;
+      allVotes.push(v);
+      if (v.vote === 'boy') boyList.push(v.name);
+      if (v.vote === 'girl') girlList.push(v.name);
     });
-    const total = boy + girl;
-    boyCount.textContent = boy;
-    girlCount.textContent = girl;
-    boyBar.style.width = total ? `${(boy/total)*100}%` : '0%';
-    girlBar.style.width = total ? `${(girl/total)*100}%` : '0%';
-    guestList.innerHTML = guests.map(g => `<li>${g.name} <span class="${g.vote==='boy'?'text-blue-500':'text-pink-500'}">${g.vote==='boy'?'💙':'💖'}</span></li>`).join('');
+    const total = boyList.length + girlList.length;
+    boyCount.textContent = boyList.length;
+    girlCount.textContent = girlList.length;
+    // Animate bars
+    boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
+    girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
+    // Scrollable name lists
+    boyNames.innerHTML = boyList.map(n => `<div class='truncate'>${n}</div>`).join('');
+    girlNames.innerHTML = girlList.map(n => `<div class='truncate'>${n}</div>`).join('');
   });
 }); 
