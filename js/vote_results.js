@@ -67,8 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
     const qrDiv = adminQR.querySelector('#adminGuestQR');
     qrDiv.innerHTML = '';
-    QRCode.toCanvas(document.createElement('canvas'), guestLink, (err, canvas) => {
-      if (!err) qrDiv.appendChild(canvas);
+    new QRCode(qrDiv, {
+      text: guestLink,
+      width: 192,
+      height: 192,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
     });
   }
   function hideAdminQR() {
