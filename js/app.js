@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const landingPage = document.getElementById('landingPage');
   const partyPanel = document.getElementById('partyPanel');
   const notFound = document.getElementById('notFound');
+  const partyForm = document.getElementById('partyForm');
+  const partyNameInput = document.getElementById('partyName');
+  const partyError = document.getElementById('partyError');
+  const startPartyBtn = document.getElementById('startPartyBtn');
 
   // Helper to generate a random room ID
   function generateRoomId() {
@@ -63,9 +67,93 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     closePanelBtn.onclick = () => {
       panel.classList.add('hidden');
+      // Reset wizard to step 1 and clear fields
+      landingPage.classList.remove('hidden');
+      if (window.resetWizard) window.resetWizard();
     };
+    // Hide the landing wizard when showing the panel
+    landingPage.classList.add('hidden');
     panel.classList.remove('hidden');
   }
+
+  if (partyForm) {
+    partyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      partyError.textContent = '';
+      const partyName = partyNameInput.value.trim();
+      const prediction = partyForm.hostPrediction.value;
+      if (!partyName) {
+        partyError.textContent = 'Please enter a party name.';
+        partyNameInput.classList.add('border-red-500');
+        return;
+      }
+      if (!prediction) {
+        partyError.textContent = 'Please select a gender prediction.';
+        return;
+      }
+      // Show loading spinner on Start Party button
+      if (startPartyBtn) {
+        startPartyBtn.disabled = true;
+        startPartyBtn.innerHTML = '<span class="animate-spin inline-block mr-2 w-5 h-5 border-2 border-white border-t-blue-400 rounded-full"></span>Creating...';
+      }
+      const newRoomId = generateRoomId();
+      const adminToken = generateAdminToken();
+      if (typeof firebaseConfig !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+      }
+      if (typeof firebase !== 'undefined') {
+        const db = firebase.database();
+        await db.ref(`parties/${newRoomId}/info`).set({
+          partyName,
+          prediction,
+          createdAt: Date.now(),
+        });
+        await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
+      }
+      showPartyPanel({ partyName, roomId: newRoomId, adminToken });
+      // Reset Start Party button
+      if (startPartyBtn) {
+        startPartyBtn.disabled = false;
+        startPartyBtn.innerHTML = 'Start Party 🎈';
+      }
+      partyForm.querySelectorAll('input,button').forEach(el => el.disabled = false);
+    });
+  }
+
+  // Expose a resetWizard function for the modal to call
+  window.resetWizard = function() {
+    // Reset all wizard steps and fields
+    const wizardStep1 = document.getElementById('wizardStep1');
+    const wizardStep2 = document.getElementById('wizardStep2');
+    const wizardStep3 = document.getElementById('wizardStep3');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const partyNameError = document.getElementById('partyNameError');
+    const predictionError = document.getElementById('predictionError');
+    if (wizardStep1 && wizardStep2 && wizardStep3) {
+      wizardStep1.classList.remove('hidden');
+      wizardStep2.classList.add('hidden');
+      wizardStep3.classList.add('hidden');
+    }
+    if (step1 && step2 && step3) {
+      step1.classList.add('step-active');
+      step2.classList.remove('step-active');
+      step3.classList.remove('step-active');
+      step1.classList.remove('step');
+      step2.classList.add('step');
+      step3.classList.add('step');
+    }
+    if (partyNameInput) partyNameInput.value = '';
+    if (partyNameError) partyNameError.textContent = '';
+    if (predictionError) predictionError.textContent = '';
+    const predInputs = document.querySelectorAll('input[name="hostPrediction"]');
+    predInputs.forEach(input => { input.checked = false; });
+    const reviewPartyName = document.getElementById('reviewPartyName');
+    const reviewPrediction = document.getElementById('reviewPrediction');
+    if (reviewPartyName) reviewPartyName.textContent = '';
+    if (reviewPrediction) reviewPrediction.textContent = '';
+  };
 
   // If roomId is present, show guest name input UI
   if (roomId) {
@@ -150,6 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const partyForm = document.getElementById('partyForm');
   const partyNameInput = document.getElementById('partyName');
   const partyError = document.getElementById('partyError');
+  const startPartyBtn = document.getElementById('startPartyBtn');
 
   if (partyForm) {
     partyForm.addEventListener('submit', async (e) => {
@@ -166,6 +255,11 @@ document.addEventListener('DOMContentLoaded', () => {
         partyError.textContent = 'Please select a gender prediction.';
         return;
       }
+      // Show loading spinner on Start Party button
+      if (startPartyBtn) {
+        startPartyBtn.disabled = true;
+        startPartyBtn.innerHTML = '<span class="animate-spin inline-block mr-2 w-5 h-5 border-2 border-white border-t-blue-400 rounded-full"></span>Creating...';
+      }
       const newRoomId = generateRoomId();
       const adminToken = generateAdminToken();
       if (typeof firebaseConfig !== 'undefined') {
@@ -181,6 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
         await db.ref(`parties/${newRoomId}/adminToken`).set(adminToken);
       }
       showPartyPanel({ partyName, roomId: newRoomId, adminToken });
+      // Reset Start Party button
+      if (startPartyBtn) {
+        startPartyBtn.disabled = false;
+        startPartyBtn.innerHTML = 'Start Party 🎈';
+      }
       partyForm.querySelectorAll('input,button').forEach(el => el.disabled = false);
     });
   }
