@@ -8,10 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const voteResultsPage = document.getElementById('voteResultsPage');
   const notFound = document.getElementById('notFound');
 
-  // If roomId is present, show voting/results UI
+  // If roomId is present, show guest name input UI
   if (roomId) {
     landingPage.classList.add('hidden');
-    // Fetch party info to check if room exists
     if (typeof firebaseConfig !== 'undefined') {
       firebase.initializeApp(firebaseConfig);
     }
@@ -21,61 +20,57 @@ document.addEventListener('DOMContentLoaded', () => {
       const info = snap.val();
       if (!info) {
         notFound.classList.remove('hidden');
+        notFound.querySelector('h2').textContent = 'Oops! This party link is invalid or has expired.';
         return;
       }
-      // Inject voting/results markup
+      // Show guest name input UI
       voteResultsPage.innerHTML = `
         <div id="partyInfo" class="mb-4">
-          <h1 id="partyName" class="text-2xl font-extrabold mb-1"></h1>
-          <div id="hostPrediction" class="text-lg font-semibold"></div>
+          <h1 id="partyName" class="text-2xl font-extrabold mb-1">${info.partyName || 'Gender Reveal Party'}</h1>
         </div>
-        <div id="nameSection" class="mb-4">
-          <input id="guestName" type="text" placeholder="Enter your name" class="w-full px-4 py-2 border rounded mb-2" />
-          <button id="submitNameBtn" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Continue</button>
-          <div id="nameError" class="text-red-500 text-sm mt-1"></div>
-        </div>
-        <div id="voteSection" class="hidden">
-          <p class="mb-4 font-semibold">Who do you think it is?</p>
-          <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6 w-full">
-            <button id="voteBoyBtn" class="flex-1 bg-blue-400 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded text-lg transition-all">Boy 💙</button>
-            <button id="voteGirlBtn" class="flex-1 bg-pink-400 hover:bg-pink-600 text-white font-bold py-2 px-6 rounded text-lg transition-all">Girl 💖</button>
-          </div>
-          <div id="voteMsg" class="text-green-600 font-semibold"></div>
-        </div>
-        <div id="resultsSection" class="hidden mt-6">
-          <h2 class="text-lg font-semibold mb-2">Live Results</h2>
-          <div class="mb-4">
-            <div class="flex items-center mb-2">
-              <span class="text-blue-500 text-2xl mr-2">💙</span>
-              <div class="w-full bg-blue-100 rounded h-8 flex items-center relative overflow-hidden">
-                <div id="boyBar" class="bg-blue-400 h-8 rounded-l transition-all duration-700 ease-in-out absolute left-0 top-0" style="width:0%"></div>
-                <span id="boyCount" class="ml-2 text-blue-700 font-bold relative z-10 pl-2"></span>
-              </div>
-            </div>
-            <div class="max-h-24 overflow-y-auto mb-2 bg-blue-50 rounded p-2 text-left" id="boyNames"></div>
-            <div class="flex items-center mb-2">
-              <span class="text-pink-500 text-2xl mr-2">💖</span>
-              <div class="w-full bg-pink-100 rounded h-8 flex items-center relative overflow-hidden">
-                <div id="girlBar" class="bg-pink-400 h-8 rounded-l transition-all duration-700 ease-in-out absolute left-0 top-0" style="width:0%"></div>
-                <span id="girlCount" class="ml-2 text-pink-700 font-bold relative z-10 pl-2"></span>
-              </div>
-            </div>
-            <div class="max-h-24 overflow-y-auto bg-pink-50 rounded p-2 text-left" id="girlNames"></div>
-          </div>
-        </div>
-        <div id="changePopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-          <div class="bg-white p-6 rounded shadow-lg text-center">
-            <p class="mb-4 font-bold">You can only change your vote once. Are you sure?</p>
-            <button id="confirmChangeBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2">Yes, change</button>
-            <button id="cancelChangeBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Cancel</button>
-          </div>
+        <div id="guestNameSection" class="mb-4">
+          <h2 class="text-lg font-bold mb-2">Welcome to ${info.partyName || 'the Party'}'s Gender Reveal!</h2>
+          <p class="mb-2 text-gray-700">Enter your name to join and cast your vote!</p>
+          <input id="guestName" type="text" placeholder="Your name" class="w-full px-4 py-2 border rounded mb-2" />
+          <button id="continueBtn" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center">Continue <span id="continueSpinner" class="hidden ml-2 w-4 h-4 border-2 border-white border-t-blue-400 rounded-full animate-spin"></span></button>
+          <div id="guestNameError" class="text-red-500 text-sm mt-1"></div>
         </div>
       `;
       voteResultsPage.classList.remove('hidden');
-      // Dynamically load voting/results logic
-      const script = document.createElement('script');
-      script.src = 'js/vote_results.js';
-      document.body.appendChild(script);
+      // Guest name logic
+      const guestNameInput = document.getElementById('guestName');
+      const continueBtn = document.getElementById('continueBtn');
+      const continueSpinner = document.getElementById('continueSpinner');
+      const guestNameError = document.getElementById('guestNameError');
+      continueBtn.addEventListener('click', async () => {
+        guestNameError.textContent = '';
+        const name = guestNameInput.value.trim();
+        if (!name) {
+          guestNameError.textContent = 'Please enter your name.';
+          guestNameInput.classList.add('border-red-500');
+          return;
+        }
+        continueBtn.disabled = true;
+        continueSpinner.classList.remove('hidden');
+        // Check for duplicate name in guest list
+        const guestsRef = db.ref(`rooms/${roomId}/guests`);
+        const guestsSnap = await guestsRef.once('value');
+        const guests = guestsSnap.val() || {};
+        const lower = name.toLowerCase();
+        if (Object.values(guests).some(n => n.trim().toLowerCase() === lower)) {
+          guestNameError.textContent = 'This name has already joined.';
+          guestNameInput.classList.add('border-red-500');
+          continueBtn.disabled = false;
+          continueSpinner.classList.add('hidden');
+          return;
+        }
+        // Save name to guest list
+        await guestsRef.push(name);
+        // Save to localStorage for voting/results page
+        localStorage.setItem(`name_${roomId}`, name);
+        // Redirect to vote/results page (with roomId)
+        window.location.href = `${window.location.pathname}?roomId=${roomId}`;
+      });
     });
     return;
   }
