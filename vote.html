@@ -45,6 +45,7 @@
         </div>
         <div class="max-h-24 overflow-y-auto bg-pink-50 rounded p-2 text-left" id="girlNames"></div>
       </div>
+      <button id="revealGenderBtn" class="hidden bg-yellow-400 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mb-4">Reveal Gender</button>
     </div>
   </div>
   <div id="changePopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
@@ -52,6 +53,19 @@
       <p class="mb-4 font-bold">You can only change your vote once. Are you sure?</p>
       <button id="confirmChangeBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2">Yes, change</button>
       <button id="cancelChangeBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Cancel</button>
+    </div>
+  </div>
+  <div id="revealPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded shadow-lg text-center">
+      <p class="mb-4 font-bold">Are you sure you want to reveal the result?</p>
+      <button id="confirmRevealBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-2">Yes, reveal</button>
+      <button id="cancelRevealBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">Cancel</button>
+    </div>
+  </div>
+  <div id="finalReveal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-8 rounded shadow-lg text-center">
+      <h2 id="finalRevealMsg" class="text-3xl font-extrabold mb-4"></h2>
+      <div id="finalConfetti" class="text-5xl"></div>
     </div>
   </div>
   <script src="firebaseConfig.js"></script>
