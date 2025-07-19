@@ -1,7 +1,7 @@
 // js/app.js for landing and dynamic voting/results page
 // Handles: party creation, QR, and dynamic voting/results if ?roomId=xxx
 
-// Firebase initialization guard
+// Firebase initialization - must happen before any Firebase operations
 if (typeof firebaseConfig !== 'undefined' && !firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
@@ -94,24 +94,30 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('partyForm submit event fired');
       e.preventDefault();
       try {
-        if (typeof firebase !== 'undefined') {
-          const db = firebase.database();
-          const roomId = db.ref('parties').push().key;
-          const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
-          const partyName = partyNameInput.value.trim();
-          const prediction = partyForm.hostPrediction.value;
-          console.log('Creating party:', { partyName, prediction, roomId, adminToken });
-          await db.ref(`parties/${roomId}/info`).set({
-            partyName,
-            prediction,
-            createdAt: firebase.database.ServerValue.TIMESTAMP
-          });
-          await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
-          showPartyPanel({ partyName, roomId, adminToken });
-          console.log('Party panel shown');
+        // Ensure Firebase is initialized
+        if (typeof firebase === 'undefined') {
+          throw new Error('Firebase is not loaded');
         }
+        
+        const db = firebase.database();
+        const roomId = db.ref('parties').push().key;
+        const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
+        const partyName = partyNameInput.value.trim();
+        const prediction = partyForm.hostPrediction.value;
+        console.log('Creating party:', { partyName, prediction, roomId, adminToken });
+        await db.ref(`parties/${roomId}/info`).set({
+          partyName,
+          prediction,
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        });
+        await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
+        showPartyPanel({ partyName, roomId, adminToken });
+        console.log('Party panel shown');
       } catch (err) {
         console.error('Error creating party:', err);
+        if (partyError) {
+          partyError.textContent = 'Error creating party. Please try again.';
+        }
       }
     });
   }
@@ -154,8 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // If roomId is present, show guest name input UI
   if (roomId) {
     landingPage.classList.add('hidden');
-    if (typeof firebaseConfig !== 'undefined') {
-      firebase.initializeApp(firebaseConfig);
+    // Firebase is already initialized at the top level
+    if (typeof firebase === 'undefined') {
+      console.error('Firebase is not loaded');
+      return;
     }
     const db = firebase.database();
     const infoRef = db.ref(`parties/${roomId}`);
