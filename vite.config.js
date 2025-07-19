@@ -5,12 +5,7 @@ export default defineConfig({
   publicDir: '../public',
   build: {
     outDir: '../dist',
-    assetsDir: 'assets',
-    rollupOptions: {
-      input: {
-        main: 'index.html'
-      }
-    }
+    assetsDir: 'assets'
   },
   server: {
     port: 3000,
