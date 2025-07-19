@@ -58,40 +58,30 @@ This app requires Firebase Realtime Database. Follow these steps:
    - Register your app and copy the config
 
 4. **Set Up Environment Variables:**
-   - Copy `env.template` to `.env`
-   - Replace the placeholder values with your actual Firebase config:
 
-```bash
-# Copy the template
-cp env.template .env
+   **For Local Development:**
+   ```bash
+   # Copy the template
+   cp env.template .env
+   
+   # Edit .env with your Firebase credentials
+   VITE_FIREBASE_API_KEY=your_actual_api_key_here
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_DATABASE_URL=https://your_project-default-rtdb.firebaseio.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+   VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
+   VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+   ```
 
-# Edit .env with your Firebase credentials
-VITE_FIREBASE_API_KEY=your_actual_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_DATABASE_URL=https://your_project-default-rtdb.firebaseio.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
-VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
-VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
-```
+   **For Production (Vercel):**
+   - Go to your Vercel project dashboard
+   - Navigate to Settings → Environment Variables
+   - Add all the Firebase environment variables listed above
+   - Redeploy your app
 
-5. **Update the Configuration (Alternative):**
-   - If you prefer to hardcode values, open `firebaseConfig.js`
-   - Replace the placeholder values with your actual Firebase config:
-
-```javascript
-const firebaseConfig = {
-  apiKey: "your_actual_api_key",
-  authDomain: "your_project.firebaseapp.com",
-  databaseURL: "https://your_project-default-rtdb.firebaseio.com",
-  projectId: "your_project",
-  storageBucket: "your_project.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890",
-  measurementId: "G-XXXXXXXXXX"
-};
-```
+**⚠️ Security Note:** Never commit your `.env` file to Git. The `.gitignore` file is already configured to exclude it.
 
 ### 2. Database Rules
 
