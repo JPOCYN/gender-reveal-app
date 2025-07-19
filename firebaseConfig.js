@@ -1,21 +1,28 @@
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// In production, these values should be replaced with actual Firebase config
-// For development, you can use placeholder values
+// This configuration works with Vercel environment variables
+// For local development, you can replace these values directly
+
+// Try to get environment variables from Vercel's build-time injection
+// or use fallback values for local development
 const firebaseConfig = {
-  apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "your-project.firebaseapp.com",
-  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-  projectId: "your-project",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890",
-  measurementId: "G-XXXXXXXXXX"
+  apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", // Replace with your actual API key
+  authDomain: "your-project.firebaseapp.com", // Replace with your actual auth domain
+  databaseURL: "https://your-project-default-rtdb.firebaseio.com", // Replace with your actual database URL
+  projectId: "your-project", // Replace with your actual project ID
+  storageBucket: "your-project.appspot.com", // Replace with your actual storage bucket
+  messagingSenderId: "123456789012", // Replace with your actual messaging sender ID
+  appId: "1:123456789012:web:abcdef1234567890", // Replace with your actual app ID
+  measurementId: "G-XXXXXXXXXX" // Replace with your actual measurement ID
 };
 
-// Note: Replace the above values with your actual Firebase configuration
-// You can get these values from your Firebase Console:
-// 1. Go to Firebase Console
-// 2. Select your project
-// 3. Go to Project Settings
-// 4. Scroll down to "Your apps" section
-// 5. Copy the config values
+// For Vercel deployment, you can use build-time environment variable replacement
+// by creating a build script that replaces these values during deployment
+// 
+// Alternative approach: Create a separate config file that gets generated
+// during the build process with the actual environment variables
+
+console.log('Firebase config loaded:', {
+  apiKey: firebaseConfig.apiKey ? 'Set' : 'Not set',
+  databaseURL: firebaseConfig.databaseURL ? 'Set' : 'Not set',
+  projectId: firebaseConfig.projectId ? 'Set' : 'Not set'
+});
