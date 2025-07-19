@@ -22,21 +22,33 @@ function initializeFirebase() {
   try {
     console.log('Checking Firebase availability...', {
       firebaseDefined: typeof firebase !== 'undefined',
+      firebaseApp: typeof firebase !== 'undefined' ? typeof firebase.app : 'N/A',
+      firebaseApps: typeof firebase !== 'undefined' ? typeof firebase.apps : 'N/A',
       appsLength: typeof firebase !== 'undefined' ? firebase.apps.length : 'N/A'
     });
     
-    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    // Check if Firebase SDK is fully loaded
+    if (typeof firebase === 'undefined') {
+      console.log('Firebase SDK not loaded yet');
+      return false;
+    }
+    
+    // Check if Firebase.app is available (indicates SDK is fully loaded)
+    if (typeof firebase.app === 'undefined') {
+      console.log('Firebase.app not available yet');
+      return false;
+    }
+    
+    if (!firebase.apps.length) {
+      console.log('Initializing Firebase...');
       firebase.initializeApp(firebaseConfig);
       console.log('Firebase initialized successfully');
       window.firebaseReady = true;
       return true;
-    } else if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+    } else {
       console.log('Firebase already initialized');
       window.firebaseReady = true;
       return true;
-    } else {
-      console.log('Firebase SDK not yet loaded, waiting...');
-      return false;
     }
   } catch (error) {
     console.error('Error initializing Firebase:', error);
@@ -46,24 +58,31 @@ function initializeFirebase() {
 
 // Create a promise that resolves when Firebase is ready
 window.firebaseInitPromise = new Promise((resolve, reject) => {
+  console.log('Creating Firebase init promise...');
+  
   // Try to initialize immediately
   if (initializeFirebase()) {
+    console.log('Firebase initialized immediately');
     resolve();
     return;
   }
   
   // Wait for Firebase to be available
   let attempts = 0;
-  const maxAttempts = 50; // 5 seconds
+  const maxAttempts = 100; // 10 seconds
   
   const checkFirebase = setInterval(() => {
     attempts++;
+    console.log(`Firebase init attempt ${attempts}/${maxAttempts}...`);
+    
     if (initializeFirebase()) {
       clearInterval(checkFirebase);
+      console.log('Firebase initialized successfully after waiting');
       resolve();
     } else if (attempts >= maxAttempts) {
       clearInterval(checkFirebase);
-      reject(new Error('Firebase SDK failed to load within 5 seconds'));
+      console.error('Firebase SDK failed to load within 10 seconds');
+      reject(new Error('Firebase SDK failed to load within 10 seconds'));
     }
   }, 100);
 });
