@@ -326,7 +326,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Translation helper function that supports interpolation
   function t(key, params = {}) {
-    let text = getTranslation(key);
+    // Always get fresh translation for current language
+    let text = getTranslation(key, localStorage.getItem('lang') || 'en');
     if (params && typeof params === 'object') {
       Object.keys(params).forEach(param => {
         const regex = new RegExp(`{{${param}}}`, 'g');
@@ -360,11 +361,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   
+  // Initialize guest counter with correct language on page load
+  function initializeGuestCounter() {
+    if (guestCounter && isAdmin) {
+      updateGuestCounter(0); // Start with 0 guests but correct language
+    }
+  }
+  
   // Function to refresh guest counter when language changes
   function refreshGuestCounter() {
-    if (currentGuestCount > 0) {
-      updateGuestCounter(currentGuestCount);
-    }
+    // Update guest counter even if count is 0 to show correct language
+    updateGuestCounter(currentGuestCount);
   }
   
   // Function to refresh admin badge tooltip when language changes
@@ -570,6 +577,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Show guest counter for admin (party header is always visible now)
     if (guestCounter) guestCounter.classList.remove('hidden');
+    
+    // Initialize guest counter with correct language
+    initializeGuestCounter();
     
     // Load and display party name
     infoRef.once('value').then(snap => {
