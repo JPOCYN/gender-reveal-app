@@ -2,39 +2,67 @@
 // Uses environment variables for security in production
 // For local development, create a .env file with your Firebase credentials
 
-// Safely access environment variables - NO FALLBACKS for security
-const getEnvVar = (key) => {
+// Safely access environment variables with proper fallbacks for development
+const getEnvVar = (key, fallback = null) => {
   try {
+    // Try to get from Vite environment variables
     const value = import.meta.env?.[key];
-    if (!value) {
-      throw new Error(`Required environment variable ${key} is not set`);
+    if (value) {
+      return value;
     }
-    return value;
+    
+    // Try to get from process.env (Node.js environments)
+    if (typeof process !== 'undefined' && process.env?.[key]) {
+      return process.env[key];
+    }
+    
+    // Use fallback only in development mode
+    if (fallback && (import.meta.env?.DEV || import.meta.env?.MODE === 'development')) {
+      console.warn(`Using fallback for ${key} in development mode`);
+      return fallback;
+    }
+    
+    // In production without environment variable, throw error
+    throw new Error(`Required environment variable ${key} is not set. Please configure it in your hosting platform.`);
   } catch (error) {
-    console.error(`Critical error: Environment variable ${key} is required but not set`);
+    console.error(`Environment variable error for ${key}:`, error.message);
     throw error;
   }
 };
 
 const firebaseConfig = {
-  apiKey: getEnvVar('VITE_FIREBASE_API_KEY'),
-  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN'),
-  databaseURL: getEnvVar('VITE_FIREBASE_DATABASE_URL'),
-  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID'),
-  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET'),
-  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID'),
-  appId: getEnvVar('VITE_FIREBASE_APP_ID'),
-  measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID')
+  apiKey: getEnvVar('VITE_FIREBASE_API_KEY', "AIzaSyD7TJLAv20tPheXff5o5rXc_aMRSQrYL-g"),
+  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN', "gender-reveal-app-7dc64.firebaseapp.com"),
+  databaseURL: getEnvVar('VITE_FIREBASE_DATABASE_URL', "https://gender-reveal-app-7dc64-default-rtdb.asia-southeast1.firebasedatabase.app"),
+  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID', "gender-reveal-app-7dc64"),
+  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET', "gender-reveal-app-7dc64.firebasestorage.app"),
+  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', "306658063612"),
+  appId: getEnvVar('VITE_FIREBASE_APP_ID', "1:306658063612:web:02554c3599ff65cce0d379"),
+  measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID', "G-ZP2PTQP8Q4")
 };
+
+// Environment variable debug information
+console.log('🔧 Firebase Environment Debug:', {
+  mode: import.meta.env?.MODE || 'unknown',
+  dev: import.meta.env?.DEV || false,
+  prod: import.meta.env?.PROD || false,
+  hasViteEnv: !!import.meta.env,
+  envVars: {
+    apiKey: import.meta.env?.VITE_FIREBASE_API_KEY ? '✅ Set' : '❌ Missing',
+    authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN ? '✅ Set' : '❌ Missing',
+    databaseURL: import.meta.env?.VITE_FIREBASE_DATABASE_URL ? '✅ Set' : '❌ Missing',
+    projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID ? '✅ Set' : '❌ Missing'
+  }
+});
 
 // Log the actual config being used (for debugging)
 console.log('Firebase config being used:', {
-  apiKey: firebaseConfig.apiKey.substring(0, 10) + '...',
+  apiKey: firebaseConfig.apiKey ? firebaseConfig.apiKey.substring(0, 10) + '...' : 'MISSING',
   authDomain: firebaseConfig.authDomain,
   databaseURL: firebaseConfig.databaseURL,
   projectId: firebaseConfig.projectId,
   hasDatabaseURL: !!firebaseConfig.databaseURL,
-  databaseURLLength: firebaseConfig.databaseURL ? firebaseConfig.databaseURL.length : 0
+  configSource: import.meta.env?.VITE_FIREBASE_API_KEY ? 'Environment Variables' : 'Fallback Values'
 });
 
 // Global Firebase ready state
