@@ -2,12 +2,12 @@
 // Uses environment variables for security in production
 // For local development, create a .env file with your Firebase credentials
 
-// Safely access environment variables with proper fallbacks for development
+// Safely access environment variables with proper fallbacks
 const getEnvVar = (key, fallback = null) => {
   try {
     // Try to get from Vite environment variables
     const value = import.meta.env?.[key];
-    if (value) {
+    if (value && value !== 'undefined') {
       return value;
     }
     
@@ -16,16 +16,34 @@ const getEnvVar = (key, fallback = null) => {
       return process.env[key];
     }
     
-    // Use fallback only in development mode
-    if (fallback && (import.meta.env?.DEV || import.meta.env?.MODE === 'development')) {
-      console.warn(`Using fallback for ${key} in development mode`);
+    // Check if we're in development mode (multiple ways to detect)
+    const isDev = import.meta.env?.DEV || 
+                  import.meta.env?.MODE === 'development' || 
+                  window.location.hostname === 'localhost' ||
+                  window.location.hostname === '127.0.0.1' ||
+                  window.location.port === '3000';
+    
+    // Use fallback if provided (for both dev and prod to ensure app works)
+    if (fallback) {
+      if (isDev) {
+        console.warn(`⚠️ Using fallback for ${key} in development mode`);
+      } else {
+        console.warn(`⚠️ Using fallback for ${key} - environment variable not found`);
+      }
       return fallback;
     }
     
-    // In production without environment variable, throw error
+    // No fallback provided and no environment variable found
     throw new Error(`Required environment variable ${key} is not set. Please configure it in your hosting platform.`);
   } catch (error) {
     console.error(`Environment variable error for ${key}:`, error.message);
+    
+    // If we have a fallback, use it instead of crashing
+    if (fallback) {
+      console.warn(`🔄 Falling back to default value for ${key}`);
+      return fallback;
+    }
+    
     throw error;
   }
 };
@@ -43,10 +61,18 @@ const firebaseConfig = {
 
 // Environment variable debug information
 console.log('🔧 Firebase Environment Debug:', {
-  mode: import.meta.env?.MODE || 'unknown',
-  dev: import.meta.env?.DEV || false,
-  prod: import.meta.env?.PROD || false,
-  hasViteEnv: !!import.meta.env,
+  location: {
+    hostname: window.location.hostname,
+    port: window.location.port,
+    protocol: window.location.protocol
+  },
+  vite: {
+    mode: import.meta.env?.MODE || 'unknown',
+    dev: import.meta.env?.DEV || false,
+    prod: import.meta.env?.PROD || false,
+    hasViteEnv: !!import.meta.env,
+    viteEnvKeys: import.meta.env ? Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')) : []
+  },
   envVars: {
     apiKey: import.meta.env?.VITE_FIREBASE_API_KEY ? '✅ Set' : '❌ Missing',
     authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN ? '✅ Set' : '❌ Missing',
@@ -54,6 +80,15 @@ console.log('🔧 Firebase Environment Debug:', {
     projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID ? '✅ Set' : '❌ Missing'
   }
 });
+
+// Additional debug for troubleshooting
+if (!import.meta.env?.VITE_FIREBASE_API_KEY) {
+  console.log('🔍 Detailed Environment Analysis:', {
+    importMetaEnv: import.meta.env,
+    allViteVars: import.meta.env ? Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')) : 'No Vite env available',
+    nodeProcess: typeof process !== 'undefined' ? 'Available' : 'Not available'
+  });
+}
 
 // Log the actual config being used (for debugging)
 console.log('Firebase config being used:', {

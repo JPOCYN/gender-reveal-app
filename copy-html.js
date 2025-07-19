@@ -32,7 +32,7 @@ const copyDir = (src, dest) => {
 };
 
 // Copy HTML files
-const htmlFiles = ['wizard.html', 'vote.html', 'result.html'];
+const htmlFiles = ['wizard.html', 'vote.html', 'result.html', 'debug.html'];
 htmlFiles.forEach(file => {
   const sourcePath = path.join(__dirname, 'src', file);
   const destPath = path.join(__dirname, 'dist', file);
