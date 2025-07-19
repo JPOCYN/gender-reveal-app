@@ -118,28 +118,29 @@
     /* Fullscreen Layout Styles */
     .fullscreen-layout {
       min-height: 100vh !important;
-      background: linear-gradient(135deg, #fdf2f8 0%, #dbeafe 50%, #fef3c7 100%) !important;
-      padding: 2rem !important;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      padding: 0 !important;
       display: flex !important;
       flex-direction: column !important;
       justify-content: center !important;
-      align-items: center !important;
-      overflow-y: auto !important;
+      align-items: stretch !important;
+      overflow: hidden !important;
     }
     
     .fullscreen-layout .w-full.max-w-6xl {
-      max-width: min(1200px, 85vw) !important;
+      max-width: none !important;
       width: 100% !important;
-      background: rgba(255, 255, 255, 0.95) !important;
-      backdrop-filter: blur(10px) !important;
-      border-radius: 2rem !important;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1) !important;
-      padding: 2rem !important;
-      margin: auto !important;
+      background: transparent !important;
+      backdrop-filter: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 3rem 4rem !important;
+      margin: 0 !important;
       display: flex !important;
       flex-direction: column !important;
-      align-items: center !important;
+      align-items: stretch !important;
       justify-content: center !important;
+      flex: 1 !important;
     }
     
     /* Fullscreen Results Container */
@@ -147,18 +148,21 @@
       transform: none !important;
       margin: 0 !important;
       width: 100% !important;
-      max-width: 800px !important;
-      margin: 0 auto !important;
+      max-width: none !important;
+      margin: 0 !important;
       display: flex !important;
       flex-direction: column !important;
-      gap: 1.5rem !important;
+      gap: 2rem !important;
+      align-items: stretch !important;
     }
     
     .fullscreen-layout .party-display-mode h2 {
-      font-size: clamp(2rem, 5vw, 3.5rem) !important;
-      margin-bottom: 1rem !important;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1) !important;
+      font-size: clamp(2.5rem, 6vw, 4rem) !important;
+      margin-bottom: 2rem !important;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2) !important;
       text-align: center !important;
+      color: white !important;
+      font-weight: 900 !important;
     }
     
     /* Vote Bars Styling */
@@ -166,44 +170,58 @@
       width: 100% !important;
       display: flex !important;
       flex-direction: column !important;
-      gap: 1.5rem !important;
-      margin: 1rem 0 !important;
+      gap: 2rem !important;
+      margin: 2rem 0 !important;
+      max-width: 1200px !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
     }
     
     .fullscreen-layout .party-display-mode .flex.items-center {
-      margin-bottom: 1rem !important;
+      margin-bottom: 1.5rem !important;
       width: 100% !important;
       display: flex !important;
       align-items: center !important;
-      gap: 1rem !important;
+      gap: 1.5rem !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      padding: 1.5rem !important;
+      border-radius: 1.5rem !important;
+      backdrop-filter: blur(10px) !important;
     }
     
     .fullscreen-layout .party-display-mode .w-full.bg-blue-100,
     .fullscreen-layout .party-display-mode .w-full.bg-pink-100 {
-      height: clamp(2.5rem, 4vw, 3.5rem) !important;
+      height: clamp(3rem, 5vw, 4rem) !important;
       border-radius: 2rem !important;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
       flex: 1 !important;
       min-width: 0 !important;
+      background: rgba(255, 255, 255, 0.2) !important;
     }
     
     .fullscreen-layout .party-display-mode .bg-blue-400,
     .fullscreen-layout .party-display-mode .bg-pink-400 {
-      height: clamp(2.5rem, 4vw, 3.5rem) !important;
+      height: clamp(3rem, 5vw, 4rem) !important;
       border-radius: 2rem !important;
       transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
     }
     
     .fullscreen-layout .party-display-mode .text-2xl {
-      font-size: clamp(1.5rem, 3vw, 2.5rem) !important;
+      font-size: clamp(2rem, 4vw, 3rem) !important;
       flex-shrink: 0 !important;
+      color: white !important;
+      font-weight: 900 !important;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
     }
     
     .fullscreen-layout .party-display-mode .text-blue-700,
     .fullscreen-layout .party-display-mode .text-pink-700 {
-      font-size: clamp(1.25rem, 2.5vw, 2rem) !important;
-      font-weight: bold !important;
-      padding-left: 1rem !important;
+      font-size: clamp(1.5rem, 3vw, 2.5rem) !important;
+      font-weight: 900 !important;
+      padding-left: 1.5rem !important;
+      color: white !important;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
     }
     
     /* Name Lists Styling */
@@ -236,78 +254,140 @@
     
     /* Reveal Button Styling */
     .fullscreen-layout .party-display-mode #revealGenderBtn {
-      font-size: clamp(1.25rem, 2.5vw, 2rem) !important;
-      padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1.5rem, 3vw, 2.5rem) !important;
-      margin: 2rem auto 0 !important;
-      border-radius: 1.5rem !important;
-      box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4) !important;
+      font-size: clamp(1.5rem, 3vw, 2.5rem) !important;
+      padding: clamp(1rem, 2vw, 1.5rem) clamp(2rem, 4vw, 3rem) !important;
+      margin: 3rem auto 0 !important;
+      border-radius: 2rem !important;
+      box-shadow: 0 12px 32px rgba(251, 191, 36, 0.6) !important;
       animation: pulse-glow 2s infinite !important;
-      max-width: 300px !important;
+      max-width: 400px !important;
       width: auto !important;
       display: block !important;
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%) !important;
+      border: none !important;
+      color: white !important;
+      font-weight: 900 !important;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    .fullscreen-layout .party-display-mode #revealGenderBtn:hover {
+      transform: translateY(-4px) !important;
+      box-shadow: 0 16px 40px rgba(251, 191, 36, 0.8) !important;
     }
     
     /* Mobile Responsive */
     @media (max-width: 768px) {
       .fullscreen-layout {
-        padding: 1rem !important;
+        padding: 0 !important;
       }
       
       .fullscreen-layout .w-full.max-w-6xl {
-        max-width: 95vw !important;
-        padding: 1.5rem !important;
+        padding: 2rem 1rem !important;
       }
       
       .fullscreen-layout .party-display-mode {
-        gap: 1rem !important;
+        gap: 1.5rem !important;
         max-width: 100% !important;
       }
       
       .fullscreen-layout .party-display-mode h2 {
-        font-size: clamp(1.5rem, 4vw, 2.5rem) !important;
+        font-size: clamp(2rem, 6vw, 3rem) !important;
+        margin-bottom: 1.5rem !important;
+      }
+      
+      .fullscreen-layout .party-display-mode .mb-4 {
+        max-width: 100% !important;
+        margin: 1.5rem 0 !important;
+        gap: 1.5rem !important;
       }
       
       .fullscreen-layout .party-display-mode .flex.items-center {
         flex-direction: column !important;
-        gap: 0.5rem !important;
+        gap: 1rem !important;
         align-items: stretch !important;
+        padding: 1rem !important;
       }
       
       .fullscreen-layout .party-display-mode .text-2xl {
-        font-size: clamp(1rem, 2.5vw, 1.5rem) !important;
+        font-size: clamp(1.5rem, 4vw, 2rem) !important;
         text-align: center !important;
       }
       
       .fullscreen-layout .party-display-mode .text-blue-700,
       .fullscreen-layout .party-display-mode .text-pink-700 {
-        font-size: clamp(0.875rem, 2vw, 1.25rem) !important;
+        font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
         text-align: center !important;
         padding-left: 0 !important;
       }
       
-      .fullscreen-layout .party-display-mode .mb-4 > .max-h-24 {
-        width: 100% !important;
-        margin-right: 0 !important;
-        margin-bottom: 0.5rem !important;
-      }
-      
       .fullscreen-layout .party-display-mode #revealGenderBtn {
-        font-size: clamp(1rem, 2.5vw, 1.5rem) !important;
-        padding: 0.75rem 1.5rem !important;
+        font-size: clamp(1.25rem, 3vw, 2rem) !important;
+        padding: 1rem 2rem !important;
         width: 100% !important;
         max-width: none !important;
+        margin: 2rem auto 0 !important;
+      }
+      
+      /* Mobile floating controls */
+      .floating-controls {
+        top: 1rem !important;
+        left: 1rem !important;
+        gap: 0.75rem !important;
+      }
+      
+      .floating-controls button {
+        padding: 0.6rem 0.8rem !important;
+        font-size: 0.875rem !important;
+        min-width: 90px !important;
       }
     }
     
     /* Tablet Responsive */
     @media (min-width: 769px) and (max-width: 1024px) {
       .fullscreen-layout .w-full.max-w-6xl {
-        max-width: 90vw !important;
-        padding: 2rem !important;
+        padding: 3rem 2rem !important;
       }
       
       .fullscreen-layout .party-display-mode {
-        max-width: 700px !important;
+        max-width: 900px !important;
+      }
+      
+      .fullscreen-layout .party-display-mode .mb-4 {
+        max-width: 800px !important;
+      }
+      
+      .fullscreen-layout .party-display-mode h2 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem) !important;
+      }
+      
+      .fullscreen-layout .party-display-mode .text-2xl {
+        font-size: clamp(1.75rem, 3.5vw, 2.5rem) !important;
+      }
+      
+      .fullscreen-layout .party-display-mode .text-blue-700,
+      .fullscreen-layout .party-display-mode .text-pink-700 {
+        font-size: clamp(1.25rem, 2.5vw, 2rem) !important;
+      }
+    }
+    
+    /* Ultra-wide monitor support */
+    @media (min-width: 1440px) {
+      .fullscreen-layout .party-display-mode .mb-4 {
+        max-width: 1400px !important;
+      }
+      
+      .fullscreen-layout .party-display-mode h2 {
+        font-size: clamp(3rem, 4vw, 4.5rem) !important;
+      }
+      
+      .fullscreen-layout .party-display-mode .text-2xl {
+        font-size: clamp(2.5rem, 3vw, 3.5rem) !important;
+      }
+      
+      .fullscreen-layout .party-display-mode .text-blue-700,
+      .fullscreen-layout .party-display-mode .text-pink-700 {
+        font-size: clamp(2rem, 2.5vw, 3rem) !important;
       }
     }
     
@@ -367,27 +447,90 @@
       z-index: 50;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 1rem;
     }
     
     .floating-controls button {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border: 2px solid rgba(0, 0, 0, 0.1);
-      border-radius: 0.75rem;
-      padding: 0.5rem 0.75rem;
+      border-radius: 1rem;
+      padding: 0.75rem 1rem;
       font-weight: bold;
-      font-size: 0.875rem;
+      font-size: 1rem;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
       white-space: nowrap;
-      min-width: 80px;
+      min-width: 100px;
+      color: #374151;
     }
     
     .floating-controls button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
       background: rgba(255, 255, 255, 1);
+    }
+    
+    /* QR Modal */
+    .qr-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .qr-modal.show {
+      display: flex;
+    }
+    
+    .qr-modal-content {
+      background: white;
+      border-radius: 2rem;
+      padding: 3rem;
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+    
+    .qr-modal h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #374151;
+    }
+    
+    .qr-modal .qr-code {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: #f9fafb;
+      border-radius: 1rem;
+    }
+    
+    .qr-modal .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .qr-modal .close-btn:hover {
+      background: white;
+      transform: scale(1.1);
     }
     
     /* Responsive floating controls */

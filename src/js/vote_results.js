@@ -371,18 +371,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       existingControls.remove();
     }
     
+    // Create QR modal
+    const qrModal = document.createElement('div');
+    qrModal.id = 'qrModal';
+    qrModal.className = 'qr-modal';
+    qrModal.innerHTML = `
+      <div class="qr-modal-content">
+        <button class="close-btn" onclick="closeQRModal()">✕</button>
+        <h3>Guest Voting Link</h3>
+        <p>Share this QR code with your guests to let them vote!</p>
+        <div class="qr-code" id="modalQRCode"></div>
+        <p class="text-sm text-gray-600 mt-4">Scan with your phone camera to open the voting page</p>
+      </div>
+    `;
+    document.body.appendChild(qrModal);
+    
     const controls = document.createElement('div');
     controls.id = 'enhancedFloatingControls';
     controls.className = 'floating-controls';
     controls.innerHTML = `
       <button id="qrToggleBtn" class="hover:bg-blue-100">
-        📱 QR
+        📱 QR Code
       </button>
       <button id="homeBtn" class="hover:bg-gray-100">
         🏠 Home
       </button>
       <button id="confettiBtn" class="hover:bg-pink-100">
-        🎉 Party
+        🎉 Party Mode
       </button>
     `;
     document.body.appendChild(controls);
@@ -392,12 +407,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const target = e.target;
       
       if (target.id === 'qrToggleBtn') {
-        const qrElement = document.querySelector('.bg-gradient-to-br.from-pink-50.to-blue-50');
-        if (qrElement) {
-          qrElement.classList.toggle('hidden');
-          // Update button text
-          target.innerHTML = qrElement.classList.contains('hidden') ? '📱 QR' : '❌ Hide';
-        }
+        showQRModal();
       }
       
       if (target.id === 'homeBtn') {
@@ -414,6 +424,47 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+  
+  // QR Modal functions
+  function showQRModal() {
+    const modal = document.getElementById('qrModal');
+    const qrContainer = document.getElementById('modalQRCode');
+    
+    if (modal && qrContainer) {
+      // Generate QR code for the current page
+      const currentURL = window.location.href;
+      qrContainer.innerHTML = '';
+      
+      // Use QRCode library to generate QR code
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+          text: currentURL,
+          width: 200,
+          height: 200,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+      
+      modal.classList.add('show');
+    }
+  }
+  
+  function closeQRModal() {
+    const modal = document.getElementById('qrModal');
+    if (modal) {
+      modal.classList.remove('show');
+    }
+  }
+  
+  // Close modal when clicking outside
+  document.addEventListener('click', (e) => {
+    const modal = document.getElementById('qrModal');
+    if (modal && e.target === modal) {
+      closeQRModal();
+    }
+  });
 
   function hideEnhancedFloatingControls() {
     const controls = document.getElementById('enhancedFloatingControls');
