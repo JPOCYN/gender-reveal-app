@@ -91,14 +91,16 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script src="js/qrcode.min.js"></script>
   <script src="js/vote_results.js"></script>
-  <script src="translations.js"></script>
-  <script>
+  <script type="module">
+    import { TRANSLATIONS } from './translations.js';
+    
     // Language switching logic
     const langBtns = document.querySelectorAll('.lang-btn');
     const i18nEls = document.querySelectorAll('[data-i18n]');
+    
     function setLang(lang) {
       localStorage.setItem('lang', lang);
-      const t = window.TRANSLATIONS[lang] || window.TRANSLATIONS['en'];
+      const t = TRANSLATIONS[lang] || TRANSLATIONS['en'];
       i18nEls.forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.innerHTML = t[key];
@@ -111,9 +113,11 @@
         }
       });
     }
+    
     langBtns.forEach(btn => {
       btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
     });
+    
     setLang(localStorage.getItem('lang') || 'en');
   </script>
 </body>

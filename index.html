@@ -75,14 +75,16 @@
     <div><span data-i18n="footer">Made with ♥ for families & friends. | Creator: </span><span class="font-bold" data-i18n="creator">OC</span></div>
     <div class="mt-2 text-xs text-gray-500" data-i18n="adminF11Tip">Tip: On the admin/share page, press <span class='font-bold'>F11</span> to enter full screen for the best party experience!</div>
   </footer>
-  <script src="translations.js"></script>
-  <script>
+  <script type="module">
+    import { TRANSLATIONS } from './translations.js';
+    
     // Language switching logic
     const langBtns = document.querySelectorAll('.lang-btn');
     const i18nEls = document.querySelectorAll('[data-i18n]');
+    
     function setLang(lang) {
       localStorage.setItem('lang', lang);
-      const t = window.TRANSLATIONS[lang] || window.TRANSLATIONS['en'];
+      const t = TRANSLATIONS[lang] || TRANSLATIONS['en'];
       i18nEls.forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (t[key]) el.textContent = t[key];
@@ -96,9 +98,11 @@
         }
       });
     }
+    
     langBtns.forEach(btn => {
       btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
     });
+    
     // On load, set language from localStorage or default to English
     setLang(localStorage.getItem('lang') || 'en');
   </script>

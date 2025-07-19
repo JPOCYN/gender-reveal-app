@@ -15,7 +15,29 @@ A beautiful, interactive gender reveal party app with real-time voting and live 
 
 ## Setup Instructions
 
-### 1. Firebase Configuration
+### Local Development
+
+1. **Clone or download** this repository
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Configure Firebase** (see Firebase Setup below)
+4. **Run locally:**
+   ```bash
+   npm run dev
+   ```
+5. Open http://localhost:3000 in your browser
+
+### Production Deployment
+
+1. **Build for production:**
+   ```bash
+   npm run build
+   ```
+2. **Deploy** the `dist` folder to your preferred hosting service
+
+### Firebase Setup
 
 This app requires Firebase Realtime Database. Follow these steps:
 
@@ -35,8 +57,27 @@ This app requires Firebase Realtime Database. Follow these steps:
    - Click the web app icon (</>)
    - Register your app and copy the config
 
-4. **Update the Configuration:**
-   - Open `firebaseConfig.js`
+4. **Set Up Environment Variables:**
+   - Copy `env.template` to `.env`
+   - Replace the placeholder values with your actual Firebase config:
+
+```bash
+# Copy the template
+cp env.template .env
+
+# Edit .env with your Firebase credentials
+VITE_FIREBASE_API_KEY=your_actual_api_key_here
+VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://your_project-default-rtdb.firebaseio.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
+VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef1234567890
+VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+5. **Update the Configuration (Alternative):**
+   - If you prefer to hardcode values, open `firebaseConfig.js`
    - Replace the placeholder values with your actual Firebase config:
 
 ```javascript

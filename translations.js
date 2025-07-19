@@ -1,4 +1,4 @@
-window.TRANSLATIONS = {
+export const TRANSLATIONS = {
   en: {
     heroTitle: "Gender Reveal Party App",
     heroSubtitle: "Create your own magical gender reveal experience. Invite guests, gather predictions, and reveal in style!",
