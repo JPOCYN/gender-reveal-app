@@ -143,20 +143,12 @@
     }
     
     /* Fullscreen Results Container */
-    .fullscreen-results-container {
-      width: 100% !important;
-      max-width: 800px !important;
-      margin: 0 auto !important;
-      display: flex !important;
-      flex-direction: column !important;
-      gap: 2rem !important;
-      align-items: center !important;
-    }
-    
     .fullscreen-layout .party-display-mode {
       transform: none !important;
       margin: 0 !important;
       width: 100% !important;
+      max-width: 800px !important;
+      margin: 0 auto !important;
       display: flex !important;
       flex-direction: column !important;
       gap: 1.5rem !important;
@@ -169,8 +161,8 @@
       text-align: center !important;
     }
     
-    /* Vote Bars Container */
-    .fullscreen-layout .vote-bars-container {
+    /* Vote Bars Styling */
+    .fullscreen-layout .party-display-mode .mb-4 {
       width: 100% !important;
       display: flex !important;
       flex-direction: column !important;
@@ -179,7 +171,7 @@
     }
     
     .fullscreen-layout .party-display-mode .flex.items-center {
-      margin-bottom: 0 !important;
+      margin-bottom: 1rem !important;
       width: 100% !important;
       display: flex !important;
       align-items: center !important;
@@ -214,15 +206,7 @@
       padding-left: 1rem !important;
     }
     
-    /* Name Lists Container */
-    .fullscreen-layout .names-container {
-      width: 100% !important;
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: 1rem !important;
-      margin-top: 1rem !important;
-    }
-    
+    /* Name Lists Styling */
     .fullscreen-layout .party-display-mode .max-h-24 {
       max-height: clamp(6rem, 12vh, 10rem) !important;
       font-size: clamp(1rem, 1.5vw, 1.4rem) !important;
@@ -230,25 +214,37 @@
       border-radius: 1rem !important;
       overflow-y: auto !important;
       width: 100% !important;
+      margin-bottom: 1rem !important;
     }
     
-    /* Reveal Button */
-    .fullscreen-layout .reveal-button-container {
-      width: 100% !important;
+    /* Create side-by-side layout for name lists in fullscreen */
+    .fullscreen-layout .party-display-mode .mb-4 {
       display: flex !important;
-      justify-content: center !important;
-      margin-top: 2rem !important;
+      flex-direction: column !important;
+      gap: 1rem !important;
     }
     
+    .fullscreen-layout .party-display-mode .mb-4 > .max-h-24 {
+      width: calc(50% - 0.5rem) !important;
+      display: inline-block !important;
+      vertical-align: top !important;
+    }
+    
+    .fullscreen-layout .party-display-mode .mb-4 > .max-h-24:first-of-type {
+      margin-right: 1rem !important;
+    }
+    
+    /* Reveal Button Styling */
     .fullscreen-layout .party-display-mode #revealGenderBtn {
       font-size: clamp(1.25rem, 2.5vw, 2rem) !important;
       padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(1.5rem, 3vw, 2.5rem) !important;
-      margin: 0 !important;
+      margin: 2rem auto 0 !important;
       border-radius: 1.5rem !important;
       box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4) !important;
       animation: pulse-glow 2s infinite !important;
       max-width: 300px !important;
       width: auto !important;
+      display: block !important;
     }
     
     /* Mobile Responsive */
