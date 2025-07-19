@@ -1,5 +1,25 @@
 // js/wizard.js - Step-by-step wizard for landing page
 
+// Translation helper function
+function getTranslation(key) {
+  const lang = localStorage.getItem('lang') || 'en';
+  const translations = {
+    en: {
+      partyNameError: "Please enter a party name!",
+      predictionError: "Please select a prediction!",
+      welcomeMessageError: "Please select yes or no for the welcome message.",
+      welcomeMessageRequired: "Please enter a welcome message or select \"No\"."
+    },
+    zh: {
+      partyNameError: "請輸入派對名稱！",
+      predictionError: "請選擇預測！",
+      welcomeMessageError: "請選擇是否要寫歡迎訊息。",
+      welcomeMessageRequired: "請輸入歡迎訊息或選擇「否」。"
+    }
+  };
+  return translations[lang]?.[key] || translations['en'][key] || key;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const step1 = document.getElementById('step1');
   const step2 = document.getElementById('step2');
@@ -43,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   toStep2Btn.addEventListener('click', () => {
     partyName = partyNameInput.value.trim();
     if (!partyName) {
-      partyNameError.textContent = 'Please enter a party name!';
+      partyNameError.textContent = getTranslation('partyNameError');
       partyNameInput.classList.add('border-red-500');
       return;
     }
@@ -55,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
   toStep3Btn.addEventListener('click', () => {
     const pred = document.querySelector('input[name="hostPrediction"]:checked');
     if (!pred) {
-      predictionError.textContent = 'Please select a prediction!';
+      predictionError.textContent = getTranslation('predictionError');
       return;
     }
     prediction = pred.value;
@@ -67,14 +87,14 @@ document.addEventListener('DOMContentLoaded', () => {
   toStep4Btn.addEventListener('click', () => {
     const includeWelcome = document.querySelector('input[name="includeWelcome"]:checked');
     if (!includeWelcome) {
-      welcomeError.textContent = 'Please select yes or no for the welcome message.';
+      welcomeError.textContent = getTranslation('welcomeMessageError');
       return;
     }
     
     if (includeWelcome.value === 'yes') {
       welcomeMessage = welcomeMessageInput.value.trim();
       if (!welcomeMessage) {
-        welcomeError.textContent = 'Please enter a welcome message or select "No".';
+        welcomeError.textContent = getTranslation('welcomeMessageRequired');
         return;
       }
     } else {

@@ -91,6 +91,7 @@
       flex-direction: column;
       border: 3px solid #e5e7eb;
       position: relative;
+      margin-top: 1rem; /* Add space to prevent overlap with guest counter */
     }
     
     .results-title {
@@ -341,10 +342,10 @@
     
     /* Language Switcher */
     #langSwitcher {
-      position: absolute;
+      position: fixed;
       top: 1rem;
       right: 2rem;
-      z-index: 60;
+      z-index: 1000;
       background: rgba(255, 255, 255, 0.95);
       padding: 0.25rem;
       border-radius: 1.5rem;
@@ -377,6 +378,8 @@
       padding: 2rem;
       box-shadow: 0 8px 32px rgba(0,0,0,0.1);
       text-align: center;
+      position: relative;
+      z-index: 10;
     }
     
     /* Responsive Design */
@@ -436,6 +439,7 @@
     @media (max-width: 768px) {
       .admin-layout {
         padding: 0.5rem;
+        margin-top: 4rem; /* Add space for fixed language switcher */
       }
       
       .qr-section, .results-section {
@@ -444,6 +448,7 @@
       
       .results-title {
         font-size: 1.5rem;
+        margin-top: 1rem;
       }
       
       .party-emoji {
@@ -458,9 +463,11 @@
       .guest-counter {
         font-size: 0.8rem;
         padding: 0.5rem 1rem;
-        top: 1.5rem;
+        top: 1rem;
         left: 0.5rem;
-        max-width: 180px;
+        max-width: 160px;
+        position: fixed;
+        z-index: 999;
       }
       
       .vote-bar {
@@ -485,8 +492,102 @@
       }
       
       #langSwitcher {
-        right: 1rem;
+        right: 0.5rem;
         top: 0.5rem;
+        padding: 0.2rem;
+      }
+      
+      .lang-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+      
+      /* Ensure guest layout doesn't overlap */
+      .guest-layout {
+        margin-top: 4rem;
+        padding: 1rem;
+      }
+      
+      .guest-card {
+        margin: 1rem auto;
+        padding: 1.5rem;
+      }
+    }
+    
+    /* Additional mobile improvements */
+    @media (max-width: 480px) {
+      .admin-layout {
+        margin-top: 5rem;
+        padding: 0.25rem;
+      }
+      
+      .guest-counter {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.8rem;
+        max-width: 140px;
+        top: 0.5rem;
+        left: 0.25rem;
+      }
+      
+      .results-title {
+        font-size: 1.3rem;
+        margin-top: 1.5rem;
+      }
+      
+      .party-emoji {
+        font-size: 1.8rem;
+      }
+      
+      .party-name {
+        font-size: 1rem;
+        padding: 0.3rem 0.8rem;
+      }
+      
+      .vote-bar {
+        height: 2.5rem;
+      }
+      
+      .vote-count {
+        font-size: 1.2rem;
+      }
+      
+      .reveal-btn {
+        padding: 0.8rem 1.5rem;
+        font-size: 1.2rem;
+      }
+      
+      #langSwitcher {
+        right: 0.25rem;
+        top: 0.25rem;
+        padding: 0.15rem;
+      }
+      
+      .lang-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+      }
+      
+      .guest-layout {
+        margin-top: 5rem;
+        padding: 0.5rem;
+      }
+      
+      .guest-card {
+        margin: 0.5rem auto;
+        padding: 1rem;
+      }
+      
+      .welcome-content {
+        margin: 1rem;
+        padding: 2rem;
+      }
+      
+      .welcome-title {
+        font-size: 2rem;
+      }
+      
+      .welcome-message {
+        font-size: 1.1rem;
       }
     }
     
@@ -506,6 +607,8 @@
       animation: counterPulse 2s infinite;
       z-index: 20;
       max-width: 250px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     
     @keyframes counterPulse {
@@ -644,6 +747,25 @@
       box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
     }
     
+    /* Back to Home Button */
+    .back-home-btn {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: white;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 16px;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    }
+    
+    .back-home-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    }
+    
     /* Hidden by default */
     .hidden { display: none !important; }
   </style>
@@ -661,9 +783,15 @@
       <div class="text-5xl mb-4">🎉</div>
       <h2 class="welcome-title" data-i18n="welcomeTitle">Welcome to Your Party Control Center!</h2>
       <div class="welcome-message">
-        <div class="mb-3"><strong>👉</strong> <span data-i18n="pressF11">Press F11 to enter fullscreen mode.</span></div>
+        <div class="mb-3 text-center">
+          <strong class="text-xl text-purple-600" data-i18n="projectInstructions">🎯 PROJECT THIS PAGE TO YOUR PARTY SCREEN/TV!</strong>
+        </div>
+        <div class="mb-3"><strong>👉</strong> <span data-i18n="fullscreenInstructions">Press F11 for fullscreen party mode</span></div>
         <div class="mb-3"><strong>📱</strong> <span data-i18n="guestsCanScan">Guests can scan the QR code or share the invite link to check-in and vote.</span></div>
-        <div><strong>🟡</strong> <span data-i18n="whenReady">When you're ready, press "Reveal Gender" to start the reveal!</span></div>
+        <div class="mb-3"><strong>🟡</strong> <span data-i18n="whenReady">When you're ready, press "Reveal Gender" to start the reveal!</span></div>
+        <div class="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+          <span data-i18n="husbandJoke">💡 Don't know how to project? Just let your husband do it! 😄</span>
+        </div>
       </div>
       <button id="welcomeGotItBtn" class="welcome-btn" data-i18n="gotIt">Got it!</button>
     </div>
@@ -752,6 +880,7 @@
     <!-- Reveal Button Section -->
     <div class="reveal-section">
       <button id="revealGenderBtn" class="reveal-btn" data-i18n="revealGender">🎊 Reveal Gender</button>
+      <button id="backToHomeBtn" class="back-home-btn hidden" data-i18n="backToHome">🏠 Back to Home</button>
     </div>
   </div>
 
@@ -813,6 +942,11 @@
     <button id="viewHostMessageBtn" class="hidden fixed bottom-4 right-4 bg-blue-100 hover:bg-blue-200 text-blue-600 px-4 py-2 rounded-full text-sm font-bold z-50 border-2 border-blue-300 shadow-lg transition-all hover:scale-105" data-i18n="viewHostMessageAgain">
       🔔 View Host Message Again
     </button>
+    
+    <!-- Back to Home Button (for guests) -->
+    <button id="guestBackToHomeBtn" class="hidden fixed bottom-4 left-4 bg-indigo-100 hover:bg-indigo-200 text-indigo-600 px-4 py-2 rounded-full text-sm font-bold z-50 border-2 border-indigo-300 shadow-lg transition-all hover:scale-105" data-i18n="backToHome">
+      🏠 Back to Home
+    </button>
   </div>
 
   <!-- Popups and Modals -->
@@ -838,7 +972,10 @@
   <div id="finalReveal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
     <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
       <h2 id="finalRevealMsg" class="text-4xl font-extrabold mb-4"></h2>
-      <div id="finalConfetti" class="text-5xl"></div>
+      <div id="finalConfetti" class="text-5xl mb-6"></div>
+      <button id="modalBackToHomeBtn" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-xl transition-all" data-i18n="backToHome">
+        🏠 Back to Home
+      </button>
     </div>
   </div>
   

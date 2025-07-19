@@ -3,6 +3,20 @@
 
 // Firebase is initialized in firebaseConfig.js
 
+// Translation helper function
+function getTranslation(key) {
+  const lang = localStorage.getItem('lang') || 'en';
+  const translations = {
+    en: {
+      guestNameError: "Please enter your name."
+    },
+    zh: {
+      guestNameError: "請輸入您的姓名。"
+    }
+  };
+  return translations[lang]?.[key] || translations['en'][key] || key;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const roomId = params.get('roomId');
@@ -261,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         guestNameError.textContent = '';
         const name = guestNameInput.value.trim();
         if (!name) {
-          guestNameError.textContent = 'Please enter your name.';
+          guestNameError.textContent = getTranslation('guestNameError');
           guestNameInput.classList.add('border-red-500');
           return;
         }

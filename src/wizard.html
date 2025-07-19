@@ -63,7 +63,7 @@
       <div id="wizardStep3" class="hidden">
         <div class="text-3xl mb-2 emoji-bounce">💌✨</div>
         <h2 class="text-xl font-bold mb-2" data-i18n="welcomeMessageQuestion">Would you like to write a welcome message for your guests?</h2>
-        <p class="mb-3 text-gray-700">Optional: Create a personal greeting that guests will see when they join.</p>
+        <p class="mb-3 text-gray-700" data-i18n="welcomeMessageOptional">Optional: Create a personal greeting that guests will see when they join.</p>
         <div class="flex justify-center gap-6 mb-4">
           <label class="flex flex-col items-center cursor-pointer">
             <input type="radio" name="includeWelcome" value="yes" class="form-radio text-purple-500 mb-2" />
@@ -78,7 +78,7 @@
           <label class="block text-sm font-medium text-gray-700 mb-2" data-i18n="welcomeMessageLabel">Your welcome message:</label>
           <textarea id="welcomeMessage" placeholder="Thank you for coming! We're so excited to share this moment with you ❤️" class="w-full px-4 py-3 border-2 border-purple-200 rounded-xl resize-none h-24" maxlength="300" data-i18n-placeholder="welcomeMessagePlaceholder"></textarea>
           <div class="text-xs text-gray-500 mt-1">
-            <span id="charCount">0</span>/300 characters
+            <span id="charCount">0</span>/300 <span data-i18n="welcomeMessageCharCount">characters</span>
           </div>
         </div>
         <div class="flex gap-2">

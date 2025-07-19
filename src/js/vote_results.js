@@ -590,6 +590,12 @@ document.addEventListener('DOMContentLoaded', async () => {
               revealGenderBtn.innerHTML = getTranslation('announced');
               revealGenderBtn.classList.add('announced');
             }
+            
+            // Show back to home button after reveal
+            const backToHomeBtn = document.getElementById('backToHomeBtn');
+            if (backToHomeBtn) {
+              backToHomeBtn.classList.remove('hidden');
+            }
           }
         });
       };
@@ -607,6 +613,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (partyWelcomeMessage && guestName) {
         showGuestWelcomeModal(guestName, partyWelcomeMessage);
       }
+    });
+  }
+  
+  // Setup "Back to Home" button
+  const backToHomeBtn = document.getElementById('backToHomeBtn');
+  if (backToHomeBtn) {
+    backToHomeBtn.addEventListener('click', () => {
+      // Navigate back to the main page
+      window.location.href = '/';
+    });
+  }
+  
+  // Setup "Back to Home" button for guests
+  const guestBackToHomeBtn = document.getElementById('guestBackToHomeBtn');
+  if (guestBackToHomeBtn) {
+    guestBackToHomeBtn.addEventListener('click', () => {
+      // Navigate back to the main page
+      window.location.href = '/';
+    });
+  }
+  
+  // Setup "Back to Home" button in modal
+  const modalBackToHomeBtn = document.getElementById('modalBackToHomeBtn');
+  if (modalBackToHomeBtn) {
+    modalBackToHomeBtn.addEventListener('click', () => {
+      // Navigate back to the main page
+      window.location.href = '/';
     });
   }
 
@@ -1003,6 +1036,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       confetti += data.actual === 'boy' ? '💙' : '💖';
     }
     finalConfetti.innerHTML = confetti;
+    
+    // Show back to home button for guests when reveal happens
+    if (!adminTokenParam && guestBackToHomeBtn) {
+      guestBackToHomeBtn.classList.remove('hidden');
+    }
+    
     if (adminTokenParam) checkAdminMode();
   });
 }); 
