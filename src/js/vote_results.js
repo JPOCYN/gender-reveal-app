@@ -307,9 +307,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         mainContainer.className = 'w-full max-w-6xl mx-auto p-8 bg-white cute-card text-center mt-4';
       }
       
-      // Make results section more prominent
+      // Structure the results section for fullscreen
       if (resultsSection) {
         resultsSection.classList.add('party-display-mode');
+        structureFullscreenResults();
       }
       
       // Hide QR code in fullscreen, show floating controls
@@ -333,6 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (resultsSection) {
         resultsSection.classList.remove('party-display-mode');
+        restoreCompactResults();
       }
       
       // Show QR code in compact mode
@@ -343,6 +345,113 @@ document.addEventListener('DOMContentLoaded', async () => {
       hideEnhancedFloatingControls();
       stopSubtleConfetti();
     }
+  }
+
+  // Structure results section for fullscreen display
+  function structureFullscreenResults() {
+    const resultsSection = document.getElementById('resultsSection');
+    if (!resultsSection) return;
+    
+    // Check if already structured
+    if (resultsSection.querySelector('.fullscreen-results-container')) return;
+    
+    // Get existing elements
+    const heading = resultsSection.querySelector('h2');
+    const voteBars = resultsSection.querySelectorAll('.flex.items-center');
+    const boyNames = document.getElementById('boyNames');
+    const girlNames = document.getElementById('girlNames');
+    const revealBtn = document.getElementById('revealGenderBtn');
+    
+    // Create structured layout
+    const container = document.createElement('div');
+    container.className = 'fullscreen-results-container';
+    
+    // Add heading
+    if (heading) {
+      container.appendChild(heading.cloneNode(true));
+    }
+    
+    // Create vote bars container
+    const barsContainer = document.createElement('div');
+    barsContainer.className = 'vote-bars-container';
+    
+    voteBars.forEach(bar => {
+      barsContainer.appendChild(bar.cloneNode(true));
+    });
+    container.appendChild(barsContainer);
+    
+    // Create names container
+    if (boyNames && girlNames) {
+      const namesContainer = document.createElement('div');
+      namesContainer.className = 'names-container';
+      namesContainer.appendChild(boyNames.cloneNode(true));
+      namesContainer.appendChild(girlNames.cloneNode(true));
+      container.appendChild(namesContainer);
+    }
+    
+    // Create reveal button container
+    if (revealBtn) {
+      const btnContainer = document.createElement('div');
+      btnContainer.className = 'reveal-button-container';
+      btnContainer.appendChild(revealBtn.cloneNode(true));
+      container.appendChild(btnContainer);
+    }
+    
+    // Replace content
+    resultsSection.innerHTML = '';
+    resultsSection.appendChild(container);
+    
+    // Update references to new elements
+    updateElementReferences();
+  }
+
+  // Restore compact results structure
+  function restoreCompactResults() {
+    const resultsSection = document.getElementById('resultsSection');
+    if (!resultsSection) return;
+    
+    // Check if needs restoration
+    const container = resultsSection.querySelector('.fullscreen-results-container');
+    if (!container) return;
+    
+    // Restore original structure
+    const heading = container.querySelector('h2');
+    const voteBars = container.querySelectorAll('.flex.items-center');
+    const boyNames = container.querySelector('#boyNames');
+    const girlNames = container.querySelector('#girlNames');
+    const revealBtn = container.querySelector('#revealGenderBtn');
+    
+    resultsSection.innerHTML = '';
+    
+    if (heading) resultsSection.appendChild(heading.cloneNode(true));
+    
+    const mainDiv = document.createElement('div');
+    mainDiv.className = 'mb-4';
+    
+    voteBars.forEach(bar => {
+      mainDiv.appendChild(bar.cloneNode(true));
+    });
+    
+    if (boyNames) mainDiv.appendChild(boyNames.cloneNode(true));
+    if (girlNames) mainDiv.appendChild(girlNames.cloneNode(true));
+    
+    resultsSection.appendChild(mainDiv);
+    
+    if (revealBtn) resultsSection.appendChild(revealBtn.cloneNode(true));
+    
+    // Update references to new elements
+    updateElementReferences();
+  }
+
+  // Update element references after restructuring
+  function updateElementReferences() {
+    window.boyBar = document.getElementById('boyBar');
+    window.girlBar = document.getElementById('girlBar');
+    window.boyCount = document.getElementById('boyCount');
+    window.girlCount = document.getElementById('girlCount');
+    window.boyNames = document.getElementById('boyNames');
+    window.girlNames = document.getElementById('girlNames');
+    window.revealGenderBtn = document.getElementById('revealGenderBtn');
   }
 
   // Enhanced floating controls for fullscreen
