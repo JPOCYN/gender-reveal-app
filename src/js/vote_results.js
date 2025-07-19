@@ -429,11 +429,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         <h2>🎉 Fullscreen Party Mode</h2>
         <p>Press <span class="key">F11</span> to enter fullscreen mode for the best party experience!</p>
         <p class="text-sm text-gray-500">Your guests can scan the QR code to join and vote in real-time.</p>
-        <button class="close-btn" onclick="closeF11Instructions()">Got it!</button>
+        <button class="close-btn" id="closeF11Btn">Got it!</button>
       </div>
     `;
     
     document.body.appendChild(instructions);
+    
+    // Add event listener for close button
+    const closeBtn = instructions.querySelector('#closeF11Btn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeF11Instructions);
+    }
     
     // Mark as shown
     localStorage.setItem('f11InstructionsShown', 'true');
