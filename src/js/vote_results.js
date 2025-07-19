@@ -352,6 +352,98 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Just add CSS classes - don't restructure DOM to preserve event handlers
     resultsSection.classList.add('fullscreen-results-structured');
+    
+    // Create admin QR section
+    createAdminQRSection();
+    
+    // Show F11 instructions
+    showF11Instructions();
+    
+    // Start subtle confetti
+    startSubtleConfetti();
+  }
+  
+  function createAdminQRSection() {
+    // Remove existing admin QR if any
+    const existingQR = document.querySelector('.admin-qr-section');
+    if (existingQR) {
+      existingQR.remove();
+    }
+    
+    const qrSection = document.createElement('div');
+    qrSection.className = 'admin-qr-section';
+    qrSection.innerHTML = `
+      <h3>📱 Guest Check-in</h3>
+      <p class="text-sm text-gray-600 mb-4">Scan QR code to join and vote</p>
+      <div class="qr-code" id="adminQrCode"></div>
+      <div class="guest-link" id="guestLinkText"></div>
+      <button class="copy-btn" id="copyGuestLinkBtn">Copy Link</button>
+    `;
+    
+    // Insert after the title
+    const container = document.querySelector('.party-display-mode');
+    const title = container.querySelector('h2');
+    if (title) {
+      title.parentNode.insertBefore(qrSection, title.nextSibling);
+    }
+    
+    // Generate QR code
+    const qrContainer = qrSection.querySelector('#adminQrCode');
+    const guestLinkText = qrSection.querySelector('#guestLinkText');
+    const copyBtn = qrSection.querySelector('#copyGuestLinkBtn');
+    
+    const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
+    guestLinkText.textContent = guestLink;
+    
+    if (typeof QRCode !== 'undefined' && qrContainer) {
+      new QRCode(qrContainer, {
+        text: guestLink,
+        width: 150,
+        height: 150,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+    
+    // Copy functionality
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(guestLink);
+      copyBtn.textContent = 'Copied!';
+      copyBtn.style.background = '#10b981';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy Link';
+        copyBtn.style.background = '';
+      }, 2000);
+    };
+  }
+  
+  function showF11Instructions() {
+    // Check if instructions were already shown
+    if (localStorage.getItem('f11InstructionsShown')) return;
+    
+    const instructions = document.createElement('div');
+    instructions.className = 'f11-instructions';
+    instructions.innerHTML = `
+      <div class="content">
+        <h2>🎉 Fullscreen Party Mode</h2>
+        <p>Press <span class="key">F11</span> to enter fullscreen mode for the best party experience!</p>
+        <p class="text-sm text-gray-500">Your guests can scan the QR code to join and vote in real-time.</p>
+        <button class="close-btn" onclick="closeF11Instructions()">Got it!</button>
+      </div>
+    `;
+    
+    document.body.appendChild(instructions);
+    
+    // Mark as shown
+    localStorage.setItem('f11InstructionsShown', 'true');
+  }
+  
+  function closeF11Instructions() {
+    const instructions = document.querySelector('.f11-instructions');
+    if (instructions) {
+      instructions.remove();
+    }
   }
 
   // Restore compact results structure
@@ -363,7 +455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     resultsSection.classList.remove('fullscreen-results-structured');
   }
 
-  // Enhanced floating controls for fullscreen
+  // Simple floating controls for fullscreen
   function showEnhancedFloatingControls() {
     // Remove existing controls first
     const existingControls = document.getElementById('enhancedFloatingControls');
@@ -371,28 +463,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       existingControls.remove();
     }
     
-    // Create QR modal
-    const qrModal = document.createElement('div');
-    qrModal.id = 'qrModal';
-    qrModal.className = 'qr-modal';
-    qrModal.innerHTML = `
-      <div class="qr-modal-content">
-        <button class="close-btn" onclick="closeQRModal()">✕</button>
-        <h3>Guest Voting Link</h3>
-        <p>Share this QR code with your guests to let them vote!</p>
-        <div class="qr-code" id="modalQRCode"></div>
-        <p class="text-sm text-gray-600 mt-4">Scan with your phone camera to open the voting page</p>
-      </div>
-    `;
-    document.body.appendChild(qrModal);
-    
     const controls = document.createElement('div');
     controls.id = 'enhancedFloatingControls';
     controls.className = 'floating-controls';
     controls.innerHTML = `
-      <button id="qrToggleBtn" class="hover:bg-blue-100">
-        📱 QR Code
-      </button>
       <button id="homeBtn" class="hover:bg-gray-100">
         🏠 Home
       </button>
@@ -405,21 +479,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Use event delegation for better reliability
     controls.addEventListener('click', (e) => {
       const target = e.target;
-      
-      if (target.id === 'qrToggleBtn') {
-        // Toggle between modal and inline QR
-        const modal = document.getElementById('qrModal');
-        if (modal && modal.classList.contains('show')) {
-          closeQRModal();
-        } else {
-          showQRModal();
-        }
-        
-        // Update button text based on state
-        const isModalVisible = modal && modal.classList.contains('show');
-        const isInlineVisible = adminQR && !adminQR.classList.contains('hidden');
-        target.innerHTML = (isModalVisible || isInlineVisible) ? '❌ Hide QR' : '📱 QR Code';
-      }
       
       if (target.id === 'homeBtn') {
         window.location.href = '/';

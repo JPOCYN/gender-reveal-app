@@ -134,7 +134,7 @@
       backdrop-filter: none !important;
       border-radius: 0 !important;
       box-shadow: none !important;
-      padding: 3rem 4rem !important;
+      padding: 2rem !important;
       margin: 0 !important;
       display: flex !important;
       flex-direction: column !important;
@@ -150,10 +150,12 @@
       width: 100% !important;
       max-width: none !important;
       margin: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
+      display: grid !important;
+      grid-template-columns: 1fr 300px !important;
       gap: 2rem !important;
-      align-items: stretch !important;
+      align-items: start !important;
+      height: 100vh !important;
+      padding: 2rem !important;
     }
     
     .fullscreen-layout .party-display-mode h2 {
@@ -163,6 +165,126 @@
       text-align: center !important;
       color: white !important;
       font-weight: 900 !important;
+      grid-column: 1 / -1 !important;
+    }
+    
+    /* Admin QR Section - Always Visible */
+    .admin-qr-section {
+      background: rgba(255, 255, 255, 0.95) !important;
+      border-radius: 1.5rem !important;
+      padding: 2rem !important;
+      text-align: center !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+      backdrop-filter: blur(10px) !important;
+      height: fit-content !important;
+      position: sticky !important;
+      top: 2rem !important;
+    }
+    
+    .admin-qr-section h3 {
+      font-size: 1.5rem !important;
+      font-weight: bold !important;
+      color: #374151 !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    .admin-qr-section .qr-code {
+      margin: 1.5rem 0 !important;
+      padding: 1rem !important;
+      background: white !important;
+      border-radius: 1rem !important;
+      display: inline-block !important;
+    }
+    
+    .admin-qr-section .guest-link {
+      background: #f3f4f6 !important;
+      border-radius: 0.5rem !important;
+      padding: 0.75rem !important;
+      margin: 1rem 0 !important;
+      font-family: monospace !important;
+      font-size: 0.875rem !important;
+      word-break: break-all !important;
+    }
+    
+    .admin-qr-section .copy-btn {
+      background: #3b82f6 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 0.5rem !important;
+      padding: 0.5rem 1rem !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    .admin-qr-section .copy-btn:hover {
+      background: #2563eb !important;
+      transform: translateY(-2px) !important;
+    }
+    
+    /* F11 Instructions Modal */
+    .f11-instructions {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      background: rgba(0, 0, 0, 0.9) !important;
+      backdrop-filter: blur(10px) !important;
+      z-index: 1000 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    .f11-instructions .content {
+      background: white !important;
+      border-radius: 2rem !important;
+      padding: 3rem !important;
+      text-align: center !important;
+      max-width: 500px !important;
+      width: 90% !important;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .f11-instructions h2 {
+      font-size: 2rem !important;
+      font-weight: bold !important;
+      color: #374151 !important;
+      margin-bottom: 1rem !important;
+    }
+    
+    .f11-instructions p {
+      font-size: 1.125rem !important;
+      color: #6b7280 !important;
+      margin-bottom: 2rem !important;
+    }
+    
+    .f11-instructions .key {
+      background: #f3f4f6 !important;
+      border: 2px solid #d1d5db !important;
+      border-radius: 0.5rem !important;
+      padding: 0.5rem 1rem !important;
+      font-family: monospace !important;
+      font-weight: bold !important;
+      color: #374151 !important;
+      margin: 0 0.25rem !important;
+    }
+    
+    .f11-instructions .close-btn {
+      background: #3b82f6 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 1rem !important;
+      padding: 0.75rem 2rem !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    .f11-instructions .close-btn:hover {
+      background: #2563eb !important;
+      transform: translateY(-2px) !important;
     }
     
     /* Vote Bars Styling */
@@ -283,12 +405,16 @@
       }
       
       .fullscreen-layout .w-full.max-w-6xl {
-        padding: 2rem 1rem !important;
+        padding: 1rem !important;
       }
       
       .fullscreen-layout .party-display-mode {
+        display: flex !important;
+        flex-direction: column !important;
         gap: 1.5rem !important;
         max-width: 100% !important;
+        height: auto !important;
+        padding: 1rem !important;
       }
       
       .fullscreen-layout .party-display-mode h2 {
@@ -327,6 +453,22 @@
         width: 100% !important;
         max-width: none !important;
         margin: 2rem auto 0 !important;
+      }
+      
+      /* Mobile admin QR section */
+      .admin-qr-section {
+        order: -1 !important;
+        position: static !important;
+        margin-bottom: 1.5rem !important;
+      }
+      
+      .admin-qr-section h3 {
+        font-size: 1.25rem !important;
+      }
+      
+      .admin-qr-section .qr-code {
+        margin: 1rem 0 !important;
+        padding: 0.75rem !important;
       }
       
       /* Mobile floating controls */
