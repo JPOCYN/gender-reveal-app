@@ -101,14 +101,14 @@
     </div>
   </div>
   <!-- SCRIPTS: Firebase config, SDKs, QRCode, then app code -->
-  <script src="firebaseConfig.js"></script>
+  <script src="../config/firebaseConfig.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  <script src="js/qrcode.min.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/wizard.js"></script>
+  <script src="../js/qrcode.min.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/wizard.js"></script>
   <script type="module">
-    import { TRANSLATIONS } from './translations.js';
+    import { TRANSLATIONS } from '../config/translations.js';
     
     // Language switching logic
     const langBtns = document.querySelectorAll('.lang-btn');

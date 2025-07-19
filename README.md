@@ -148,18 +148,26 @@ You can deploy this app to any static hosting service:
 
 ```
 gender-reveal-app/
-├── index.html          # Landing page
-├── wizard.html         # Party creation wizard
-├── vote.html           # Voting and results page
-├── result.html         # Results page
-├── firebaseConfig.js   # Firebase configuration
-├── js/
-│   ├── app.js         # Main app logic
-│   ├── wizard.js      # Wizard page logic
-│   ├── vote_results.js # Voting and results logic
-│   └── qrcode.min.js  # QR code library
-├── translations.js     # Multi-language support
-└── README.md          # This file
+├── src/
+│   ├── pages/
+│   │   ├── index.html          # Landing page
+│   │   ├── wizard.html         # Party creation wizard
+│   │   ├── vote.html           # Voting and results page
+│   │   └── result.html         # Results page
+│   ├── js/
+│   │   ├── app.js             # Main app logic
+│   │   ├── wizard.js          # Wizard page logic
+│   │   ├── vote_results.js    # Voting and results logic
+│   │   └── qrcode.min.js      # QR code library
+│   ├── config/
+│   │   ├── firebaseConfig.js  # Firebase configuration
+│   │   └── translations.js    # Multi-language support
+│   └── styles/                # Future CSS files
+├── public/                    # Static assets
+├── dist/                      # Build output
+├── package.json               # Dependencies
+├── vite.config.js            # Vite configuration
+└── README.md                 # This file
 ```
 
 ## Security Notes
