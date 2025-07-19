@@ -44,6 +44,59 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); }
     }
+    
+    /* Sticky QR Code Area */
+    .sticky-qr {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      padding: 1.5rem;
+      z-index: 30;
+      border: 2px solid #e5e7eb;
+      max-width: 280px;
+    }
+    
+    .sticky-qr .qr-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    
+    .sticky-qr .copy-btn {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 100%;
+      font-size: 0.9rem;
+    }
+    
+    .sticky-qr .copy-btn:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+    }
+    
+    .sticky-qr .copy-btn.copied {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    /* Responsive adjustments for sticky QR */
+    @media (max-width: 768px) {
+      .sticky-qr {
+        position: relative;
+        top: auto;
+        left: auto;
+        margin: 1rem auto;
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-pink-100 to-blue-100 min-h-screen flex flex-col items-center justify-center">
@@ -95,28 +148,24 @@
   </div>
   <div id="changePopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
-      <p class="mb-4 font-bold">You can only change your vote once. Are you sure?</p>
-      <button id="confirmChangeBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl mr-2">Yes, change</button>
-      <button id="cancelChangeBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-xl">Cancel</button>
+      <p class="mb-4 font-bold" data-i18n="changeVoteConfirm">You can only change your vote once. Are you sure?</p>
+      <button id="confirmChangeBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl mr-2" data-i18n="yesChange">Yes, change</button>
+      <button id="cancelChangeBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-xl" data-i18n="cancel">Cancel</button>
     </div>
   </div>
   <div id="revealPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
     <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
-      <p class="mb-4 font-bold">Are you sure you want to reveal the gender? This cannot be undone.</p>
-      <button id="confirmRevealBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl mr-2">Yes, reveal</button>
-      <button id="cancelRevealBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-xl">Cancel</button>
+      <p class="mb-4 font-bold" data-i18n="revealConfirm">Are you sure you want to reveal the gender? This cannot be undone.</p>
+      <button id="confirmRevealBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl mr-2" data-i18n="yesReveal">Yes, reveal</button>
+      <button id="cancelRevealBtn" class="bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-xl" data-i18n="cancel">Cancel</button>
     </div>
   </div>
   <!-- F11 Fullscreen Instruction Popup (Admin Only) -->
   <div id="fullscreenPopup" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 hidden">
-    <div class="bg-white p-8 rounded-2xl shadow-2xl text-center max-w-md mx-4">
-      <div class="text-4xl mb-4">🖥️📺</div>
-      <h2 class="text-2xl font-bold mb-4" data-i18n="fullscreenTitle">Perfect for Party Display!</h2>
-      <p class="mb-4 text-gray-700" data-i18n="fullscreenDesc">Press <span class="font-bold bg-yellow-100 px-2 py-1 rounded">F11</span> to enter fullscreen mode for the best party experience!</p>
-      <div class="mb-4 p-3 bg-blue-50 rounded-lg">
-        <p class="text-sm text-blue-800" data-i18n="fullscreenTip">💡 Tip: This works great on TVs, projectors, and large screens!</p>
-      </div>
-      <button id="closeFullscreenPopup" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition-all" data-i18n="gotIt">Got it!</button>
+    <div class="bg-white p-6 rounded-2xl shadow-2xl text-center max-w-sm mx-4 relative">
+      <button id="closeFullscreenPopup" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none" aria-label="Close">✖️</button>
+      <div class="text-4xl mb-3">🎉</div>
+      <p class="text-lg font-medium text-gray-800 mb-4" data-i18n="fullscreenTip">Tip: Press F11 to enter Fullscreen Party Mode!</p>
     </div>
   </div>
 

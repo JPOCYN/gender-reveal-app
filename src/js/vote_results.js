@@ -72,38 +72,44 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showAdminQR(roomId) {
     if (!adminQR) {
       adminQR = document.createElement('div');
-      adminQR.className = 'bg-white rounded-xl p-6 shadow-lg mt-6 border-2 border-blue-200';
+      adminQR.className = 'sticky-qr';
       adminQR.innerHTML = `
         <div class="text-center">
-          <div class="text-2xl mb-2">📱</div>
-          <h3 class="font-bold text-lg mb-2" data-i18n="shareWithGuests">Share with Guests</h3>
-          <div class="mb-4">
-            <div id="adminGuestQR" class="flex justify-center mb-2"></div>
-            <div class="text-sm text-gray-600 mb-3" data-i18n="qrInstructions">Guests can scan this QR code to join and vote</div>
-            <div class="bg-gray-100 rounded p-2 text-xs text-gray-700 mb-3">
-              <div class="font-semibold mb-1" data-i18n="guestLink">Guest Link:</div>
-              <div id="guestLinkText" class="break-all"></div>
-            </div>
-            <button id="copyGuestLinkBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm" data-i18n="copyLink">Copy Link</button>
+          <div class="qr-container">
+            <div id="adminGuestQR"></div>
           </div>
+          <button id="copyGuestLinkBtn" class="copy-btn" data-i18n="copyInviteLink">📋 Copy Invite Link</button>
         </div>
       `;
-      resultsSection.parentNode.insertBefore(adminQR, resultsSection.nextSibling);
+      document.body.appendChild(adminQR);
       
       // Add copy functionality
       const copyBtn = adminQR.querySelector('#copyGuestLinkBtn');
-      const guestLinkText = adminQR.querySelector('#guestLinkText');
       const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
-      guestLinkText.textContent = guestLink;
       
       copyBtn.onclick = () => {
-        navigator.clipboard.writeText(guestLink);
-        copyBtn.textContent = 'Copied!';
-        copyBtn.classList.add('bg-green-500');
-        setTimeout(() => {
-          copyBtn.textContent = 'Copy Link';
-          copyBtn.classList.remove('bg-green-500');
-        }, 2000);
+        navigator.clipboard.writeText(guestLink).then(() => {
+          copyBtn.textContent = '✅ Copied!';
+          copyBtn.classList.add('copied');
+          setTimeout(() => {
+            copyBtn.textContent = '📋 Copy Invite Link';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        }).catch(() => {
+          // Fallback for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = guestLink;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textArea);
+          copyBtn.textContent = '✅ Copied!';
+          copyBtn.classList.add('copied');
+          setTimeout(() => {
+            copyBtn.textContent = '📋 Copy Invite Link';
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        });
       };
     }
     const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
@@ -111,8 +117,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     qrDiv.innerHTML = '';
     new QRCode(qrDiv, {
       text: guestLink,
-      width: 192,
-      height: 192,
+      width: 160,
+      height: 160,
       colorDark: "#000000",
       colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.H
@@ -130,6 +136,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   const nameKey = `name_${roomId}`;
   const changeKey = `changed_${roomId}`;
   const voteIdKey = `voteId_${roomId}`;
+
+  // Translation helper function
+  function getTranslation(key, lang = localStorage.getItem('lang') || 'en') {
+    const translations = {
+      en: {
+        voteSubmitted: "Vote for {vote} submitted!",
+        errorSubmittingVote: "Error submitting vote. Try again!",
+        alreadyChangedVote: "You have already changed your vote once.",
+        voteChanged: "Vote changed to {vote}!",
+        errorChangingVote: "Error changing vote. Try again!",
+        itsABoy: "It's a BOY 💙!",
+        itsAGirl: "It's a GIRL 💖!"
+      },
+      zh: {
+        voteSubmitted: "投票給 {vote} 已提交！",
+        errorSubmittingVote: "提交投票時發生錯誤。請重試！",
+        alreadyChangedVote: "你已經更改過一次投票了。",
+        voteChanged: "投票已更改為 {vote}！",
+        errorChangingVote: "更改投票時發生錯誤。請重試！",
+        itsABoy: "是個男孩 💙！",
+        itsAGirl: "是個女孩 💖！"
+      }
+    };
+    const t = translations[lang] || translations['en'];
+    return t[key] || key;
+  }
 
   // Cute emoji for badges
   const badgeEmojis = ['👶🏻','🍼','🎈','🎉','🧸','🎀','🦄','🐣','🐥','🦋','🌈','⭐','💫','🍭','🍬','🎂','🎁','😻','🐻','🐰'];
@@ -249,14 +281,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   }
 
-  // F11 Fullscreen popup for admin
+  // F11 Fullscreen popup for admin (show once per session)
   function showFullscreenPopup() {
     const popup = document.getElementById('fullscreenPopup');
     const closeBtn = document.getElementById('closeFullscreenPopup');
+    const sessionKey = `fullscreenPopupShown_${Date.now()}_${Math.random()}`;
     
-    if (popup && !localStorage.getItem('fullscreenPopupShown')) {
+    if (popup && !sessionStorage.getItem('fullscreenPopupShown')) {
       popup.classList.remove('hidden');
-      localStorage.setItem('fullscreenPopupShown', 'true');
+      sessionStorage.setItem('fullscreenPopupShown', 'true');
       
       if (closeBtn) {
         closeBtn.onclick = () => {
@@ -429,7 +462,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!err) {
           localStorage.setItem(votedKey, vote);
           localStorage.setItem(voteIdKey, newVoteRef.key);
-          voteMsg.textContent = `Vote for ${vote === 'boy' ? 'Boy 💙' : 'Girl 💖'} submitted!`;
+          const voteText = vote === 'boy' ? 'Boy 💙' : 'Girl 💖';
+          voteMsg.textContent = getTranslation('voteSubmitted').replace('{vote}', voteText);
           voteBoyBtn.disabled = false;
           voteGirlBtn.disabled = false;
           userVoteId = newVoteRef.key;
@@ -438,12 +472,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           showResults();
           checkAdminMode();
         } else {
-          voteMsg.textContent = 'Error submitting vote. Try again!';
+          voteMsg.textContent = getTranslation('errorSubmittingVote');
         }
       });
     } else {
       if (userChanged) {
-        voteMsg.textContent = 'You have already changed your vote once.';
+        voteMsg.textContent = getTranslation('alreadyChangedVote');
         voteBoyBtn.disabled = true;
         voteGirlBtn.disabled = true;
         return;
@@ -465,7 +499,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!err) {
           localStorage.setItem(votedKey, pendingVote);
           localStorage.setItem(changeKey, '1');
-          voteMsg.textContent = `Vote changed to ${pendingVote === 'boy' ? 'Boy 💙' : 'Girl 💖'}!`;
+          const voteText = pendingVote === 'boy' ? 'Boy 💙' : 'Girl 💖';
+          voteMsg.textContent = getTranslation('voteChanged').replace('{vote}', voteText);
           voteBoyBtn.disabled = true;
           voteGirlBtn.disabled = true;
           userChanged = true;
@@ -473,7 +508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           showResults();
           checkAdminMode();
         } else {
-          voteMsg.textContent = 'Error changing vote. Try again!';
+          voteMsg.textContent = getTranslation('errorChangingVote');
         }
         changePopup.classList.add('hidden');
         pendingVote = null;
@@ -618,7 +653,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = snapshot.val();
     if (!data) return;
     finalReveal.classList.remove('hidden');
-    finalRevealMsg.textContent = `It's a ${data.actual === 'boy' ? 'BOY 💙' : 'GIRL 💖'}!`;
+    finalRevealMsg.textContent = data.actual === 'boy' ? getTranslation('itsABoy') : getTranslation('itsAGirl');
     let confetti = '';
     for (let i = 0; i < 30; i++) {
       confetti += data.actual === 'boy' ? '💙' : '💖';
