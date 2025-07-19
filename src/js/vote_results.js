@@ -282,15 +282,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Welcome modal for admin (show once per page load)
   function showWelcomeModal() {
+    console.log('showWelcomeModal called', { welcomeModal, welcomeGotItBtn });
+    // Clear previous session storage for testing
+    sessionStorage.removeItem('welcomeModalShown');
+    
     if (welcomeModal && !sessionStorage.getItem('welcomeModalShown')) {
+      console.log('Showing welcome modal');
       welcomeModal.classList.remove('hidden');
       sessionStorage.setItem('welcomeModalShown', 'true');
       
       if (welcomeGotItBtn) {
         welcomeGotItBtn.onclick = () => {
+          console.log('Got it button clicked');
           welcomeModal.classList.add('hidden');
         };
       }
+    } else {
+      console.log('Modal not shown:', { hasModal: !!welcomeModal, alreadyShown: !!sessionStorage.getItem('welcomeModalShown') });
     }
   }
   
