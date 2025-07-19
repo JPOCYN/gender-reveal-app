@@ -23,6 +23,14 @@ const firebaseConfig = {
   measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID', "G-XXXXXXXXXX")
 };
 
+// Log the actual config being used (for debugging)
+console.log('Firebase config being used:', {
+  apiKey: firebaseConfig.apiKey.substring(0, 10) + '...',
+  authDomain: firebaseConfig.authDomain,
+  databaseURL: firebaseConfig.databaseURL,
+  projectId: firebaseConfig.projectId
+});
+
 // Global Firebase ready state
 window.firebaseReady = false;
 window.firebaseInitPromise = null;
