@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Home Page -->
+  <url>
+    <loc>https://www.bbreveal.com/</loc>
+    <lastmod>2025-01-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bbreveal.com/"/>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://www.bbreveal.com/"/>
+  </url>
+  
+  <!-- Party Creation Wizard -->
+  <url>
+    <loc>https://www.bbreveal.com/wizard.html</loc>
+    <lastmod>2025-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bbreveal.com/wizard.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://www.bbreveal.com/wizard.html"/>
+  </url>
+  
+  <!-- Voting Page -->
+  <url>
+    <loc>https://www.bbreveal.com/vote.html</loc>
+    <lastmod>2025-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bbreveal.com/vote.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://www.bbreveal.com/vote.html"/>
+  </url>
+  
+  <!-- Results Page -->
+  <url>
+    <loc>https://www.bbreveal.com/result.html</loc>
+    <lastmod>2025-01-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.bbreveal.com/result.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-HK" href="https://www.bbreveal.com/result.html"/>
+  </url>
+  
+</urlset> 

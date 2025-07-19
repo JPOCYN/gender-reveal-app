@@ -46,6 +46,21 @@ htmlFiles.forEach(file => {
   }
 });
 
+// Copy SEO files
+const seoFiles = ['sitemap.xml', 'robots.txt'];
+seoFiles.forEach(file => {
+  const sourcePath = path.join(__dirname, 'public', file);
+  const destPath = path.join(__dirname, 'dist', file);
+  
+  try {
+    fs.copyFileSync(sourcePath, destPath);
+    console.log(`✅ Copied ${file} to dist/`);
+  } catch (error) {
+    console.error(`❌ Error copying ${file}:`, error.message);
+    process.exit(1);
+  }
+});
+
 // Copy js and config directories
 const dirsToCopy = ['js', 'config'];
 dirsToCopy.forEach(dir => {

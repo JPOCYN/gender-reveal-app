@@ -102,13 +102,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Generate QR code
       adminQR.innerHTML = '';
       new QRCode(adminQR, {
-        text: guestLink,
+      text: guestLink,
         width: 200,
         height: 200,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-      });
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
+    });
       
       // Setup copy button
       copyInviteBtn.onclick = () => {
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       attempts++;
     }
     
-    if (!firebase.apps.length) {
+  if (!firebase.apps.length) {
       console.error('Firebase failed to initialize');
       document.body.innerHTML = '<div class="flex flex-col items-center justify-center min-h-screen"><h2 class="text-xl font-bold text-red-600">Error: Firebase failed to initialize. Please refresh the page.</h2></div>';
       return;
@@ -485,9 +485,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (viewHostMessageBtn && !isAdmin) {
           viewHostMessageBtn.classList.remove('hidden');
         }
-      };
+        };
+      }
     }
-  }
   
       function showGuestUI() {
       isAdmin = false;
@@ -504,7 +504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Initialize guest flow
       initializeGuestFlow();
-    }
+  }
 
   // Enhanced admin instructions
   function showAdminInstructions() {
@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         // No cached admin status, show guest UI
         showGuestUI();
-        hideAdminBadge();
+      hideAdminBadge();
       }
     }
   }
@@ -726,20 +726,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   // This will be called after admin verification is complete
   function initializeGuestFlow() {
     if (!adminTokenParam && !isAdmin) {
-      if (guestName) {
-        nameSection.classList.add('hidden');
-        voteSection.classList.remove('hidden');
-        localStorage.setItem(nameKey, guestName);
-        // Only hide results if the guest hasn't voted yet
-        if (!localStorage.getItem(votedKey)) {
-          resultsSection.classList.add('hidden');
-        } else {
-          resultsSection.classList.remove('hidden');
-        }
-      } else {
-        nameSection.classList.remove('hidden');
-        voteSection.classList.add('hidden');
+    if (guestName) {
+      nameSection.classList.add('hidden');
+      voteSection.classList.remove('hidden');
+      localStorage.setItem(nameKey, guestName);
+      // Only hide results if the guest hasn't voted yet
+      if (!localStorage.getItem(votedKey)) {
         resultsSection.classList.add('hidden');
+      } else {
+        resultsSection.classList.remove('hidden');
+      }
+    } else {
+      nameSection.classList.remove('hidden');
+      voteSection.classList.add('hidden');
+      resultsSection.classList.add('hidden');
       }
     }
   }
@@ -943,8 +943,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => girlCount.classList.remove('count-grow'), 600);
       }
       
-      boyCount.textContent = boyList.length;
-      girlCount.textContent = girlList.length;
+    boyCount.textContent = boyList.length;
+    girlCount.textContent = girlList.length;
       boyBarFill.style.width = boyPercent + '%';
       girlBarFill.style.width = girlPercent + '%';
       
@@ -975,7 +975,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       girlCountGuest.textContent = girlList.length;
       boyBar.style.width = boyPercent + '%';
       girlBar.style.width = girlPercent + '%';
-      
+    
       // Update names with simple badges for guest view
       boyNamesGuest.innerHTML = boyList.map(n => {
         const sanitizedName = sanitizeName(n);
