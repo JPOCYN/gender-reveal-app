@@ -94,10 +94,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const voteIdKey = `voteId_${roomId}`;
 
   // Cute emoji for badges
-  const badgeEmojis = ['👶🏻','🍼','🎈','🎉','🧸','🎀','🦄','🐣','🐥','🦋','🌈','⭐','💫','🍭','🍬','🎂','��','😻','🐻','🐰'];
+  const badgeEmojis = ['👶🏻','🍼','🎈','🎉','🧸','🎀','🦄','🐣','🐥','🦋','🌈','⭐','💫','🍭','🍬','🎂','🎁','😻','🐻','🐰'];
+  
+  // Sanitize and validate name input
+  function sanitizeName(name) {
+    if (!name || typeof name !== 'string') return 'Guest';
+    
+    // Decode URI component if needed
+    let sanitized = name;
+    try {
+      sanitized = decodeURIComponent(name);
+    } catch (e) {
+      // If decodeURIComponent fails, use the original
+      sanitized = name;
+    }
+    
+    // Remove or replace problematic characters
+    sanitized = sanitized
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+      .replace(/[\uFFFD]/g, '') // Remove replacement characters
+      .trim();
+    
+    // If name is empty or only contains problematic characters, use fallback
+    if (!sanitized || sanitized.length === 0) {
+      return 'Guest';
+    }
+    
+    // Limit length to prevent overflow
+    if (sanitized.length > 20) {
+      sanitized = sanitized.substring(0, 20) + '...';
+    }
+    
+    return sanitized;
+  }
+  
   function emojiForName(name) {
+    const sanitizedName = sanitizeName(name);
     let hash = 0;
-    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    for (let i = 0; i < sanitizedName.length; i++) {
+      hash = sanitizedName.charCodeAt(i) + ((hash << 5) - hash);
+    }
     return badgeEmojis[Math.abs(hash) % badgeEmojis.length];
   }
 
@@ -188,6 +224,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   checkAdminMode();
+
+  // Sanitize guest name to prevent encoding issues
+  if (guestName) {
+    guestName = sanitizeName(guestName);
+  }
 
   // Name validation
   function validateName(name) {
@@ -361,14 +402,16 @@ document.addEventListener('DOMContentLoaded', () => {
       boyVotes.forEach(v => {
         const badge = document.createElement('span');
         badge.className = 'pill-badge pill-boy vote-bounce';
-        badge.textContent = emojiForName(v.name) + ' ' + v.name;
+        const sanitizedName = sanitizeName(v.name);
+        badge.textContent = emojiForName(sanitizedName) + ' ' + sanitizedName;
         boyNames.appendChild(badge);
         setTimeout(() => badge.classList.remove('vote-bounce'), 600);
       });
       girlVotes.forEach(v => {
         const badge = document.createElement('span');
         badge.className = 'pill-badge pill-girl vote-bounce';
-        badge.textContent = emojiForName(v.name) + ' ' + v.name;
+        const sanitizedName = sanitizeName(v.name);
+        badge.textContent = emojiForName(sanitizedName) + ' ' + sanitizedName;
         girlNames.appendChild(badge);
         setTimeout(() => badge.classList.remove('vote-bounce'), 600);
       });
@@ -397,8 +440,14 @@ document.addEventListener('DOMContentLoaded', () => {
     boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
     girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
     // Cute pill badges with emoji
-    boyNames.innerHTML = boyList.map(n => `<span class='pill-badge pill-boy'>${emojiForName(n)} ${n}</span>`).join('');
-    girlNames.innerHTML = girlList.map(n => `<span class='pill-badge pill-girl'>${emojiForName(n)} ${n}</span>`).join('');
+    boyNames.innerHTML = boyList.map(n => {
+      const sanitizedName = sanitizeName(n);
+      return `<span class='pill-badge pill-boy'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
+    }).join('');
+    girlNames.innerHTML = girlList.map(n => {
+      const sanitizedName = sanitizeName(n);
+      return `<span class='pill-badge pill-girl'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
+    }).join('');
     if (!adminTokenParam && hasVoted) showResults();
     if (adminTokenParam) checkAdminMode();
   });

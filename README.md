@@ -11,6 +11,7 @@ A beautiful, interactive gender reveal party app with real-time voting and live 
 - 🎉 Animated reveal celebrations
 - 🌐 Multi-language support (English/繁體中文)
 - 📱 QR code generation for easy sharing
+- 🛡️ Robust name sanitization (prevents encoding issues)
 
 ## Setup Instructions
 
