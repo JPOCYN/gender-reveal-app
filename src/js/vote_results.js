@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const countdownOverlay = document.getElementById('countdownOverlay');
   const countdownNumber = document.getElementById('countdownNumber');
   const votePopupContainer = document.getElementById('votePopupContainer');
+  const partyHeader = document.getElementById('partyHeader');
+  const adminPartyName = document.getElementById('adminPartyName');
 
   // Elements
   const partyNameEl = document.getElementById('partyName');
@@ -68,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showAdminBadge() {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
-      adminBadge.innerHTML = '<span data-i18n="partyScreenMode">🎬 Live Reveal View</span>';
+      adminBadge.innerHTML = '<span data-i18n="partyScreenMode">👀 Party Screen</span>';
       adminBadge.className = 'fixed top-14 right-2 bg-gradient-to-r from-purple-400 to-pink-400 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold z-50 border-2 border-white';
       // On wide screens, move left to avoid lang switcher
       if (window.innerWidth > 640) {
@@ -156,7 +158,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         votedBoyPopup: "💙 {name} just voted for Boy!",
         votedGirlPopup: "💖 {name} just voted for Girl!",
         voteChangedPopup: "🔁 {name} switched vote to {vote}",
-        announced: "🎊 Announced!"
+        announced: "🎊 Announced!",
+        defaultPartyName: "Gender Reveal Party"
       },
       zh: {
         voteSubmitted: "投票給 {vote} 已提交！",
@@ -171,7 +174,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         votedBoyPopup: "💙 {name} 剛投票給男孩！",
         votedGirlPopup: "💖 {name} 剛投票給女孩！",
         voteChangedPopup: "🔁 {name} 改投 {vote}",
-        announced: "🎊 已揭曉！"
+        announced: "🎊 已揭曉！",
+        defaultPartyName: "性別揭曉派對"
       }
     };
     const t = translations[lang] || translations['en'];
@@ -319,6 +323,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       currentGuestCount = newCount;
     }
   }
+  
+  // Function to refresh guest counter when language changes
+  function refreshGuestCounter() {
+    if (currentGuestCount > 0) {
+      updateGuestCounter(currentGuestCount);
+    }
+  }
+  
+  // Make functions available globally for language switching
+  window.refreshGuestCounter = refreshGuestCounter;
+  window.updatePartyName = updatePartyName;
 
   // Vote popup notifications
   const activePopups = new Set();
@@ -345,7 +360,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     popup.textContent = message;
     
     // Position popup (stack them if multiple)
-    const topOffset = 6 + (activePopups.size * 5);
+    const topOffset = 9 + (activePopups.size * 5);
     popup.style.top = `${topOffset}rem`;
     
     votePopupContainer.appendChild(popup);
@@ -397,6 +412,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCountdown();
   }
 
+  // Party name functionality
+  function updatePartyName(partyName) {
+    if (adminPartyName && isAdmin) {
+      const name = partyName || getTranslation('defaultPartyName');
+      adminPartyName.textContent = name;
+    }
+  }
+
   // Welcome modal for admin (show once per page load)
   function showWelcomeModal() {
     if (welcomeModal && !sessionStorage.getItem('welcomeModalShown')) {
@@ -418,8 +441,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (guestLayout) guestLayout.classList.remove('hidden');
       if (adminLayout) adminLayout.classList.add('hidden');
       
-      // Hide guest counter for non-admin users
+      // Hide guest counter and party header for non-admin users
       if (guestCounter) guestCounter.classList.add('hidden');
+      if (partyHeader) partyHeader.classList.add('hidden');
     }
 
   // Enhanced admin instructions
@@ -462,8 +486,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAdminQR(roomId);
     showAdminBadge();
     
-    // Show guest counter for admin
+    // Show guest counter and party header for admin
     if (guestCounter) guestCounter.classList.remove('hidden');
+    if (partyHeader) partyHeader.classList.remove('hidden');
+    
+    // Load and display party name
+    infoRef.once('value').then(snap => {
+      const info = snap.val();
+      if (info && info.partyName) {
+        updatePartyName(info.partyName);
+      } else {
+        updatePartyName(null); // Will use default name
+      }
+    });
     
     // Show welcome modal for first-time experience
     showWelcomeModal();

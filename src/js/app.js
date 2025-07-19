@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           localStorage.setItem(`name_${roomId}`, name);
           // Redirect to /vote.html?roomId=ROOM_ID&guest=GUEST_NAME
           const encodedName = encodeURIComponent(name);
-                      window.location.href = `/vote.html?roomId=${roomId}&guest=${encodedName}`;
+          window.location.href = `/vote.html?roomId=${roomId}&guest=${encodedName}`;
         } catch (err) {
           guestNameError.textContent = 'An error occurred. Please try again.';
           continueBtn.disabled = false;

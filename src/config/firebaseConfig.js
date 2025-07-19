@@ -110,12 +110,12 @@ window.firebaseInitPromise = new Promise((resolve, reject) => {
 // Development mode logging
 try {
   if (import.meta.env?.VITE_DEV_MODE === 'true') {
-    console.log('Firebase config loaded:', {
-      apiKey: firebaseConfig.apiKey !== "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ? 'Set' : 'Not set',
-      databaseURL: firebaseConfig.databaseURL !== "https://your-project-default-rtdb.firebaseio.com" ? 'Set' : 'Not set',
-      projectId: firebaseConfig.projectId !== "your-project" ? 'Set' : 'Not set'
-    });
-  }
+  console.log('Firebase config loaded:', {
+    apiKey: firebaseConfig.apiKey !== "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" ? 'Set' : 'Not set',
+    databaseURL: firebaseConfig.databaseURL !== "https://your-project-default-rtdb.firebaseio.com" ? 'Set' : 'Not set',
+    projectId: firebaseConfig.projectId !== "your-project" ? 'Set' : 'Not set'
+  });
+}
 } catch (error) {
   console.log('Firebase config loaded (development mode not available)');
 }

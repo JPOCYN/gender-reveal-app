@@ -442,7 +442,7 @@
     /* Guest Counter Styles */
     .guest-counter {
       position: fixed;
-      top: 1rem;
+      top: 6rem;
       left: 50%;
       transform: translateX(-50%);
       background: linear-gradient(135deg, #fbbf24, #f59e0b);
@@ -475,7 +475,7 @@
     /* Vote Popup Notifications */
     .vote-popup {
       position: fixed;
-      top: 6rem;
+      top: 9rem;
       left: 50%;
       transform: translateX(-50%);
       background: white;
@@ -614,6 +614,12 @@
   <!-- Vote Popup Container -->
   <div id="votePopupContainer"></div>
 
+  <!-- Party Name Header (Admin Only) -->
+  <div id="partyHeader" class="fixed top-1 left-1/2 transform -translate-x-1/2 text-center z-30 hidden">
+    <div class="text-4xl mb-1">👶🎈</div>
+    <h1 id="adminPartyName" class="text-xl font-bold text-white bg-black bg-opacity-50 px-4 py-1 rounded-full">Gender Reveal Party</h1>
+  </div>
+
   <!-- Admin Layout -->
   <div id="adminLayout" class="admin-layout hidden">
     <!-- QR Code Section -->
@@ -670,42 +676,42 @@
   <!-- Guest Layout (Mobile/Non-Admin) -->
   <div id="guestLayout" class="guest-layout">
     <div class="guest-card">
-      <div id="partyInfo" class="mb-4">
+    <div id="partyInfo" class="mb-4">
         <div class="text-3xl mb-2">🎈👶🏻</div>
-        <h1 id="partyName" class="text-2xl font-extrabold mb-1" data-i18n="partyNameTitle">Party Name</h1>
-      </div>
+      <h1 id="partyName" class="text-2xl font-extrabold mb-1" data-i18n="partyNameTitle">Party Name</h1>
+    </div>
       
-      <div id="nameSection" class="mb-4">
-        <div class="text-lg mb-2"><span data-i18n="whatsYourName">👋 <span class="font-bold">What's your name?</span></span></div>
-        <input id="guestName" type="text" placeholder="Enter your name" class="w-full px-4 py-3 border-2 border-blue-200 rounded-xl mb-2 text-lg" />
-        <button id="submitNameBtn" class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl transition-all" data-i18n="continue">Continue</button>
-        <div id="nameError" class="text-red-500 text-sm mt-1"></div>
-      </div>
+    <div id="nameSection" class="mb-4">
+      <div class="text-lg mb-2"><span data-i18n="whatsYourName">👋 <span class="font-bold">What's your name?</span></span></div>
+      <input id="guestName" type="text" placeholder="Enter your name" class="w-full px-4 py-3 border-2 border-blue-200 rounded-xl mb-2 text-lg" />
+      <button id="submitNameBtn" class="w-full bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-xl transition-all" data-i18n="continue">Continue</button>
+      <div id="nameError" class="text-red-500 text-sm mt-1"></div>
+    </div>
       
-      <div id="voteSection" class="hidden">
-        <div class="text-lg mb-2" data-i18n="whoDoYouThink">Who do you think it is?</div>
-        <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6 w-full">
+    <div id="voteSection" class="hidden">
+      <div class="text-lg mb-2" data-i18n="whoDoYouThink">Who do you think it is?</div>
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mb-6 w-full">
           <button id="voteBoyBtn" class="flex-1 bg-blue-400 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full text-lg transition-all" data-i18n="boy">Boy 💙</button>
           <button id="voteGirlBtn" class="flex-1 bg-pink-400 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded-full text-lg transition-all" data-i18n="girl">Girl 💖</button>
-        </div>
-        <div id="voteMsg" class="text-green-600 font-semibold"></div>
       </div>
+      <div id="voteMsg" class="text-green-600 font-semibold"></div>
+    </div>
       
-      <div id="resultsSection" class="hidden mt-6">
-        <h2 class="text-lg font-bold mb-2" data-i18n="liveResults">Live Results <span class="text-2xl">🎉</span></h2>
-        <div class="mb-4">
-          <div class="flex items-center mb-2">
-            <span class="text-blue-500 text-2xl mr-2">💙</span>
-            <div class="w-full bg-blue-100 rounded h-8 flex items-center relative overflow-hidden">
-              <div id="boyBar" class="bg-blue-400 h-8 rounded-l transition-all duration-700 ease-in-out absolute left-0 top-0" style="width:0%"></div>
+    <div id="resultsSection" class="hidden mt-6">
+      <h2 class="text-lg font-bold mb-2" data-i18n="liveResults">Live Results <span class="text-2xl">🎉</span></h2>
+      <div class="mb-4">
+        <div class="flex items-center mb-2">
+          <span class="text-blue-500 text-2xl mr-2">💙</span>
+          <div class="w-full bg-blue-100 rounded h-8 flex items-center relative overflow-hidden">
+            <div id="boyBar" class="bg-blue-400 h-8 rounded-l transition-all duration-700 ease-in-out absolute left-0 top-0" style="width:0%"></div>
               <span id="boyCountGuest" class="ml-2 text-blue-700 font-bold relative z-10 pl-2"></span>
             </div>
           </div>
           <div class="max-h-24 overflow-y-auto mb-2 bg-blue-50 rounded p-2 text-left" id="boyNamesGuest"></div>
-          <div class="flex items-center mb-2">
-            <span class="text-pink-500 text-2xl mr-2">💖</span>
-            <div class="w-full bg-pink-100 rounded h-8 flex items-center relative overflow-hidden">
-              <div id="girlBar" class="bg-pink-400 h-8 rounded-l transition-all duration-700 ease-in-out absolute left-0 top-0" style="width:0%"></div>
+        <div class="flex items-center mb-2">
+          <span class="text-pink-500 text-2xl mr-2">💖</span>
+          <div class="w-full bg-pink-100 rounded h-8 flex items-center relative overflow-hidden">
+            <div id="girlBar" class="bg-pink-400 h-8 rounded-l transition-all duration-700 ease-in-out absolute left-0 top-0" style="width:0%"></div>
               <span id="girlCountGuest" class="ml-2 text-pink-700 font-bold relative z-10 pl-2"></span>
             </div>
           </div>
@@ -772,7 +778,20 @@
     }
     
     langBtns.forEach(btn => {
-      btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang')));
+      btn.addEventListener('click', () => {
+        setLang(btn.getAttribute('data-lang'));
+        // Refresh dynamic content when language changes
+        if (typeof refreshGuestCounter === 'function') refreshGuestCounter();
+        if (typeof updatePartyName === 'function') {
+          // Refresh party name from current data
+          const currentName = document.getElementById('adminPartyName')?.textContent;
+          if (currentName && currentName !== 'Gender Reveal Party' && currentName !== '性別揭曉派對') {
+            // Keep the current party name
+          } else {
+            updatePartyName(null); // Update to new language default
+          }
+        }
+      });
     });
     
     setLang(localStorage.getItem('lang') || 'en');

@@ -86,7 +86,7 @@ export const TRANSLATIONS = {
     guestsCanScan: "Guests can scan the QR code or share the invite link to check-in and vote.",
     whenReady: "When you're ready, press \"Reveal Gender\" to start the reveal!",
     scanToVote: "📱 Scan to check-in & vote!",
-    partyScreenMode: "🎬 Live Reveal View",
+    partyScreenMode: "👀 Party Screen",
     guestsCheckedIn: "{count} guests checked in",
     oneGuestCheckedIn: "{count} guest checked in",
     votedBoyPopup: "💙 {name} just voted for Boy!",
@@ -94,6 +94,7 @@ export const TRANSLATIONS = {
     voteChangedPopup: "🔁 {name} switched vote to {vote}",
     announced: "🎊 Announced!",
     metaKeywords: "線上性別揭曉投票 / Gender Reveal Party App",
+    defaultPartyName: "Gender Reveal Party",
   },
   zh: {
     heroTitle: "性別揭曉派對應用",
@@ -182,7 +183,7 @@ export const TRANSLATIONS = {
     guestsCanScan: "賓客可掃描 QR 碼或分享邀請連結來報到投票。",
     whenReady: "準備好時，按「揭曉性別」開始揭曉！",
     scanToVote: "📱 掃描來報到投票！",
-    partyScreenMode: "🎬 即時揭曉顯示",
+    partyScreenMode: "👀 派對螢幕",
     guestsCheckedIn: "{count} 位賓客已報到",
     oneGuestCheckedIn: "{count} 位賓客已報到",
     votedBoyPopup: "💙 {name} 剛投票給男孩！",
@@ -190,5 +191,6 @@ export const TRANSLATIONS = {
     voteChangedPopup: "🔁 {name} 改投 {vote}",
     announced: "🎊 已揭曉！",
     metaKeywords: "線上性別揭曉投票 / Gender Reveal Party App",
+    defaultPartyName: "性別揭曉派對",
   }
 }; 
