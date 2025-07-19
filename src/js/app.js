@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const closePanelBtn = document.getElementById('closePanelBtn');
 
     const baseUrl = window.location.origin;
-    const guestLink = `${baseUrl}/pages/vote.html?roomId=${roomId}`;
-    const adminLink = `${baseUrl}/pages/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
+    const guestLink = `${baseUrl}/vote.html?roomId=${roomId}`;
+    const adminLink = `${baseUrl}/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
 
     panelPartyName.textContent = partyName;
     panelGuestLink.textContent = guestLink;
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
         
         // Redirect directly to admin mode for smooth flow
-        const adminUrl = `${window.location.origin}/pages/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
+        const adminUrl = `${window.location.origin}/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
         window.location.href = adminUrl;
         
         console.log('Redirecting to admin mode');
@@ -229,9 +229,9 @@ document.addEventListener('DOMContentLoaded', () => {
           await guestsRef.push(name);
           // Save to localStorage for voting/results page
           localStorage.setItem(`name_${roomId}`, name);
-          // Redirect to /pages/vote.html?roomId=ROOM_ID&guest=GUEST_NAME
+          // Redirect to /vote.html?roomId=ROOM_ID&guest=GUEST_NAME
           const encodedName = encodeURIComponent(name);
-                      window.location.href = `/pages/vote.html?roomId=${roomId}&guest=${encodedName}`;
+                      window.location.href = `/vote.html?roomId=${roomId}&guest=${encodedName}`;
         } catch (err) {
           guestNameError.textContent = 'An error occurred. Please try again.';
           continueBtn.disabled = false;

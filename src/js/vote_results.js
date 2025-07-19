@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Add copy functionality
       const copyBtn = adminQR.querySelector('#copyGuestLinkBtn');
       const guestLinkText = adminQR.querySelector('#guestLinkText');
-      const guestLink = `${window.location.origin}/pages/vote.html?roomId=${roomId}`;
+      const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
       guestLinkText.textContent = guestLink;
       
       copyBtn.onclick = () => {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
       };
     }
-    const guestLink = `${window.location.origin}/pages/vote.html?roomId=${roomId}`;
+    const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
     const qrDiv = adminQR.querySelector('#adminGuestQR');
     qrDiv.innerHTML = '';
     new QRCode(qrDiv, {
