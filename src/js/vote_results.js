@@ -71,11 +71,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
       adminBadge.innerHTML = '<span data-i18n="partyScreenMode">👀 Party Screen</span>';
-      adminBadge.className = 'fixed top-14 right-2 bg-gradient-to-r from-purple-400 to-pink-400 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold z-50 border-2 border-white';
-      // On wide screens, move left to avoid lang switcher
-      if (window.innerWidth > 640) {
-        adminBadge.className += ' sm:top-4 sm:right-36';
-      }
+      adminBadge.className = 'fixed bottom-4 right-4 bg-gradient-to-r from-purple-400 to-pink-400 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold z-50 border-2 border-white cursor-pointer hover:scale-105 transition-transform';
+      adminBadge.title = getTranslation('partyScreenTooltip');
       document.body.appendChild(adminBadge);
     }
   }
@@ -159,7 +156,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         votedGirlPopup: "💖 {name} just voted for Girl!",
         voteChangedPopup: "🔁 {name} switched vote to {vote}",
         announced: "🎊 Announced!",
-        defaultPartyName: "Gender Reveal Party"
+        defaultPartyName: "Gender Reveal Party",
+        partyScreenTooltip: "F11 for full-screen party view"
       },
       zh: {
         voteSubmitted: "投票給 {vote} 已提交！",
@@ -175,7 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         votedGirlPopup: "💖 {name} 剛投票給女孩！",
         voteChangedPopup: "🔁 {name} 改投 {vote}",
         announced: "🎊 已揭曉！",
-        defaultPartyName: "性別揭曉派對"
+        defaultPartyName: "性別揭曉派對",
+        partyScreenTooltip: "按 F11 進入全螢幕派對顯示"
       }
     };
     const t = translations[lang] || translations['en'];
@@ -360,7 +359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     popup.textContent = message;
     
     // Position popup (stack them if multiple)
-    const topOffset = 9 + (activePopups.size * 5);
+    const topOffset = 2 + (activePopups.size * 5);
     popup.style.top = `${topOffset}rem`;
     
     votePopupContainer.appendChild(popup);
@@ -441,9 +440,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (guestLayout) guestLayout.classList.remove('hidden');
       if (adminLayout) adminLayout.classList.add('hidden');
       
-      // Hide guest counter and party header for non-admin users
+      // Hide guest counter for non-admin users (party header stays hidden via CSS)
       if (guestCounter) guestCounter.classList.add('hidden');
-      if (partyHeader) partyHeader.classList.add('hidden');
     }
 
   // Enhanced admin instructions
@@ -486,9 +484,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAdminQR(roomId);
     showAdminBadge();
     
-    // Show guest counter and party header for admin
+    // Show guest counter for admin (party header is always visible now)
     if (guestCounter) guestCounter.classList.remove('hidden');
-    if (partyHeader) partyHeader.classList.remove('hidden');
     
     // Load and display party name
     infoRef.once('value').then(snap => {

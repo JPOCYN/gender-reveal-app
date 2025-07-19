@@ -95,6 +95,7 @@ export const TRANSLATIONS = {
     announced: "🎊 Announced!",
     metaKeywords: "線上性別揭曉投票 / Gender Reveal Party App",
     defaultPartyName: "Gender Reveal Party",
+    partyScreenTooltip: "F11 for full-screen party view",
   },
   zh: {
     heroTitle: "性別揭曉派對應用",
@@ -192,5 +193,6 @@ export const TRANSLATIONS = {
     announced: "🎊 已揭曉！",
     metaKeywords: "線上性別揭曉投票 / Gender Reveal Party App",
     defaultPartyName: "性別揭曉派對",
+    partyScreenTooltip: "按 F11 進入全螢幕派對顯示",
   }
 }; 
