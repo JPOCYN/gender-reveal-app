@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showAdminBadge() {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
-      adminBadge.textContent = 'Admin Mode';
-      adminBadge.className = 'fixed top-14 right-2 bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full shadow text-xs font-bold z-50';
+      adminBadge.textContent = '🎛️ Admin';
+      adminBadge.className = 'fixed top-14 right-2 bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full shadow text-xs font-semibold z-50 opacity-80';
       // On wide screens, move left to avoid lang switcher
       if (window.innerWidth > 640) {
         adminBadge.className += ' sm:top-4 sm:right-36';
@@ -72,19 +72,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showAdminQR(roomId) {
     if (!adminQR) {
       adminQR = document.createElement('div');
-      adminQR.className = 'bg-white rounded-xl p-6 shadow-lg mt-6 border-2 border-blue-200';
+      adminQR.className = 'bg-gradient-to-br from-pink-50 to-blue-50 rounded-xl p-4 shadow-lg mt-4 border border-pink-200';
       adminQR.innerHTML = `
         <div class="text-center">
-          <div class="text-2xl mb-2">📱</div>
-          <h3 class="font-bold text-lg mb-2" data-i18n="shareWithGuests">Share with Guests</h3>
-          <div class="mb-4">
+          <div class="text-xl mb-2">📱 Share with Guests</div>
+          <div class="mb-3">
             <div id="adminGuestQR" class="flex justify-center mb-2"></div>
-            <div class="text-sm text-gray-600 mb-3" data-i18n="qrInstructions">Guests can scan this QR code to join and vote</div>
-            <div class="bg-gray-100 rounded p-2 text-xs text-gray-700 mb-3">
-              <div class="font-semibold mb-1" data-i18n="guestLink">Guest Link:</div>
-              <div id="guestLinkText" class="break-all"></div>
+            <div class="text-xs text-gray-600 mb-2">Scan to join and vote</div>
+            <div class="bg-white rounded p-2 text-xs text-gray-700 mb-2 border">
+              <div class="font-semibold mb-1">Guest Link:</div>
+              <div id="guestLinkText" class="break-all text-xs"></div>
             </div>
-            <button id="copyGuestLinkBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm" data-i18n="copyLink">Copy Link</button>
+            <button id="copyGuestLinkBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg transition-all text-xs" data-i18n="copyLink">Copy Link</button>
           </div>
         </div>
       `;
@@ -111,8 +110,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     qrDiv.innerHTML = '';
     new QRCode(qrDiv, {
       text: guestLink,
-      width: 192,
-      height: 192,
+      width: 128,
+      height: 128,
       colorDark: "#000000",
       colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.H
@@ -266,24 +265,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Enhanced admin instructions
+  // Minimal admin instructions for party display
   function showAdminInstructions() {
     const instructions = document.createElement('div');
-    instructions.className = 'bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 rounded-r-lg';
+    instructions.className = 'bg-gradient-to-r from-pink-100 to-blue-100 border-2 border-pink-200 p-3 mb-4 rounded-xl text-center';
     instructions.innerHTML = `
-      <div class="flex items-start">
-        <div class="flex-shrink-0">
-          <span class="text-2xl">🎉</span>
-        </div>
-        <div class="ml-3">
-          <h3 class="text-sm font-medium text-blue-800" data-i18n="adminWelcome">Welcome to your Party Control Center!</h3>
-          <div class="mt-2 text-sm text-blue-700">
-            <p class="mb-2" data-i18n="adminInstructions1">• Share the QR code or guest link with your friends</p>
-            <p class="mb-2" data-i18n="adminInstructions2">• Watch live votes appear in real-time</p>
-            <p class="mb-2" data-i18n="adminInstructions3">• Press "Reveal Gender" when ready to announce</p>
-            <p class="mb-2" data-i18n="adminInstructions4">• Press F11 for fullscreen party display</p>
-          </div>
-        </div>
+      <div class="flex items-center justify-center space-x-2">
+        <span class="text-2xl">🎉</span>
+        <span class="text-sm font-semibold text-gray-700">Press F11 for fullscreen party display</span>
+        <span class="text-2xl">📱</span>
       </div>
     `;
     
@@ -294,7 +284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // --- Admin UI encapsulation ---
+  // --- Clean Admin UI for Party Display ---
   function showAdminUI() {
     isAdmin = true;
     // Hide guest UI
@@ -303,26 +293,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (submitNameBtn) submitNameBtn.disabled = true;
     if (voteBoyBtn) voteBoyBtn.disabled = true;
     if (voteGirlBtn) voteGirlBtn.disabled = true;
-    // Show results and reveal
-    if (resultsSection) resultsSection.classList.remove('hidden');
+    
+    // Show results and reveal with celebration styling
+    if (resultsSection) {
+      resultsSection.classList.remove('hidden');
+      resultsSection.classList.add('admin-results');
+    }
     if (revealGenderBtn) revealGenderBtn.classList.remove('hidden');
+    
+    // Show minimal admin badge
     showAdminBadge();
+    
+    // Show compact QR code section
     showAdminQR(roomId);
     
-    // Show admin instructions
+    // Show minimal instructions
     showAdminInstructions();
     
     // Show F11 popup for admin
     showFullscreenPopup();
     
-    // Add back to home button for admin
+    // Add compact back button for admin
     const backToHomeBtn = document.createElement('button');
-    backToHomeBtn.className = 'fixed bottom-4 left-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm z-40';
-    backToHomeBtn.textContent = '← Back to Home';
+    backToHomeBtn.className = 'fixed bottom-4 left-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg transition-all text-xs z-40 opacity-70 hover:opacity-100';
+    backToHomeBtn.textContent = '← Home';
     backToHomeBtn.onclick = () => {
       window.location.href = '/';
     };
     document.body.appendChild(backToHomeBtn);
+    
+    // Apply celebration styling to progress bars
+    const boyBar = document.getElementById('boyBar');
+    const girlBar = document.getElementById('girlBar');
+    if (boyBar) boyBar.classList.add('celebration-bar');
+    if (girlBar) girlBar.classList.add('celebration-bar-girl');
     
     // Reveal button logic
     if (revealGenderBtn) {
