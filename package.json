@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && npm run copy-html",
+    "preview": "vite preview",
+    "copy-html": "copy src\\wizard.html dist\\ && copy src\\vote.html dist\\ && copy src\\result.html dist\\"
   },
   "devDependencies": {
     "vite": "^5.0.0"
