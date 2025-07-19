@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showAdminQR(roomId) {
     if (!adminQR) {
       adminQR = document.createElement('div');
-      adminQR.className = 'bg-gradient-to-br from-pink-50 to-blue-50 rounded-xl p-4 shadow-lg mt-4 border border-pink-200';
+      adminQR.className = 'bg-gradient-to-br from-pink-50 to-blue-50 rounded-xl p-4 shadow-lg mt-4 border border-pink-200 hidden';
       adminQR.innerHTML = `
         <div class="text-center">
           <div class="text-xl mb-2">📱 Share with Guests</div>
@@ -407,7 +407,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       const target = e.target;
       
       if (target.id === 'qrToggleBtn') {
-        showQRModal();
+        // Toggle between modal and inline QR
+        const modal = document.getElementById('qrModal');
+        if (modal && modal.classList.contains('show')) {
+          closeQRModal();
+        } else {
+          showQRModal();
+        }
+        
+        // Update button text based on state
+        const isModalVisible = modal && modal.classList.contains('show');
+        const isInlineVisible = adminQR && !adminQR.classList.contains('hidden');
+        target.innerHTML = (isModalVisible || isInlineVisible) ? '❌ Hide QR' : '📱 QR Code';
       }
       
       if (target.id === 'homeBtn') {
@@ -448,6 +459,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       
       modal.classList.add('show');
+    }
+    
+    // Also toggle the admin QR section if it exists
+    if (adminQR) {
+      adminQR.classList.toggle('hidden');
     }
   }
   
