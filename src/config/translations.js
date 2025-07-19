@@ -81,6 +81,11 @@ export const TRANSLATIONS = {
     errorChangingVote: "Error changing vote. Try again!",
     itsABoy: "It's a BOY 💙!",
     itsAGirl: "It's a GIRL 💖!",
+    welcomeTitle: "Welcome to Your Party Control Center!",
+    pressF11: "Press F11 to enter fullscreen mode.",
+    guestsCanScan: "Guests can scan the QR code or share the invite link to check-in and vote.",
+    whenReady: "When you're ready, press \"Reveal Gender\" to start the reveal!",
+    scanToVote: "📱 Scan to check-in & vote!",
   },
   zh: {
     heroTitle: "性別揭曉派對應用",
@@ -164,5 +169,10 @@ export const TRANSLATIONS = {
     errorChangingVote: "更改投票時發生錯誤。請重試！",
     itsABoy: "是個男孩 💙！",
     itsAGirl: "是個女孩 💖！",
+    welcomeTitle: "歡迎來到您的派對控制中心！",
+    pressF11: "按 F11 進入全螢幕模式。",
+    guestsCanScan: "賓客可掃描 QR 碼或分享邀請連結來報到投票。",
+    whenReady: "準備好時，按「揭曉性別」開始揭曉！",
+    scanToVote: "📱 掃描來報到投票！",
   }
 }; 

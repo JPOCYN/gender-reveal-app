@@ -1,5 +1,5 @@
 // js/vote_results.js
-// Strict admin/guest separation, admin QR, no admin voting
+// Fullscreen admin layout with no-scroll design
 
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
@@ -12,6 +12,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Layout elements
+  const adminLayout = document.getElementById('adminLayout');
+  const guestLayout = document.getElementById('guestLayout');
+  const welcomeModal = document.getElementById('welcomeModal');
+  const welcomeGotItBtn = document.getElementById('welcomeGotItBtn');
+
   // Elements
   const partyNameEl = document.getElementById('partyName');
   const nameSection = document.getElementById('nameSection');
@@ -23,12 +29,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const voteGirlBtn = document.getElementById('voteGirlBtn');
   const voteMsg = document.getElementById('voteMsg');
   const resultsSection = document.getElementById('resultsSection');
-  const boyBar = document.getElementById('boyBar');
-  const girlBar = document.getElementById('girlBar');
+  
+  // Admin layout elements
+  const adminQR = document.getElementById('adminQR');
+  const copyInviteBtn = document.getElementById('copyInviteBtn');
+  const boyBarFill = document.getElementById('boyBarFill');
+  const girlBarFill = document.getElementById('girlBarFill');
   const boyCount = document.getElementById('boyCount');
   const girlCount = document.getElementById('girlCount');
   const boyNames = document.getElementById('boyNames');
   const girlNames = document.getElementById('girlNames');
+  
+  // Guest layout elements
+  const boyBar = document.getElementById('boyBar');
+  const girlBar = document.getElementById('girlBar');
+  const boyCountGuest = document.getElementById('boyCountGuest');
+  const girlCountGuest = document.getElementById('girlCountGuest');
+  const boyNamesGuest = document.getElementById('boyNamesGuest');
+  const girlNamesGuest = document.getElementById('girlNamesGuest');
+  
   const changePopup = document.getElementById('changePopup');
   const confirmChangeBtn = document.getElementById('confirmChangeBtn');
   const cancelChangeBtn = document.getElementById('cancelChangeBtn');
@@ -40,9 +59,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const finalRevealMsg = document.getElementById('finalRevealMsg');
   const finalConfetti = document.getElementById('finalConfetti');
 
-  // Admin badge and QR
+  // Admin badge
   let adminBadge = null;
-  let adminQR = null;
   function showAdminBadge() {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
@@ -69,31 +87,29 @@ document.addEventListener('DOMContentLoaded', async () => {
       backBtn.remove();
     }
   }
-  function showAdminQR(roomId) {
-    if (!adminQR) {
-      adminQR = document.createElement('div');
-      adminQR.className = 'sticky-qr';
-      adminQR.innerHTML = `
-        <div class="text-center">
-          <div class="qr-container">
-            <div id="adminGuestQR"></div>
-          </div>
-          <button id="copyGuestLinkBtn" class="copy-btn" data-i18n="copyInviteLink">📋 Copy Invite Link</button>
-        </div>
-      `;
-      document.body.appendChild(adminQR);
-      
-      // Add copy functionality
-      const copyBtn = adminQR.querySelector('#copyGuestLinkBtn');
+  function setupAdminQR(roomId) {
+    if (adminQR && copyInviteBtn) {
       const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
       
-      copyBtn.onclick = () => {
+      // Generate QR code
+      adminQR.innerHTML = '';
+      new QRCode(adminQR, {
+        text: guestLink,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+      
+      // Setup copy button
+      copyInviteBtn.onclick = () => {
         navigator.clipboard.writeText(guestLink).then(() => {
-          copyBtn.textContent = '✅ Copied!';
-          copyBtn.classList.add('copied');
+          copyInviteBtn.textContent = '✅ Copied!';
+          copyInviteBtn.classList.add('copied');
           setTimeout(() => {
-            copyBtn.textContent = '📋 Copy Invite Link';
-            copyBtn.classList.remove('copied');
+            copyInviteBtn.textContent = '📋 Copy Invite Link';
+            copyInviteBtn.classList.remove('copied');
           }, 2000);
         }).catch(() => {
           // Fallback for older browsers
@@ -103,31 +119,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           textArea.select();
           document.execCommand('copy');
           document.body.removeChild(textArea);
-          copyBtn.textContent = '✅ Copied!';
-          copyBtn.classList.add('copied');
+          copyInviteBtn.textContent = '✅ Copied!';
+          copyInviteBtn.classList.add('copied');
           setTimeout(() => {
-            copyBtn.textContent = '📋 Copy Invite Link';
-            copyBtn.classList.remove('copied');
+            copyInviteBtn.textContent = '📋 Copy Invite Link';
+            copyInviteBtn.classList.remove('copied');
           }, 2000);
         });
       };
-    }
-    const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
-    const qrDiv = adminQR.querySelector('#adminGuestQR');
-    qrDiv.innerHTML = '';
-    new QRCode(qrDiv, {
-      text: guestLink,
-      width: 160,
-      height: 160,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-      correctLevel: QRCode.CorrectLevel.H
-    });
-  }
-  function hideAdminQR() {
-    if (adminQR) {
-      adminQR.remove();
-      adminQR = null;
     }
   }
 
@@ -281,22 +280,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   }
 
-  // F11 Fullscreen popup for admin (show once per session)
-  function showFullscreenPopup() {
-    const popup = document.getElementById('fullscreenPopup');
-    const closeBtn = document.getElementById('closeFullscreenPopup');
-    const sessionKey = `fullscreenPopupShown_${Date.now()}_${Math.random()}`;
-    
-    if (popup && !sessionStorage.getItem('fullscreenPopupShown')) {
-      popup.classList.remove('hidden');
-      sessionStorage.setItem('fullscreenPopupShown', 'true');
+  // Welcome modal for admin (show once per page load)
+  function showWelcomeModal() {
+    if (welcomeModal && !sessionStorage.getItem('welcomeModalShown')) {
+      welcomeModal.classList.remove('hidden');
+      sessionStorage.setItem('welcomeModalShown', 'true');
       
-      if (closeBtn) {
-        closeBtn.onclick = () => {
-          popup.classList.add('hidden');
+      if (welcomeGotItBtn) {
+        welcomeGotItBtn.onclick = () => {
+          welcomeModal.classList.add('hidden');
         };
       }
     }
+  }
+  
+  function showGuestUI() {
+    isAdmin = false;
+    
+    // Show guest layout, hide admin layout
+    if (guestLayout) guestLayout.classList.remove('hidden');
+    if (adminLayout) adminLayout.classList.add('hidden');
   }
 
   // Enhanced admin instructions
@@ -330,32 +333,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- Admin UI encapsulation ---
   function showAdminUI() {
     isAdmin = true;
-    // Hide guest UI
-    if (nameSection) nameSection.classList.add('hidden');
-    if (voteSection) voteSection.classList.add('hidden');
-    if (submitNameBtn) submitNameBtn.disabled = true;
-    if (voteBoyBtn) voteBoyBtn.disabled = true;
-    if (voteGirlBtn) voteGirlBtn.disabled = true;
-    // Show results and reveal
-    if (resultsSection) resultsSection.classList.remove('hidden');
-    if (revealGenderBtn) revealGenderBtn.classList.remove('hidden');
+    
+    // Show admin layout, hide guest layout
+    if (adminLayout) adminLayout.classList.remove('hidden');
+    if (guestLayout) guestLayout.classList.add('hidden');
+    
+    // Setup admin components
+    setupAdminQR(roomId);
     showAdminBadge();
-    showAdminQR(roomId);
     
-    // Show admin instructions
-    showAdminInstructions();
-    
-    // Show F11 popup for admin
-    showFullscreenPopup();
-    
-    // Add back to home button for admin
-    const backToHomeBtn = document.createElement('button');
-    backToHomeBtn.className = 'fixed bottom-4 left-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm z-40';
-    backToHomeBtn.textContent = '← Back to Home';
-    backToHomeBtn.onclick = () => {
-      window.location.href = '/';
-    };
-    document.body.appendChild(backToHomeBtn);
+    // Show welcome modal for first-time experience
+    showWelcomeModal();
     
     // Reveal button logic
     if (revealGenderBtn) {
@@ -389,17 +377,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (token && token === adminTokenParam) {
           showAdminUI();
         } else {
-          if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
+          showGuestUI();
           hideAdminBadge();
-          hideAdminQR();
-          hideAdminUI();
         }
       });
     } else {
-      if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
+      showGuestUI();
       hideAdminBadge();
-      hideAdminQR();
-      hideAdminUI();
     }
   }
   checkAdminMode();
@@ -620,14 +604,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     
     const total = boyList.length + girlList.length;
-    boyCount.textContent = boyList.length;
-    girlCount.textContent = girlList.length;
-    boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
-    girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
+    const boyPercent = total ? (boyList.length / total) * 100 : 0;
+    const girlPercent = total ? (girlList.length / total) * 100 : 0;
+    
+    // Update admin layout
+    if (isAdmin && boyCount && girlCount && boyBarFill && girlBarFill && boyNames && girlNames) {
+      // Update counts with animation
+      if (parseInt(boyCount.textContent) !== boyList.length) {
+        boyCount.classList.add('count-grow');
+        setTimeout(() => boyCount.classList.remove('count-grow'), 600);
+      }
+      if (parseInt(girlCount.textContent) !== girlList.length) {
+        girlCount.classList.add('count-grow');
+        setTimeout(() => girlCount.classList.remove('count-grow'), 600);
+      }
+      
+      boyCount.textContent = boyList.length;
+      girlCount.textContent = girlList.length;
+      boyBarFill.style.width = boyPercent + '%';
+      girlBarFill.style.width = girlPercent + '%';
+      
+      // Add pulse animation when bars change
+      if (boyList.length > 0) {
+        boyBarFill.classList.add('bar-pulse-blue');
+        setTimeout(() => boyBarFill.classList.remove('bar-pulse-blue'), 1000);
+      }
+      if (girlList.length > 0) {
+        girlBarFill.classList.add('bar-pulse-pink');
+        setTimeout(() => girlBarFill.classList.remove('bar-pulse-pink'), 1000);
+      }
+      
+      // Update names with pill badges
+      boyNames.innerHTML = boyList.map(n => {
+        const sanitizedName = sanitizeName(n);
+        return `<span class='pill-badge pill-boy'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
+      }).join('');
+      girlNames.innerHTML = girlList.map(n => {
+        const sanitizedName = sanitizeName(n);
+        return `<span class='pill-badge pill-girl'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
+      }).join('');
+    }
+    
+    // Update guest layout
+    if (!isAdmin && boyCountGuest && girlCountGuest && boyBar && girlBar && boyNamesGuest && girlNamesGuest) {
+      boyCountGuest.textContent = boyList.length;
+      girlCountGuest.textContent = girlList.length;
+      boyBar.style.width = boyPercent + '%';
+      girlBar.style.width = girlPercent + '%';
+      
+      // Update names with simple badges for guest view
+      boyNamesGuest.innerHTML = boyList.map(n => {
+        const sanitizedName = sanitizeName(n);
+        return `<span class='pill-badge pill-boy'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
+      }).join('');
+      girlNamesGuest.innerHTML = girlList.map(n => {
+        const sanitizedName = sanitizeName(n);
+        return `<span class='pill-badge pill-girl'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
+      }).join('');
+    }
     
     // Show vote animation for admin when new votes come in
     if (adminTokenParam && total > previousVoteCount && total > 0) {
-      // Find the newest vote (assuming it's the last one added)
       const newestVote = allVotes[allVotes.length - 1];
       if (newestVote && newestVote.name) {
         const sanitizedName = sanitizeName(newestVote.name);
@@ -636,15 +673,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     previousVoteCount = total;
     
-    // Cute pill badges with emoji
-    boyNames.innerHTML = boyList.map(n => {
-      const sanitizedName = sanitizeName(n);
-      return `<span class='pill-badge pill-boy'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
-    }).join('');
-    girlNames.innerHTML = girlList.map(n => {
-      const sanitizedName = sanitizeName(n);
-      return `<span class='pill-badge pill-girl'>${emojiForName(sanitizedName)} ${sanitizedName}</span>`;
-    }).join('');
     if (!adminTokenParam && hasVoted) showResults();
     if (adminTokenParam) checkAdminMode();
   });
