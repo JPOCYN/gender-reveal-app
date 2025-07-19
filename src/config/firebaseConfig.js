@@ -13,6 +13,37 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-XXXXXXXXXX"
 };
 
+// Initialize Firebase when SDK is available
+function initializeFirebase() {
+  if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+    console.log('Firebase initialized successfully');
+    return true;
+  } else if (typeof firebase !== 'undefined') {
+    console.log('Firebase already initialized');
+    return true;
+  } else {
+    console.log('Firebase SDK not yet loaded, waiting...');
+    return false;
+  }
+}
+
+// Try to initialize immediately, or wait for Firebase to load
+if (!initializeFirebase()) {
+  // Wait for Firebase to be available
+  const checkFirebase = setInterval(() => {
+    if (initializeFirebase()) {
+      clearInterval(checkFirebase);
+    }
+  }, 100);
+  
+  // Timeout after 5 seconds
+  setTimeout(() => {
+    clearInterval(checkFirebase);
+    console.error('Firebase SDK failed to load within 5 seconds');
+  }, 5000);
+}
+
 // Development mode logging
 if (import.meta.env.VITE_DEV_MODE === 'true') {
   console.log('Firebase config loaded:', {
@@ -21,3 +52,6 @@ if (import.meta.env.VITE_DEV_MODE === 'true') {
     projectId: firebaseConfig.projectId !== "your-project" ? 'Set' : 'Not set'
   });
 }
+
+// Export for use in other modules
+export { firebaseConfig };

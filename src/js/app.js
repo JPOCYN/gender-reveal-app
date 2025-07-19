@@ -1,10 +1,7 @@
 // js/app.js for landing and dynamic voting/results page
 // Handles: party creation, QR, and dynamic voting/results if ?roomId=xxx
 
-// Firebase initialization - must happen before any Firebase operations
-if (typeof firebaseConfig !== 'undefined' && !firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+// Firebase is initialized in firebaseConfig.js
 
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(window.location.search);

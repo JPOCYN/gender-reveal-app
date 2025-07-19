@@ -175,10 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return badgeEmojis[Math.abs(hash) % badgeEmojis.length];
   }
 
-  // Firebase
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
+  // Firebase is initialized in firebaseConfig.js
   const db = firebase.database();
   const infoRef = db.ref(`parties/${roomId}/info`);
   const votesRef = db.ref(`parties/${roomId}/votes`);
