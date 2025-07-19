@@ -13,14 +13,14 @@ const getEnvVar = (key, fallback) => {
 };
 
 const firebaseConfig = {
-  apiKey: getEnvVar('VITE_FIREBASE_API_KEY', "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"),
-  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN', "your-project.firebaseapp.com"),
-  databaseURL: getEnvVar('VITE_FIREBASE_DATABASE_URL', "https://your-project-default-rtdb.firebaseio.com"),
-  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID', "your-project"),
-  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET', "your-project.appspot.com"),
-  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', "123456789012"),
-  appId: getEnvVar('VITE_FIREBASE_APP_ID', "1:123456789012:web:abcdef1234567890"),
-  measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID', "G-XXXXXXXXXX")
+  apiKey: getEnvVar('VITE_FIREBASE_API_KEY', "AIzaSyD7TJLAv20tPheXff5o5rXc_aMRSQrYL-g"),
+  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN', "gender-reveal-app-7dc64.firebaseapp.com"),
+  databaseURL: getEnvVar('VITE_FIREBASE_DATABASE_URL', "https://gender-reveal-app-7dc64-default-rtdb.asia-southeast1.firebasedatabase.app"),
+  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID', "gender-reveal-app-7dc64"),
+  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET', "gender-reveal-app-7dc64.firebasestorage.app"),
+  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', "306658063612"),
+  appId: getEnvVar('VITE_FIREBASE_APP_ID', "1:306658063612:web:02554c3599ff65cce0d379"),
+  measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID', "G-ZP2PTQP8Q4")
 };
 
 // Log the actual config being used (for debugging)
