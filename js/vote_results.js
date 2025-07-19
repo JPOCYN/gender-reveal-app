@@ -61,12 +61,50 @@ document.addEventListener('DOMContentLoaded', () => {
       adminBadge = null;
     }
   }
+  
+  function hideAdminUI() {
+    // Remove back to home button
+    const backBtn = document.querySelector('button[onclick*="Back to Home"]');
+    if (backBtn) {
+      backBtn.remove();
+    }
+  }
   function showAdminQR(roomId) {
     if (!adminQR) {
       adminQR = document.createElement('div');
-      adminQR.className = 'flex flex-col items-center mt-6';
-      adminQR.innerHTML = '<div class="font-bold mb-2 text-lg">Scan to Join and Vote</div><div id="adminGuestQR"></div><div class="text-xs text-gray-500 mt-1">Share this QR code with guests</div>';
+      adminQR.className = 'bg-white rounded-xl p-6 shadow-lg mt-6 border-2 border-blue-200';
+      adminQR.innerHTML = `
+        <div class="text-center">
+          <div class="text-2xl mb-2">📱</div>
+          <h3 class="font-bold text-lg mb-2" data-i18n="shareWithGuests">Share with Guests</h3>
+          <div class="mb-4">
+            <div id="adminGuestQR" class="flex justify-center mb-2"></div>
+            <div class="text-sm text-gray-600 mb-3" data-i18n="qrInstructions">Guests can scan this QR code to join and vote</div>
+            <div class="bg-gray-100 rounded p-2 text-xs text-gray-700 mb-3">
+              <div class="font-semibold mb-1" data-i18n="guestLink">Guest Link:</div>
+              <div id="guestLinkText" class="break-all"></div>
+            </div>
+            <button id="copyGuestLinkBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm" data-i18n="copyLink">Copy Link</button>
+          </div>
+        </div>
+      `;
       resultsSection.parentNode.insertBefore(adminQR, resultsSection.nextSibling);
+      
+      // Add copy functionality
+      const copyBtn = adminQR.querySelector('#copyGuestLinkBtn');
+      const guestLinkText = adminQR.querySelector('#guestLinkText');
+      const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
+      guestLinkText.textContent = guestLink;
+      
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(guestLink);
+        copyBtn.textContent = 'Copied!';
+        copyBtn.classList.add('bg-green-500');
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Link';
+          copyBtn.classList.remove('bg-green-500');
+        }, 2000);
+      };
     }
     const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
     const qrDiv = adminQR.querySelector('#adminGuestQR');
@@ -166,6 +204,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Vote animation functions
+  function showVoteAnimation(voterName, vote) {
+    const container = document.getElementById('voteAnimationContainer');
+    if (!container) return;
+    
+    const notification = document.createElement('div');
+    notification.className = 'vote-notification bg-white rounded-lg shadow-lg p-4 mb-2 max-w-xs';
+    notification.innerHTML = `
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">${vote === 'boy' ? '💙' : '💖'}</span>
+        <div>
+          <div class="font-bold text-sm">${voterName}</div>
+          <div class="text-xs text-gray-600">${vote === 'boy' ? 'Boy' : 'Girl'}</div>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(notification);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 800);
+  }
+
+  // F11 Fullscreen popup for admin
+  function showFullscreenPopup() {
+    const popup = document.getElementById('fullscreenPopup');
+    const closeBtn = document.getElementById('closeFullscreenPopup');
+    
+    if (popup && !localStorage.getItem('fullscreenPopupShown')) {
+      popup.classList.remove('hidden');
+      localStorage.setItem('fullscreenPopupShown', 'true');
+      
+      if (closeBtn) {
+        closeBtn.onclick = () => {
+          popup.classList.add('hidden');
+        };
+      }
+    }
+  }
+
+  // Enhanced admin instructions
+  function showAdminInstructions() {
+    const instructions = document.createElement('div');
+    instructions.className = 'bg-blue-50 border-l-4 border-blue-400 p-4 mb-4 rounded-r-lg';
+    instructions.innerHTML = `
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <span class="text-2xl">🎉</span>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800" data-i18n="adminWelcome">Welcome to your Party Control Center!</h3>
+          <div class="mt-2 text-sm text-blue-700">
+            <p class="mb-2" data-i18n="adminInstructions1">• Share the QR code or guest link with your friends</p>
+            <p class="mb-2" data-i18n="adminInstructions2">• Watch live votes appear in real-time</p>
+            <p class="mb-2" data-i18n="adminInstructions3">• Press "Reveal Gender" when ready to announce</p>
+            <p class="mb-2" data-i18n="adminInstructions4">• Press F11 for fullscreen party display</p>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insert instructions at the top of results section
+    const resultsSection = document.getElementById('resultsSection');
+    if (resultsSection) {
+      resultsSection.insertBefore(instructions, resultsSection.firstChild);
+    }
+  }
+
   // --- Admin UI encapsulation ---
   function showAdminUI() {
     isAdmin = true;
@@ -180,6 +290,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (revealGenderBtn) revealGenderBtn.classList.remove('hidden');
     showAdminBadge();
     showAdminQR(roomId);
+    
+    // Show admin instructions
+    showAdminInstructions();
+    
+    // Show F11 popup for admin
+    showFullscreenPopup();
+    
+    // Add back to home button for admin
+    const backToHomeBtn = document.createElement('button');
+    backToHomeBtn.className = 'fixed bottom-4 left-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm z-40';
+    backToHomeBtn.textContent = '← Back to Home';
+    backToHomeBtn.onclick = () => {
+      window.location.href = '/';
+    };
+    document.body.appendChild(backToHomeBtn);
+    
     // Reveal button logic
     if (revealGenderBtn) {
       revealGenderBtn.onclick = () => {
@@ -215,12 +341,14 @@ document.addEventListener('DOMContentLoaded', () => {
           if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
           hideAdminBadge();
           hideAdminQR();
+          hideAdminUI();
         }
       });
     } else {
       if (revealGenderBtn) revealGenderBtn.classList.add('hidden');
       hideAdminBadge();
       hideAdminQR();
+      hideAdminUI();
     }
   }
   checkAdminMode();
@@ -424,6 +552,9 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAdminMode();
   }
 
+  // Track previous vote count for animation detection
+  let previousVoteCount = 0;
+  
   votesRef.on('value', (snapshot) => {
     let boy = 0, girl = 0;
     let boyList = [], girlList = [];
@@ -434,11 +565,24 @@ document.addEventListener('DOMContentLoaded', () => {
       if (v.vote === 'boy') boyList.push(v.name);
       if (v.vote === 'girl') girlList.push(v.name);
     });
+    
     const total = boyList.length + girlList.length;
     boyCount.textContent = boyList.length;
     girlCount.textContent = girlList.length;
     boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
     girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
+    
+    // Show vote animation for admin when new votes come in
+    if (adminTokenParam && total > previousVoteCount && total > 0) {
+      // Find the newest vote (assuming it's the last one added)
+      const newestVote = allVotes[allVotes.length - 1];
+      if (newestVote && newestVote.name) {
+        const sanitizedName = sanitizeName(newestVote.name);
+        showVoteAnimation(sanitizedName, newestVote.vote);
+      }
+    }
+    previousVoteCount = total;
+    
     // Cute pill badges with emoji
     boyNames.innerHTML = boyList.map(n => {
       const sanitizedName = sanitizeName(n);

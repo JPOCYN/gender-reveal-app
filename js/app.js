@@ -111,8 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
           createdAt: firebase.database.ServerValue.TIMESTAMP
         });
         await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
-        showPartyPanel({ partyName, roomId, adminToken });
-        console.log('Party panel shown');
+        
+        // Redirect directly to admin mode for smooth flow
+        const adminUrl = `${window.location.origin}/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
+        window.location.href = adminUrl;
+        
+        console.log('Redirecting to admin mode');
       } catch (err) {
         console.error('Error creating party:', err);
         if (partyError) {
