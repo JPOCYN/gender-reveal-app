@@ -24,8 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const guestWelcomeContinueBtn = document.getElementById('guestWelcomeContinueBtn');
   const viewHostMessageBtn = document.getElementById('viewHostMessageBtn');
   const guestCounter = document.getElementById('guestCounter');
-  const countdownOverlay = document.getElementById('countdownOverlay');
-  const countdownNumber = document.getElementById('countdownNumber');
+
   const votePopupContainer = document.getElementById('votePopupContainer');
   const partyHeader = document.getElementById('partyHeader');
   const adminPartyName = document.getElementById('adminPartyName');
@@ -436,32 +435,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 500);
   }
 
-  // Countdown functionality
-  function startCountdown(callback) {
-    if (!countdownOverlay || !countdownNumber) return;
-    
-    let count = 3;
-    countdownOverlay.classList.remove('hidden');
-    
-    function updateCountdown() {
-      countdownNumber.textContent = count;
-      countdownNumber.style.animation = 'none';
-      void countdownNumber.offsetWidth; // Force reflow
-      countdownNumber.style.animation = 'countdownPulse 1s ease-in-out';
-      
-      if (count > 0) {
-        count--;
-        setTimeout(updateCountdown, 1000);
-      } else {
-        setTimeout(() => {
-          countdownOverlay.classList.add('hidden');
-          if (callback) callback();
-        }, 1000);
-      }
-    }
-    
-    updateCountdown();
-  }
+
 
   // Party name functionality
   function updatePartyName(partyName) {
@@ -605,20 +579,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       confirmRevealBtn.onclick = () => {
         revealPopup.classList.add('hidden');
         
-        // Start countdown then reveal
-        startCountdown(() => {
-          infoRef.once('value').then(snap => {
-            const info = snap.val();
-            if (info && info.prediction) {
-              revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
-              
-              // Update button to announced state
-              if (revealGenderBtn) {
-                revealGenderBtn.innerHTML = getTranslation('announced');
-                revealGenderBtn.classList.add('announced');
-              }
+        // Reveal immediately without countdown
+        infoRef.once('value').then(snap => {
+          const info = snap.val();
+          if (info && info.prediction) {
+            revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
+            
+            // Update button to announced state
+            if (revealGenderBtn) {
+              revealGenderBtn.innerHTML = getTranslation('announced');
+              revealGenderBtn.classList.add('announced');
             }
-          });
+          }
         });
       };
     }

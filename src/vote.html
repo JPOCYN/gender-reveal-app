@@ -630,30 +630,7 @@
       animation: votePopupOut 0.5s ease-in forwards;
     }
     
-    /* Countdown Animation */
-    .countdown-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 60;
-    }
-    
-    .countdown-number {
-      font-size: 8rem;
-      font-weight: 900;
-      color: white;
-      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-      animation: countdownPulse 1s ease-in-out;
-    }
-    
-    @keyframes countdownPulse {
-      0% { transform: scale(0.5); opacity: 0; }
-      50% { transform: scale(1.2); opacity: 1; }
-      100% { transform: scale(1); opacity: 1; }
-    }
+
     
     /* Improved Reveal Button States */
     .reveal-btn.announced {
@@ -706,10 +683,7 @@
     </div>
   </div>
 
-  <!-- Countdown Overlay -->
-  <div id="countdownOverlay" class="countdown-overlay hidden">
-    <div id="countdownNumber" class="countdown-number">3</div>
-  </div>
+
 
   <!-- Vote Popup Container -->
   <div id="votePopupContainer"></div>
@@ -867,6 +841,11 @@
       <div id="finalConfetti" class="text-5xl"></div>
     </div>
   </div>
+  
+  <!-- Footer -->
+  <footer class="w-full py-4 bg-white bg-opacity-80 text-center text-blue-800 text-sm mt-auto border-t border-blue-100">
+    <div><span data-i18n="footer">Made with ♥ for families & friends. | Creator: </span><span class="font-bold" data-i18n="creator">OC</span></div>
+  </footer>
 
   <!-- Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
