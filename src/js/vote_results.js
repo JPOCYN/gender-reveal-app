@@ -365,45 +365,54 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Enhanced floating controls for fullscreen
   function showEnhancedFloatingControls() {
+    // Remove existing controls first
+    const existingControls = document.getElementById('enhancedFloatingControls');
+    if (existingControls) {
+      existingControls.remove();
+    }
+    
     const controls = document.createElement('div');
     controls.id = 'enhancedFloatingControls';
     controls.className = 'floating-controls';
     controls.innerHTML = `
       <button id="qrToggleBtn" class="hover:bg-blue-100">
-        📱 QR Code
+        📱 QR
       </button>
       <button id="homeBtn" class="hover:bg-gray-100">
         🏠 Home
       </button>
       <button id="confettiBtn" class="hover:bg-pink-100">
-        🎉 Confetti
+        🎉 Party
       </button>
     `;
     document.body.appendChild(controls);
     
-    // QR toggle functionality
-    const qrToggleBtn = document.getElementById('qrToggleBtn');
-    if (qrToggleBtn && adminQR) {
-      qrToggleBtn.onclick = () => {
-        adminQR.classList.toggle('hidden');
-      };
-    }
-    
-    // Home button
-    const homeBtn = document.getElementById('homeBtn');
-    if (homeBtn) {
-      homeBtn.onclick = () => {
+    // Use event delegation for better reliability
+    controls.addEventListener('click', (e) => {
+      const target = e.target;
+      
+      if (target.id === 'qrToggleBtn') {
+        const qrElement = document.querySelector('.bg-gradient-to-br.from-pink-50.to-blue-50');
+        if (qrElement) {
+          qrElement.classList.toggle('hidden');
+          // Update button text
+          target.innerHTML = qrElement.classList.contains('hidden') ? '📱 QR' : '❌ Hide';
+        }
+      }
+      
+      if (target.id === 'homeBtn') {
         window.location.href = '/';
-      };
-    }
-    
-    // Confetti button
-    const confettiBtn = document.getElementById('confettiBtn');
-    if (confettiBtn) {
-      confettiBtn.onclick = () => {
+      }
+      
+      if (target.id === 'confettiBtn') {
         createConfetti();
-      };
-    }
+        // Add visual feedback
+        target.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          target.style.transform = '';
+        }, 150);
+      }
+    });
   }
 
   function hideEnhancedFloatingControls() {
