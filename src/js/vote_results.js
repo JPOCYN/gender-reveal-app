@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const guestLayout = document.getElementById('guestLayout');
   const welcomeModal = document.getElementById('welcomeModal');
   const welcomeGotItBtn = document.getElementById('welcomeGotItBtn');
+  const guestWelcomeModal = document.getElementById('guestWelcomeModal');
+  const guestWelcomeTitle = document.getElementById('guestWelcomeTitle');
+  const guestWelcomeMessage = document.getElementById('guestWelcomeMessage');
+  const guestWelcomeContinueBtn = document.getElementById('guestWelcomeContinueBtn');
+  const viewHostMessageBtn = document.getElementById('viewHostMessageBtn');
   const guestCounter = document.getElementById('guestCounter');
   const countdownOverlay = document.getElementById('countdownOverlay');
   const countdownNumber = document.getElementById('countdownNumber');
@@ -157,7 +162,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         voteChangedPopup: "🔁 {name} switched vote to {vote}",
         announced: "🎊 Announced!",
         defaultPartyName: "Gender Reveal Party",
-        partyScreenTooltip: "F11 for full-screen party view"
+        partyScreenTooltip: "F11 for full-screen party view",
+        welcomeModalTitle: "🎉 Welcome, {name}!",
+        welcomeModalButton: "Continue to Vote",
+        viewHostMessageAgain: "🔔 View Host Message Again"
       },
       zh: {
         voteSubmitted: "投票給 {vote} 已提交！",
@@ -174,7 +182,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         voteChangedPopup: "🔁 {name} 改投 {vote}",
         announced: "🎊 已揭曉！",
         defaultPartyName: "性別揭曉派對",
-        partyScreenTooltip: "按 F11 進入全螢幕派對顯示"
+        partyScreenTooltip: "按 F11 進入全螢幕派對顯示",
+        welcomeModalTitle: "🎉 歡迎，{name}！",
+        welcomeModalButton: "繼續投票",
+        viewHostMessageAgain: "🔔 再次查看主辦人訊息"
       }
     };
     const t = translations[lang] || translations['en'];
@@ -261,12 +272,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   let guestName = guestParam ? decodeURIComponent(guestParam) : localStorage.getItem(nameKey);
   let hasVoted = false;
   let isAdmin = false;
+  let partyWelcomeMessage = null;
 
   // Fetch and show party info
   infoRef.once('value').then(snap => {
     const info = snap.val();
     if (info) {
       partyNameEl.textContent = info.partyName || 'Gender Reveal Party';
+      partyWelcomeMessage = info.welcomeMessage || null;
+      
+      // Show welcome message to guests if they just entered their name
+      if (!isAdmin && guestParam && partyWelcomeMessage) {
+        showGuestWelcomeModal(guestName, partyWelcomeMessage);
+      } else if (!isAdmin && partyWelcomeMessage && guestName) {
+        // For returning guests, just show the "View Host Message Again" button
+        if (viewHostMessageBtn) {
+          viewHostMessageBtn.classList.remove('hidden');
+        }
+      }
     } else {
       partyNameEl.textContent = 'Gender Reveal Party';
     }
@@ -432,6 +455,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   }
+
+  // Guest welcome modal (for host message)
+  function showGuestWelcomeModal(name, message) {
+    if (!guestWelcomeModal || !message) return;
+    
+    // Update title with guest name
+    if (guestWelcomeTitle) {
+      const titleText = getTranslation('welcomeModalTitle').replace('{name}', sanitizeName(name));
+      guestWelcomeTitle.textContent = titleText;
+    }
+    
+    // Set welcome message content
+    if (guestWelcomeMessage) {
+      guestWelcomeMessage.textContent = message;
+    }
+    
+    // Show modal
+    guestWelcomeModal.classList.remove('hidden');
+    
+    // Set up continue button
+    if (guestWelcomeContinueBtn) {
+      guestWelcomeContinueBtn.onclick = () => {
+        guestWelcomeModal.classList.add('hidden');
+        // Show the "View Host Message Again" button
+        if (viewHostMessageBtn && !isAdmin) {
+          viewHostMessageBtn.classList.remove('hidden');
+        }
+      };
+    }
+  }
   
       function showGuestUI() {
       isAdmin = false;
@@ -533,6 +586,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         revealPopup.classList.add('hidden');
       };
     }
+  }
+
+  // Setup "View Host Message Again" button
+  if (viewHostMessageBtn) {
+    viewHostMessageBtn.addEventListener('click', () => {
+      if (partyWelcomeMessage && guestName) {
+        showGuestWelcomeModal(guestName, partyWelcomeMessage);
+      }
+    });
   }
 
   // Robust Admin token check (always run on load, never hidden by guest logic)

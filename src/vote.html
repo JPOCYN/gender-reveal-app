@@ -673,6 +673,20 @@
     </div>
   </div>
 
+  <!-- Guest Welcome Modal (for host welcome message) -->
+  <div id="guestWelcomeModal" class="welcome-modal hidden">
+    <div class="welcome-content">
+      <div class="text-5xl mb-4">🎉</div>
+      <h2 id="guestWelcomeTitle" class="welcome-title" data-i18n="welcomeModalTitle">🎉 Welcome, Guest!</h2>
+      <div id="guestWelcomeMessage" class="welcome-message bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400 text-left whitespace-pre-wrap">
+        <!-- Welcome message content will be inserted here -->
+      </div>
+      <button id="guestWelcomeContinueBtn" class="welcome-btn mt-4" data-i18n="welcomeModalButton">
+        Continue to Vote
+      </button>
+    </div>
+  </div>
+
   <!-- Countdown Overlay -->
   <div id="countdownOverlay" class="countdown-overlay hidden">
     <div id="countdownNumber" class="countdown-number">3</div>
@@ -794,6 +808,11 @@
         </div>
       </div>
     </div>
+    
+    <!-- View Host Message Again Button -->
+    <button id="viewHostMessageBtn" class="hidden fixed bottom-4 right-4 bg-blue-100 hover:bg-blue-200 text-blue-600 px-4 py-2 rounded-full text-sm font-bold z-50 border-2 border-blue-300 shadow-lg transition-all hover:scale-105" data-i18n="viewHostMessageAgain">
+      🔔 View Host Message Again
+    </button>
   </div>
 
   <!-- Popups and Modals -->

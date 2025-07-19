@@ -126,12 +126,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
         const partyName = partyNameInput.value.trim();
         const prediction = partyForm.hostPrediction.value;
-        console.log('Creating party:', { partyName, prediction, roomId, adminToken });
-        await db.ref(`parties/${roomId}/info`).set({
+        const welcomeMessage = window.getWelcomeMessage ? window.getWelcomeMessage() : '';
+        console.log('Creating party:', { partyName, prediction, welcomeMessage, roomId, adminToken });
+        
+        const partyData = {
           partyName,
           prediction,
           createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
+        };
+        
+        // Only add welcomeMessage if it exists
+        if (welcomeMessage) {
+          partyData.welcomeMessage = welcomeMessage;
+        }
+        
+        await db.ref(`parties/${roomId}/info`).set(partyData);
         await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
         
         // Redirect directly to admin mode for smooth flow

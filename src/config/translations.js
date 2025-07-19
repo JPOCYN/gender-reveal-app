@@ -96,6 +96,14 @@ export const TRANSLATIONS = {
     metaKeywords: "線上性別揭曉投票 / Gender Reveal Party App",
     defaultPartyName: "Gender Reveal Party",
     partyScreenTooltip: "F11 for full-screen party view",
+    welcomeMessageQuestion: "Would you like to write a welcome message for your guests?",
+    welcomeMessageYes: "Yes",
+    welcomeMessageNo: "No",
+    welcomeMessagePlaceholder: "Thank you for coming! We're so excited to share this moment with you ❤️",
+    welcomeMessageLabel: "Your welcome message:",
+    welcomeModalTitle: "🎉 Welcome, {name}!",
+    welcomeModalButton: "Continue to Vote",
+    viewHostMessageAgain: "🔔 View Host Message Again",
   },
   zh: {
     heroTitle: "性別揭曉派對應用",
@@ -194,5 +202,13 @@ export const TRANSLATIONS = {
     metaKeywords: "線上性別揭曉投票 / Gender Reveal Party App",
     defaultPartyName: "性別揭曉派對",
     partyScreenTooltip: "按 F11 進入全螢幕派對顯示",
+    welcomeMessageQuestion: "您想為賓客寫一則歡迎訊息嗎？",
+    welcomeMessageYes: "是",
+    welcomeMessageNo: "否",
+    welcomeMessagePlaceholder: "感謝您的到來！我們很興奮與您分享這個時刻 ❤️",
+    welcomeMessageLabel: "您的歡迎訊息：",
+    welcomeModalTitle: "🎉 歡迎，{name}！",
+    welcomeModalButton: "繼續投票",
+    viewHostMessageAgain: "🔔 再次查看主辦人訊息",
   }
 }; 
