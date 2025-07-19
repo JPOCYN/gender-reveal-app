@@ -353,8 +353,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Just add CSS classes - don't restructure DOM to preserve event handlers
     resultsSection.classList.add('fullscreen-results-structured');
     
-    // Create admin QR section
-    createAdminQRSection();
+    // Create live voting layout
+    createLiveVotingLayout();
     
     // Show F11 instructions
     showF11Instructions();
@@ -363,43 +363,75 @@ document.addEventListener('DOMContentLoaded', async () => {
     startSubtleConfetti();
   }
   
-  function createAdminQRSection() {
-    // Remove existing admin QR if any
-    const existingQR = document.querySelector('.admin-qr-section');
-    if (existingQR) {
-      existingQR.remove();
-    }
+  function createLiveVotingLayout() {
+    const container = document.querySelector('.party-display-mode');
+    if (!container) return;
     
-    const qrSection = document.createElement('div');
-    qrSection.className = 'admin-qr-section';
-    qrSection.innerHTML = `
-      <h3>📱 Guest Check-in</h3>
-      <p class="text-sm text-gray-600 mb-4">Scan QR code to join and vote</p>
-      <div class="qr-code" id="adminQrCode"></div>
-      <div class="guest-link" id="guestLinkText"></div>
-      <button class="copy-btn" id="copyGuestLinkBtn">Copy Link</button>
+    // Create live voting bars
+    const voteBarsContainer = document.createElement('div');
+    voteBarsContainer.className = 'live-vote-bars';
+    voteBarsContainer.innerHTML = `
+      <div class="vote-bar-container" id="boyVoteBar">
+        <div class="vote-bar-header">
+          <div class="vote-bar-label">
+            <span class="vote-bar-emoji">💙</span>
+            <span>Boy</span>
+          </div>
+          <div class="vote-count" id="boyVoteCount">0</div>
+        </div>
+        <div class="vote-bar-bg">
+          <div class="vote-bar-fill boy" id="boyVoteFill" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div class="vote-bar-container" id="girlVoteBar">
+        <div class="vote-bar-header">
+          <div class="vote-bar-label">
+            <span class="vote-bar-emoji">❤️</span>
+            <span>Girl</span>
+          </div>
+          <div class="vote-count" id="girlVoteCount">0</div>
+        </div>
+        <div class="vote-bar-bg">
+          <div class="vote-bar-fill girl" id="girlVoteFill" style="width: 0%"></div>
+        </div>
+      </div>
     `;
     
     // Insert after the title
-    const container = document.querySelector('.party-display-mode');
     const title = container.querySelector('h2');
     if (title) {
-      title.parentNode.insertBefore(qrSection, title.nextSibling);
+      title.parentNode.insertBefore(voteBarsContainer, title.nextSibling);
     }
     
+    // Create sticky QR area
+    const qrArea = document.createElement('div');
+    qrArea.className = 'sticky-qr-area';
+    qrArea.innerHTML = `
+      <h3>📱 Guest Check-in</h3>
+      <div class="qr-code" id="stickyQrCode"></div>
+      <button class="copy-btn" id="copyInviteLinkBtn">📋 Copy Invite Link</button>
+    `;
+    document.body.appendChild(qrArea);
+    
+    // Create reveal button
+    const revealBtn = document.createElement('button');
+    revealBtn.className = 'reveal-gender-btn';
+    revealBtn.textContent = 'Reveal Gender';
+    revealBtn.id = 'revealGenderBtn';
+    document.body.appendChild(revealBtn);
+    
     // Generate QR code
-    const qrContainer = qrSection.querySelector('#adminQrCode');
-    const guestLinkText = qrSection.querySelector('#guestLinkText');
-    const copyBtn = qrSection.querySelector('#copyGuestLinkBtn');
+    const qrContainer = qrArea.querySelector('#stickyQrCode');
+    const copyBtn = qrArea.querySelector('#copyInviteLinkBtn');
     
     const guestLink = `${window.location.origin}/vote.html?roomId=${roomId}`;
-    guestLinkText.textContent = guestLink;
     
     if (typeof QRCode !== 'undefined' && qrContainer) {
       new QRCode(qrContainer, {
         text: guestLink,
-        width: 150,
-        height: 150,
+        width: 120,
+        height: 120,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.H
@@ -409,13 +441,104 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Copy functionality
     copyBtn.onclick = () => {
       navigator.clipboard.writeText(guestLink);
-      copyBtn.textContent = 'Copied!';
+      copyBtn.textContent = '✅ Copied!';
       copyBtn.style.background = '#10b981';
       setTimeout(() => {
-        copyBtn.textContent = 'Copy Link';
+        copyBtn.textContent = '📋 Copy Invite Link';
         copyBtn.style.background = '';
       }, 2000);
     };
+    
+    // Reveal button functionality
+    revealBtn.onclick = () => {
+      triggerGenderReveal();
+    };
+  }
+  
+  function updateLiveVoteBars(boyVotes, girlVotes) {
+    const boyVoteCount = document.getElementById('boyVoteCount');
+    const girlVoteCount = document.getElementById('girlVoteCount');
+    const boyVoteFill = document.getElementById('boyVoteFill');
+    const girlVoteFill = document.getElementById('girlVoteFill');
+    const boyVoteBar = document.getElementById('boyVoteBar');
+    const girlVoteBar = document.getElementById('girlVoteBar');
+    
+    if (!boyVoteCount || !girlVoteCount || !boyVoteFill || !girlVoteFill) return;
+    
+    const total = boyVotes + girlVotes;
+    const boyPercentage = total > 0 ? (boyVotes / total) * 100 : 0;
+    const girlPercentage = total > 0 ? (girlVotes / total) * 100 : 0;
+    
+    // Update vote counts with animation
+    boyVoteCount.textContent = boyVotes;
+    girlVoteCount.textContent = girlVotes;
+    
+    // Animate vote bars
+    boyVoteFill.style.width = boyPercentage + '%';
+    girlVoteFill.style.width = girlPercentage + '%';
+    
+    // Add animation class
+    boyVoteFill.classList.add('vote-bar-animate');
+    girlVoteFill.classList.add('vote-bar-animate');
+    
+    // Remove animation class after animation completes
+    setTimeout(() => {
+      boyVoteFill.classList.remove('vote-bar-animate');
+      girlVoteFill.classList.remove('vote-bar-animate');
+    }, 1000);
+    
+    // Update leading indicator
+    if (boyVotes > girlVotes) {
+      boyVoteBar.classList.add('leading');
+      girlVoteBar.classList.remove('leading');
+      boyVoteFill.classList.add('leading');
+      girlVoteFill.classList.remove('leading');
+    } else if (girlVotes > boyVotes) {
+      girlVoteBar.classList.add('leading');
+      boyVoteBar.classList.remove('leading');
+      girlVoteFill.classList.add('leading');
+      boyVoteFill.classList.remove('leading');
+    } else {
+      boyVoteBar.classList.remove('leading');
+      girlVoteBar.classList.remove('leading');
+      boyVoteFill.classList.remove('leading');
+      girlVoteFill.classList.remove('leading');
+    }
+  }
+  
+  function triggerGenderReveal() {
+    // Create massive confetti
+    for (let i = 0; i < 50; i++) {
+      setTimeout(() => {
+        createConfetti();
+      }, i * 100);
+    }
+    
+    // Change background
+    document.body.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
+    
+    // Show celebration message
+    const celebration = document.createElement('div');
+    celebration.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      font-weight: 900;
+      color: white;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+      z-index: 1000;
+      text-align: center;
+    `;
+    celebration.innerHTML = '🎉 GENDER REVEALED! 🎉';
+    document.body.appendChild(celebration);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      celebration.remove();
+      document.body.style.background = '';
+    }, 3000);
   }
   
   function showF11Instructions() {
@@ -426,6 +549,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     instructions.className = 'f11-instructions';
     instructions.innerHTML = `
       <div class="content">
+        <button class="dismiss-btn" id="dismissF11Btn">✖️</button>
         <h2>🎉 Fullscreen Party Mode</h2>
         <p>Press <span class="key">F11</span> to enter fullscreen mode for the best party experience!</p>
         <p class="text-sm text-gray-500">Your guests can scan the QR code to join and vote in real-time.</p>
@@ -435,10 +559,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     document.body.appendChild(instructions);
     
-    // Add event listener for close button
+    // Add event listeners
     const closeBtn = instructions.querySelector('#closeF11Btn');
+    const dismissBtn = instructions.querySelector('#dismissF11Btn');
+    
     if (closeBtn) {
       closeBtn.addEventListener('click', closeF11Instructions);
+    }
+    
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', closeF11Instructions);
     }
     
     // Mark as shown
@@ -972,6 +1102,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     girlCount.textContent = girlList.length;
     boyBar.style.width = total ? `${(boyList.length/total)*100}%` : '0%';
     girlBar.style.width = total ? `${(girlList.length/total)*100}%` : '0%';
+    
+    // Update live vote bars for admin mode
+    if (adminTokenParam) {
+      updateLiveVoteBars(boyList.length, girlList.length);
+    }
     
     // Show vote animation for admin when new votes come in
     if (adminTokenParam && total > previousVoteCount && total > 0) {
