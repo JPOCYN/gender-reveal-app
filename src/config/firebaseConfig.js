@@ -2,25 +2,29 @@
 // Uses environment variables for security in production
 // For local development, create a .env file with your Firebase credentials
 
-// Safely access environment variables with fallbacks
-const getEnvVar = (key, fallback) => {
+// Safely access environment variables - NO FALLBACKS for security
+const getEnvVar = (key) => {
   try {
-    return import.meta.env?.[key] || fallback;
+    const value = import.meta.env?.[key];
+    if (!value) {
+      throw new Error(`Required environment variable ${key} is not set`);
+    }
+    return value;
   } catch (error) {
-    console.warn(`Could not access environment variable ${key}, using fallback`);
-    return fallback;
+    console.error(`Critical error: Environment variable ${key} is required but not set`);
+    throw error;
   }
 };
 
 const firebaseConfig = {
-  apiKey: getEnvVar('VITE_FIREBASE_API_KEY', "AIzaSyD7TJLAv20tPheXff5o5rXc_aMRSQrYL-g"),
-  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN', "gender-reveal-app-7dc64.firebaseapp.com"),
-  databaseURL: getEnvVar('VITE_FIREBASE_DATABASE_URL', "https://gender-reveal-app-7dc64-default-rtdb.asia-southeast1.firebasedatabase.app"),
-  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID', "gender-reveal-app-7dc64"),
-  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET', "gender-reveal-app-7dc64.firebasestorage.app"),
-  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID', "306658063612"),
-  appId: getEnvVar('VITE_FIREBASE_APP_ID', "1:306658063612:web:02554c3599ff65cce0d379"),
-  measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID', "G-ZP2PTQP8Q4")
+  apiKey: getEnvVar('VITE_FIREBASE_API_KEY'),
+  authDomain: getEnvVar('VITE_FIREBASE_AUTH_DOMAIN'),
+  databaseURL: getEnvVar('VITE_FIREBASE_DATABASE_URL'),
+  projectId: getEnvVar('VITE_FIREBASE_PROJECT_ID'),
+  storageBucket: getEnvVar('VITE_FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: getEnvVar('VITE_FIREBASE_MESSAGING_SENDER_ID'),
+  appId: getEnvVar('VITE_FIREBASE_APP_ID'),
+  measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID')
 };
 
 // Log the actual config being used (for debugging)

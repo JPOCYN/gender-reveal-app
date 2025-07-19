@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Show party panel modal
   function showPartyPanel({ partyName, roomId, adminToken }) {
-    console.log('showPartyPanel called', { partyName, roomId, adminToken });
+    console.log('showPartyPanel called', { partyName });
     const panel = partyPanel;
     const panelPartyName = document.getElementById('panelPartyName');
     const panelQrCode = document.getElementById('panelQrCode');
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const partyName = partyNameInput.value.trim();
         const prediction = partyForm.hostPrediction.value;
         const welcomeMessage = window.getWelcomeMessage ? window.getWelcomeMessage() : '';
-        console.log('Creating party:', { partyName, prediction, welcomeMessage, roomId, adminToken });
+        console.log('Creating party:', { partyName, prediction, hasWelcomeMessage: !!welcomeMessage });
         
         const partyData = {
           partyName,

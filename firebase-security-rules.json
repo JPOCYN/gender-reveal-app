@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "parties": {
+      "$roomId": {
+        "info": {
+          ".read": true,
+          ".write": "!data.exists()"
+        },
+        "adminToken": {
+          ".read": false,
+          ".write": "!data.exists()"
+        },
+        "votes": {
+          ".read": true,
+          "$voteId": {
+            ".write": "!data.exists() || auth != null"
+          }
+        },
+        "guests": {
+          ".read": true,
+          ".write": true
+        },
+        "reveal": {
+          ".read": true,
+          ".write": false
+        }
+      }
+    },
+    "rooms": {
+      "$roomId": {
+        "guests": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    }
+  }
+} 
