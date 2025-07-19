@@ -17,6 +17,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const guestLayout = document.getElementById('guestLayout');
   const welcomeModal = document.getElementById('welcomeModal');
   const welcomeGotItBtn = document.getElementById('welcomeGotItBtn');
+  const guestCounter = document.getElementById('guestCounter');
+  const countdownOverlay = document.getElementById('countdownOverlay');
+  const countdownNumber = document.getElementById('countdownNumber');
+  const votePopupContainer = document.getElementById('votePopupContainer');
 
   // Elements
   const partyNameEl = document.getElementById('partyName');
@@ -64,8 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function showAdminBadge() {
     if (!adminBadge) {
       adminBadge = document.createElement('div');
-      adminBadge.textContent = 'Admin Mode';
-      adminBadge.className = 'fixed top-14 right-2 bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full shadow text-xs font-bold z-50';
+      adminBadge.innerHTML = '<span data-i18n="partyScreenMode">🎬 Live Reveal View</span>';
+      adminBadge.className = 'fixed top-14 right-2 bg-gradient-to-r from-purple-400 to-pink-400 text-white px-4 py-2 rounded-full shadow-lg text-sm font-bold z-50 border-2 border-white';
       // On wide screens, move left to avoid lang switcher
       if (window.innerWidth > 640) {
         adminBadge.className += ' sm:top-4 sm:right-36';
@@ -146,7 +150,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         voteChanged: "Vote changed to {vote}!",
         errorChangingVote: "Error changing vote. Try again!",
         itsABoy: "It's a BOY 💙!",
-        itsAGirl: "It's a GIRL 💖!"
+        itsAGirl: "It's a GIRL 💖!",
+        guestsCheckedIn: "{count} guests checked in",
+        oneGuestCheckedIn: "{count} guest checked in",
+        votedBoyPopup: "💙 {name} just voted for Boy!",
+        votedGirlPopup: "💖 {name} just voted for Girl!",
+        voteChangedPopup: "🔁 {name} switched vote to {vote}",
+        announced: "🎊 Announced!"
       },
       zh: {
         voteSubmitted: "投票給 {vote} 已提交！",
@@ -155,7 +165,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         voteChanged: "投票已更改為 {vote}！",
         errorChangingVote: "更改投票時發生錯誤。請重試！",
         itsABoy: "是個男孩 💙！",
-        itsAGirl: "是個女孩 💖！"
+        itsAGirl: "是個女孩 💖！",
+        guestsCheckedIn: "{count} 位賓客已報到",
+        oneGuestCheckedIn: "{count} 位賓客已報到",
+        votedBoyPopup: "💙 {name} 剛投票給男孩！",
+        votedGirlPopup: "💖 {name} 剛投票給女孩！",
+        voteChangedPopup: "🔁 {name} 改投 {vote}",
+        announced: "🎊 已揭曉！"
       }
     };
     const t = translations[lang] || translations['en'];
@@ -280,35 +296,131 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   }
 
+  // Guest counter functionality
+  let currentGuestCount = 0;
+  function updateGuestCounter(newCount) {
+    if (guestCounter && isAdmin) {
+      const countText = newCount === 1 ? 
+        getTranslation('oneGuestCheckedIn').replace('{count}', newCount) :
+        getTranslation('guestsCheckedIn').replace('{count}', newCount);
+      
+      const span = guestCounter.querySelector('span');
+      if (span) {
+        span.textContent = `🎉 ${countText}`;
+        
+        // Add bounce animation if count increased
+        if (newCount > currentGuestCount) {
+          guestCounter.classList.remove('counter-update');
+          void guestCounter.offsetWidth; // Force reflow
+          guestCounter.classList.add('counter-update');
+          setTimeout(() => guestCounter.classList.remove('counter-update'), 600);
+        }
+      }
+      currentGuestCount = newCount;
+    }
+  }
+
+  // Vote popup notifications
+  const activePopups = new Set();
+  const maxPopups = 2;
+  
+  function showVotePopup(guestName, vote, isChange = false) {
+    if (!isAdmin || activePopups.size >= maxPopups) return;
+    
+    const popup = document.createElement('div');
+    const sanitizedName = sanitizeName(guestName);
+    
+    let message, voteClass;
+    if (isChange) {
+      message = getTranslation('voteChangedPopup').replace('{name}', sanitizedName).replace('{vote}', vote === 'boy' ? '💙 Boy' : '💖 Girl');
+      voteClass = 'vote-change';
+    } else {
+      message = vote === 'boy' ? 
+        getTranslation('votedBoyPopup').replace('{name}', sanitizedName) :
+        getTranslation('votedGirlPopup').replace('{name}', sanitizedName);
+      voteClass = vote === 'boy' ? 'boy-vote' : 'girl-vote';
+    }
+    
+    popup.className = `vote-popup ${voteClass}`;
+    popup.textContent = message;
+    
+    // Position popup (stack them if multiple)
+    const topOffset = 6 + (activePopups.size * 5);
+    popup.style.top = `${topOffset}rem`;
+    
+    votePopupContainer.appendChild(popup);
+    activePopups.add(popup);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      removeVotePopup(popup);
+    }, 3000);
+  }
+  
+  function removeVotePopup(popup) {
+    if (!activePopups.has(popup)) return;
+    
+    popup.classList.add('removing');
+    activePopups.delete(popup);
+    
+    setTimeout(() => {
+      if (popup.parentNode) {
+        popup.parentNode.removeChild(popup);
+      }
+    }, 500);
+  }
+
+  // Countdown functionality
+  function startCountdown(callback) {
+    if (!countdownOverlay || !countdownNumber) return;
+    
+    let count = 3;
+    countdownOverlay.classList.remove('hidden');
+    
+    function updateCountdown() {
+      countdownNumber.textContent = count;
+      countdownNumber.style.animation = 'none';
+      void countdownNumber.offsetWidth; // Force reflow
+      countdownNumber.style.animation = 'countdownPulse 1s ease-in-out';
+      
+      if (count > 0) {
+        count--;
+        setTimeout(updateCountdown, 1000);
+      } else {
+        setTimeout(() => {
+          countdownOverlay.classList.add('hidden');
+          if (callback) callback();
+        }, 1000);
+      }
+    }
+    
+    updateCountdown();
+  }
+
   // Welcome modal for admin (show once per page load)
   function showWelcomeModal() {
-    console.log('showWelcomeModal called', { welcomeModal, welcomeGotItBtn });
-    // Clear previous session storage for testing
-    sessionStorage.removeItem('welcomeModalShown');
-    
     if (welcomeModal && !sessionStorage.getItem('welcomeModalShown')) {
-      console.log('Showing welcome modal');
       welcomeModal.classList.remove('hidden');
       sessionStorage.setItem('welcomeModalShown', 'true');
       
       if (welcomeGotItBtn) {
         welcomeGotItBtn.onclick = () => {
-          console.log('Got it button clicked');
           welcomeModal.classList.add('hidden');
         };
       }
-    } else {
-      console.log('Modal not shown:', { hasModal: !!welcomeModal, alreadyShown: !!sessionStorage.getItem('welcomeModalShown') });
     }
   }
   
-  function showGuestUI() {
-    isAdmin = false;
-    
-    // Show guest layout, hide admin layout
-    if (guestLayout) guestLayout.classList.remove('hidden');
-    if (adminLayout) adminLayout.classList.add('hidden');
-  }
+      function showGuestUI() {
+      isAdmin = false;
+      
+      // Show guest layout, hide admin layout
+      if (guestLayout) guestLayout.classList.remove('hidden');
+      if (adminLayout) adminLayout.classList.add('hidden');
+      
+      // Hide guest counter for non-admin users
+      if (guestCounter) guestCounter.classList.add('hidden');
+    }
 
   // Enhanced admin instructions
   function showAdminInstructions() {
@@ -350,24 +462,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupAdminQR(roomId);
     showAdminBadge();
     
+    // Show guest counter for admin
+    if (guestCounter) guestCounter.classList.remove('hidden');
+    
     // Show welcome modal for first-time experience
     showWelcomeModal();
     
-    // Reveal button logic
+    // Enhanced reveal button logic with countdown
     if (revealGenderBtn) {
       revealGenderBtn.onclick = () => {
+        if (revealGenderBtn.classList.contains('announced')) return;
         revealPopup.classList.remove('hidden');
       };
     }
     if (confirmRevealBtn) {
       confirmRevealBtn.onclick = () => {
-        infoRef.once('value').then(snap => {
-          const info = snap.val();
-          if (info && info.prediction) {
-            revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
-          }
-        });
         revealPopup.classList.add('hidden');
+        
+        // Start countdown then reveal
+        startCountdown(() => {
+          infoRef.once('value').then(snap => {
+            const info = snap.val();
+            if (info && info.prediction) {
+              revealRef.set({ actual: info.prediction, revealedAt: Date.now() });
+              
+              // Update button to announced state
+              if (revealGenderBtn) {
+                revealGenderBtn.innerHTML = getTranslation('announced');
+                revealGenderBtn.classList.add('announced');
+              }
+            }
+          });
+        });
       };
     }
     if (cancelRevealBtn) {
@@ -597,8 +723,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     checkAdminMode();
   }
 
-  // Track previous vote count for animation detection
+  // Track previous vote count and votes for popup detection
   let previousVoteCount = 0;
+  let previousVotes = new Map(); // Map of voter name to their vote
   
   votesRef.on('value', (snapshot) => {
     let boy = 0, girl = 0;
@@ -671,7 +798,32 @@ document.addEventListener('DOMContentLoaded', async () => {
       }).join('');
     }
     
-    // Show vote animation for admin when new votes come in
+    // Detect new votes and changes for popups
+    if (isAdmin) {
+      const currentVotes = new Map();
+      allVotes.forEach(v => {
+        currentVotes.set(v.name, v.vote);
+      });
+      
+      // Check for new votes or vote changes
+      currentVotes.forEach((vote, name) => {
+        const previousVote = previousVotes.get(name);
+        if (!previousVote) {
+          // New voter
+          showVotePopup(name, vote, false);
+        } else if (previousVote !== vote) {
+          // Vote changed
+          showVotePopup(name, vote, true);
+        }
+      });
+      
+      previousVotes = currentVotes;
+      
+      // Update guest counter
+      updateGuestCounter(total);
+    }
+    
+    // Legacy animation for compatibility
     if (adminTokenParam && total > previousVoteCount && total > 0) {
       const newestVote = allVotes[allVotes.length - 1];
       if (newestVote && newestVote.name) {

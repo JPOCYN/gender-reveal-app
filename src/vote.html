@@ -439,6 +439,143 @@
       }
     }
     
+    /* Guest Counter Styles */
+    .guest-counter {
+      position: fixed;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: white;
+      padding: 0.75rem 2rem;
+      border-radius: 2rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(251, 191, 36, 0.3);
+      z-index: 40;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      animation: counterPulse 2s infinite;
+    }
+    
+    @keyframes counterPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+    }
+    
+    .counter-update {
+      animation: counterBounce 0.6s ease-out;
+    }
+    
+    @keyframes counterBounce {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.15); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+    
+    /* Vote Popup Notifications */
+    .vote-popup {
+      position: fixed;
+      top: 6rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      border-radius: 1.5rem;
+      padding: 1rem 2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      z-index: 45;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: 3px solid;
+      animation: votePopupIn 0.8s ease-out forwards;
+      max-width: 400px;
+      text-align: center;
+    }
+    
+    .vote-popup.boy-vote {
+      border-color: #3b82f6;
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+      color: #1d4ed8;
+    }
+    
+    .vote-popup.girl-vote {
+      border-color: #ec4899;
+      background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+      color: #be185d;
+    }
+    
+    .vote-popup.vote-change {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      color: #d97706;
+    }
+    
+    @keyframes votePopupIn {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px) scale(0.8);
+      }
+      60% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+    }
+    
+    @keyframes votePopupOut {
+      0% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px) scale(0.9);
+      }
+    }
+    
+    .vote-popup.removing {
+      animation: votePopupOut 0.5s ease-in forwards;
+    }
+    
+    /* Countdown Animation */
+    .countdown-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+    }
+    
+    .countdown-number {
+      font-size: 8rem;
+      font-weight: 900;
+      color: white;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      animation: countdownPulse 1s ease-in-out;
+    }
+    
+    @keyframes countdownPulse {
+      0% { transform: scale(0.5); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    /* Improved Reveal Button States */
+    .reveal-btn.announced {
+      background: linear-gradient(135deg, #10b981, #059669);
+      cursor: default;
+    }
+    
+    .reveal-btn.announced:hover {
+      background: linear-gradient(135deg, #10b981, #059669);
+      transform: none;
+      box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
+    }
+    
     /* Hidden by default */
     .hidden { display: none !important; }
   </style>
@@ -463,6 +600,19 @@
       <button id="welcomeGotItBtn" class="welcome-btn" data-i18n="gotIt">Got it!</button>
     </div>
   </div>
+
+  <!-- Guest Counter (Admin Only) -->
+  <div id="guestCounter" class="guest-counter hidden">
+    <span data-i18n="guestsCheckedIn">🎉 0 guests checked in</span>
+  </div>
+
+  <!-- Countdown Overlay -->
+  <div id="countdownOverlay" class="countdown-overlay hidden">
+    <div id="countdownNumber" class="countdown-number">3</div>
+  </div>
+
+  <!-- Vote Popup Container -->
+  <div id="votePopupContainer"></div>
 
   <!-- Admin Layout -->
   <div id="adminLayout" class="admin-layout hidden">
