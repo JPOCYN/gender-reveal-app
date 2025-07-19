@@ -248,43 +248,124 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   }
 
-  // F11 Fullscreen popup for admin
+  // Legacy fullscreen popup (kept for compatibility)
   function showFullscreenPopup() {
-    const popup = document.getElementById('fullscreenPopup');
-    const closeBtn = document.getElementById('closeFullscreenPopup');
-    
-    if (popup && !localStorage.getItem('fullscreenPopupShown')) {
-      popup.classList.remove('hidden');
-      localStorage.setItem('fullscreenPopupShown', 'true');
-      
-      if (closeBtn) {
-        closeBtn.onclick = () => {
-          popup.classList.add('hidden');
-        };
-      }
-    }
+    // This is now replaced by showFullscreenTip()
+    // Keeping for backward compatibility
   }
 
-  // Minimal admin instructions for party display
-  function showAdminInstructions() {
-    const instructions = document.createElement('div');
-    instructions.className = 'bg-gradient-to-r from-pink-100 to-blue-100 border-2 border-pink-200 p-3 mb-4 rounded-xl text-center';
-    instructions.innerHTML = `
-      <div class="flex items-center justify-center space-x-2">
-        <span class="text-2xl">🎉</span>
-        <span class="text-sm font-semibold text-gray-700">Press F11 for fullscreen party display</span>
-        <span class="text-2xl">📱</span>
-      </div>
-    `;
-    
-    // Insert instructions at the top of results section
+  // Smart fullscreen detection and layout adaptation
+  function detectFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+  }
+
+  // Adaptive layout for party display
+  function adaptLayoutForParty() {
+    const isFullscreen = detectFullscreen();
+    const mainContainer = document.querySelector('.w-full.max-w-md');
     const resultsSection = document.getElementById('resultsSection');
-    if (resultsSection) {
-      resultsSection.insertBefore(instructions, resultsSection.firstChild);
+    
+    if (isFullscreen && mainContainer) {
+      // Expand layout for fullscreen party display
+      mainContainer.className = 'w-full max-w-6xl mx-auto p-8 bg-white cute-card text-center mt-4';
+      
+      // Make results section more prominent
+      if (resultsSection) {
+        resultsSection.classList.add('party-display-mode');
+      }
+      
+      // Hide QR code in fullscreen (show in compact mode)
+      if (adminQR) {
+        adminQR.classList.add('hidden');
+      }
+      
+      // Show compact controls
+      showCompactControls();
+    } else {
+      // Compact layout for normal mode
+      if (mainContainer) {
+        mainContainer.className = 'w-full max-w-md mx-auto p-4 bg-white cute-card text-center mt-4';
+      }
+      
+      if (resultsSection) {
+        resultsSection.classList.remove('party-display-mode');
+      }
+      
+      // Show QR code in compact mode
+      if (adminQR) {
+        adminQR.classList.remove('hidden');
+      }
+      
+      hideCompactControls();
     }
   }
 
-  // --- Clean Admin UI for Party Display ---
+  // Compact controls for fullscreen mode
+  function showCompactControls() {
+    // Create floating controls
+    const controls = document.createElement('div');
+    controls.id = 'compactControls';
+    controls.className = 'fixed top-4 right-4 z-50 flex flex-col space-y-2';
+    controls.innerHTML = `
+      <button id="qrToggleBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg transition-all text-xs opacity-80 hover:opacity-100">
+        📱 QR
+      </button>
+      <button id="homeBtn" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg transition-all text-xs opacity-80 hover:opacity-100">
+        🏠 Home
+      </button>
+    `;
+    document.body.appendChild(controls);
+    
+    // QR toggle functionality
+    const qrToggleBtn = document.getElementById('qrToggleBtn');
+    if (qrToggleBtn && adminQR) {
+      qrToggleBtn.onclick = () => {
+        adminQR.classList.toggle('hidden');
+      };
+    }
+    
+    // Home button
+    const homeBtn = document.getElementById('homeBtn');
+    if (homeBtn) {
+      homeBtn.onclick = () => {
+        window.location.href = '/';
+      };
+    }
+  }
+
+  function hideCompactControls() {
+    const controls = document.getElementById('compactControls');
+    if (controls) {
+      controls.remove();
+    }
+  }
+
+  // One-time fullscreen tip
+  function showFullscreenTip() {
+    if (!localStorage.getItem('fullscreenTipShown')) {
+      const tip = document.createElement('div');
+      tip.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-80 text-white p-6 rounded-xl z-50 max-w-md text-center';
+      tip.innerHTML = `
+        <div class="text-4xl mb-4">🖥️</div>
+        <h3 class="text-xl font-bold mb-2">Perfect for Party Display!</h3>
+        <p class="mb-4">Press <span class="bg-yellow-500 text-black px-2 py-1 rounded font-bold">F11</span> to enter fullscreen mode</p>
+        <button onclick="this.parentElement.remove()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+          Got it!
+        </button>
+      `;
+      document.body.appendChild(tip);
+      localStorage.setItem('fullscreenTipShown', 'true');
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        if (tip.parentElement) {
+          tip.remove();
+        }
+      }, 5000);
+    }
+  }
+
+  // --- Smart Admin UI for Party Display ---
   function showAdminUI() {
     isAdmin = true;
     // Hide guest UI
@@ -307,26 +388,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Show compact QR code section
     showAdminQR(roomId);
     
-    // Show minimal instructions
-    showAdminInstructions();
-    
-    // Show F11 popup for admin
-    showFullscreenPopup();
-    
-    // Add compact back button for admin
-    const backToHomeBtn = document.createElement('button');
-    backToHomeBtn.className = 'fixed bottom-4 left-4 bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-lg transition-all text-xs z-40 opacity-70 hover:opacity-100';
-    backToHomeBtn.textContent = '← Home';
-    backToHomeBtn.onclick = () => {
-      window.location.href = '/';
-    };
-    document.body.appendChild(backToHomeBtn);
+    // Show one-time fullscreen tip
+    showFullscreenTip();
     
     // Apply celebration styling to progress bars
     const boyBar = document.getElementById('boyBar');
     const girlBar = document.getElementById('girlBar');
     if (boyBar) boyBar.classList.add('celebration-bar');
     if (girlBar) girlBar.classList.add('celebration-bar-girl');
+    
+    // Set up fullscreen detection
+    document.addEventListener('fullscreenchange', adaptLayoutForParty);
+    document.addEventListener('webkitfullscreenchange', adaptLayoutForParty);
+    document.addEventListener('mozfullscreenchange', adaptLayoutForParty);
+    document.addEventListener('MSFullscreenChange', adaptLayoutForParty);
+    
+    // Initial layout adaptation
+    adaptLayoutForParty();
     
     // Reveal button logic
     if (revealGenderBtn) {
