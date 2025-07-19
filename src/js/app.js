@@ -97,14 +97,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         // Wait for Firebase to be properly initialized
-        let attempts = 0;
-        while (!firebase.apps.length && attempts < 50) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-          attempts++;
-        }
+        console.log('Waiting for Firebase to be ready...', {
+          firebaseInitPromise: !!window.firebaseInitPromise,
+          firebaseReady: window.firebaseReady,
+          firebaseAppsLength: typeof firebase !== 'undefined' ? firebase.apps.length : 'N/A'
+        });
         
-        if (!firebase.apps.length) {
-          throw new Error('Firebase failed to initialize');
+        if (window.firebaseInitPromise) {
+          await window.firebaseInitPromise;
+          console.log('Firebase ready via promise');
+        } else {
+          // Fallback: wait for Firebase to be ready
+          console.log('Using fallback Firebase initialization');
+          let attempts = 0;
+          while (!firebase.apps.length && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+          }
+          
+          if (!firebase.apps.length) {
+            throw new Error('Firebase failed to initialize');
+          }
+          console.log('Firebase ready via fallback');
         }
         
         const db = firebase.database();
@@ -179,15 +193,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // Wait for Firebase to be properly initialized
-    let attempts = 0;
-    while (!firebase.apps.length && attempts < 50) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      attempts++;
-    }
-    
-    if (!firebase.apps.length) {
-      console.error('Firebase failed to initialize');
-      return;
+    if (window.firebaseInitPromise) {
+      await window.firebaseInitPromise;
+    } else {
+      // Fallback: wait for Firebase to be ready
+      let attempts = 0;
+      while (!firebase.apps.length && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      
+      if (!firebase.apps.length) {
+        console.error('Firebase failed to initialize');
+        return;
+      }
     }
     
     const db = firebase.database();

@@ -180,16 +180,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   let db, infoRef, votesRef, revealRef, adminTokenRef;
   
   // Wait for Firebase to be properly initialized
-  let attempts = 0;
-  while (!firebase.apps.length && attempts < 50) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-    attempts++;
-  }
-  
-  if (!firebase.apps.length) {
-    console.error('Firebase failed to initialize');
-    document.body.innerHTML = '<div class="flex flex-col items-center justify-center min-h-screen"><h2 class="text-xl font-bold text-red-600">Error: Firebase failed to initialize. Please refresh the page.</h2></div>';
-    return;
+  if (window.firebaseInitPromise) {
+    await window.firebaseInitPromise;
+  } else {
+    // Fallback: wait for Firebase to be ready
+    let attempts = 0;
+    while (!firebase.apps.length && attempts < 50) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    if (!firebase.apps.length) {
+      console.error('Firebase failed to initialize');
+      document.body.innerHTML = '<div class="flex flex-col items-center justify-center min-h-screen"><h2 class="text-xl font-bold text-red-600">Error: Firebase failed to initialize. Please refresh the page.</h2></div>';
+      return;
+    }
   }
   
   db = firebase.database();
