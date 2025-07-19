@@ -254,35 +254,79 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Keeping for backward compatibility
   }
 
-  // Smart fullscreen detection and layout adaptation
+  // Enhanced fullscreen detection and layout adaptation
   function detectFullscreen() {
     return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
   }
 
-  // Adaptive layout for party display
+  // Detect large screens
+  function detectLargeScreen() {
+    return window.innerWidth >= 1200;
+  }
+
+  // Create confetti effect
+  function createConfetti() {
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    document.body.appendChild(container);
+    
+    for (let i = 0; i < 20; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.animationDelay = Math.random() * 3 + 's';
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      container.appendChild(confetti);
+    }
+    
+    // Remove confetti after animation
+    setTimeout(() => {
+      if (container.parentElement) {
+        container.remove();
+      }
+    }, 5000);
+  }
+
+  // Enhanced adaptive layout for party display
   function adaptLayoutForParty() {
     const isFullscreen = detectFullscreen();
-    const mainContainer = document.querySelector('.w-full.max-w-md');
+    const isLargeScreen = detectLargeScreen();
+    const body = document.body;
+    const mainContainer = document.querySelector('.w-full.max-w-md, .w-full.max-w-6xl');
     const resultsSection = document.getElementById('resultsSection');
     
-    if (isFullscreen && mainContainer) {
-      // Expand layout for fullscreen party display
-      mainContainer.className = 'w-full max-w-6xl mx-auto p-8 bg-white cute-card text-center mt-4';
+    if (isFullscreen || isLargeScreen) {
+      // Apply fullscreen layout
+      body.classList.add('fullscreen-layout');
+      if (isLargeScreen && !isFullscreen) {
+        body.classList.add('large-screen-layout');
+      }
+      
+      // Expand container for immersive experience
+      if (mainContainer) {
+        mainContainer.className = 'w-full max-w-6xl mx-auto p-8 bg-white cute-card text-center mt-4';
+      }
       
       // Make results section more prominent
       if (resultsSection) {
         resultsSection.classList.add('party-display-mode');
       }
       
-      // Hide QR code in fullscreen (show in compact mode)
+      // Hide QR code in fullscreen, show floating controls
       if (adminQR) {
         adminQR.classList.add('hidden');
       }
       
-      // Show compact controls
-      showCompactControls();
+      // Show enhanced floating controls
+      showEnhancedFloatingControls();
+      
+      // Start subtle confetti animation
+      startSubtleConfetti();
+      
     } else {
       // Compact layout for normal mode
+      body.classList.remove('fullscreen-layout', 'large-screen-layout');
+      
       if (mainContainer) {
         mainContainer.className = 'w-full max-w-md mx-auto p-4 bg-white cute-card text-center mt-4';
       }
@@ -296,7 +340,74 @@ document.addEventListener('DOMContentLoaded', async () => {
         adminQR.classList.remove('hidden');
       }
       
-      hideCompactControls();
+      hideEnhancedFloatingControls();
+      stopSubtleConfetti();
+    }
+  }
+
+  // Enhanced floating controls for fullscreen
+  function showEnhancedFloatingControls() {
+    const controls = document.createElement('div');
+    controls.id = 'enhancedFloatingControls';
+    controls.className = 'floating-controls';
+    controls.innerHTML = `
+      <button id="qrToggleBtn" class="hover:bg-blue-100">
+        📱 QR Code
+      </button>
+      <button id="homeBtn" class="hover:bg-gray-100">
+        🏠 Home
+      </button>
+      <button id="confettiBtn" class="hover:bg-pink-100">
+        🎉 Confetti
+      </button>
+    `;
+    document.body.appendChild(controls);
+    
+    // QR toggle functionality
+    const qrToggleBtn = document.getElementById('qrToggleBtn');
+    if (qrToggleBtn && adminQR) {
+      qrToggleBtn.onclick = () => {
+        adminQR.classList.toggle('hidden');
+      };
+    }
+    
+    // Home button
+    const homeBtn = document.getElementById('homeBtn');
+    if (homeBtn) {
+      homeBtn.onclick = () => {
+        window.location.href = '/';
+      };
+    }
+    
+    // Confetti button
+    const confettiBtn = document.getElementById('confettiBtn');
+    if (confettiBtn) {
+      confettiBtn.onclick = () => {
+        createConfetti();
+      };
+    }
+  }
+
+  function hideEnhancedFloatingControls() {
+    const controls = document.getElementById('enhancedFloatingControls');
+    if (controls) {
+      controls.remove();
+    }
+  }
+
+  // Subtle confetti animation for fullscreen
+  let confettiInterval;
+  function startSubtleConfetti() {
+    confettiInterval = setInterval(() => {
+      if (Math.random() < 0.1) { // 10% chance every 2 seconds
+        createConfetti();
+      }
+    }, 2000);
+  }
+
+  function stopSubtleConfetti() {
+    if (confettiInterval) {
+      clearInterval(confettiInterval);
     }
   }
 
@@ -603,7 +714,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     revealGenderBtn.classList.add('reveal-animate', 'transition', 'duration-300', 'reveal-hover');
   }
 
-  // Animate new votes in showResults
+  // Enhanced showResults with confetti and animations
   function showResults() {
     votesRef.once('value').then(snap => {
       const votes = snap.val() || {};
@@ -613,17 +724,37 @@ document.addEventListener('DOMContentLoaded', async () => {
       const total = boyVotes.length + girlVotes.length;
       const boyPercent = total ? (boyVotes.length / total) * 100 : 0;
       const girlPercent = total ? (girlVotes.length / total) * 100 : 0;
+      
+      // Store previous values for animation detection
+      const oldBoyWidth = boyBar.style.width;
+      const oldGirlWidth = girlBar.style.width;
+      
       boyBar.style.width = boyPercent + '%';
       girlBar.style.width = girlPercent + '%';
       boyCount.textContent = boyVotes.length;
       girlCount.textContent = girlVotes.length;
-      // Animate bars
-      boyBar.classList.remove('vote-bounce');
-      girlBar.classList.remove('vote-bounce');
+      
+      // Enhanced bar animations
+      boyBar.classList.remove('vote-bounce', 'vote-bar-animate');
+      girlBar.classList.remove('vote-bounce', 'vote-bar-animate');
       void boyBar.offsetWidth; // force reflow
       void girlBar.offsetWidth;
-      if (boyVotes.length) boyBar.classList.add('vote-bounce');
-      if (girlVotes.length) girlBar.classList.add('vote-bounce');
+      
+      if (boyVotes.length) {
+        boyBar.classList.add('vote-bounce');
+        if (oldBoyWidth !== boyBar.style.width) {
+          boyBar.classList.add('vote-bar-animate');
+          setTimeout(() => boyBar.classList.remove('vote-bar-animate'), 600);
+        }
+      }
+      if (girlVotes.length) {
+        girlBar.classList.add('vote-bounce');
+        if (oldGirlWidth !== girlBar.style.width) {
+          girlBar.classList.add('vote-bar-animate');
+          setTimeout(() => girlBar.classList.remove('vote-bar-animate'), 600);
+        }
+      }
+      
       // Animate new names
       boyNames.innerHTML = '';
       girlNames.innerHTML = '';
@@ -643,6 +774,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         girlNames.appendChild(badge);
         setTimeout(() => badge.classList.remove('vote-bounce'), 600);
       });
+      
+      // Trigger confetti for new votes in fullscreen
+      if ((detectFullscreen() || detectLargeScreen()) && total > (window.lastVoteCount || 0)) {
+        createConfetti();
+        window.lastVoteCount = total;
+      }
     });
   }
 
@@ -679,6 +816,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (newestVote && newestVote.name) {
         const sanitizedName = sanitizeName(newestVote.name);
         showVoteAnimation(sanitizedName, newestVote.vote);
+        
+        // Trigger confetti for new votes in fullscreen
+        if (detectFullscreen() || detectLargeScreen()) {
+          createConfetti();
+        }
       }
     }
     previousVoteCount = total;
