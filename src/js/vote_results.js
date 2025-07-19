@@ -1,7 +1,7 @@
 // js/vote_results.js
 // Strict admin/guest separation, admin QR, no admin voting
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const roomId = params.get('roomId');
   const guestParam = params.get('guest');
@@ -176,11 +176,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Firebase is initialized in firebaseConfig.js
-  const db = firebase.database();
-  const infoRef = db.ref(`parties/${roomId}/info`);
-  const votesRef = db.ref(`parties/${roomId}/votes`);
-  const revealRef = db.ref(`parties/${roomId}/reveal`);
-  const adminTokenRef = db.ref(`parties/${roomId}/adminToken`);
+  // Initialize Firebase and database references
+  let db, infoRef, votesRef, revealRef, adminTokenRef;
+  
+  // Wait for Firebase to be properly initialized
+  let attempts = 0;
+  while (!firebase.apps.length && attempts < 50) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    attempts++;
+  }
+  
+  if (!firebase.apps.length) {
+    console.error('Firebase failed to initialize');
+    document.body.innerHTML = '<div class="flex flex-col items-center justify-center min-h-screen"><h2 class="text-xl font-bold text-red-600">Error: Firebase failed to initialize. Please refresh the page.</h2></div>';
+    return;
+  }
+  
+  db = firebase.database();
+  infoRef = db.ref(`parties/${roomId}/info`);
+  votesRef = db.ref(`parties/${roomId}/votes`);
+  revealRef = db.ref(`parties/${roomId}/reveal`);
+  adminTokenRef = db.ref(`parties/${roomId}/adminToken`);
 
   // State
   let userVoteId = localStorage.getItem(voteIdKey) || null;

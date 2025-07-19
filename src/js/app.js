@@ -3,7 +3,7 @@
 
 // Firebase is initialized in firebaseConfig.js
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
   const roomId = params.get('roomId');
   const landingPage = document.getElementById('landingPage');
@@ -96,6 +96,17 @@ document.addEventListener('DOMContentLoaded', () => {
           throw new Error('Firebase is not loaded');
         }
         
+        // Wait for Firebase to be properly initialized
+        let attempts = 0;
+        while (!firebase.apps.length && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (!firebase.apps.length) {
+          throw new Error('Firebase failed to initialize');
+        }
+        
         const db = firebase.database();
         const roomId = db.ref('parties').push().key;
         const adminToken = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : Math.random().toString(36).substr(2, 16) + Math.random().toString(36).substr(2, 16);
@@ -166,6 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Firebase is not loaded');
       return;
     }
+    
+    // Wait for Firebase to be properly initialized
+    let attempts = 0;
+    while (!firebase.apps.length && attempts < 50) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    
+    if (!firebase.apps.length) {
+      console.error('Firebase failed to initialize');
+      return;
+    }
+    
     const db = firebase.database();
     const infoRef = db.ref(`parties/${roomId}`);
     infoRef.once('value').then(snap => {
