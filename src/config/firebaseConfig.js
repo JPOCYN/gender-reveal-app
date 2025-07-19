@@ -25,9 +25,9 @@ const getEnvVar = (key, fallback = null) => {
     
     // Use fallback if provided (for both dev and prod to ensure app works)
     if (fallback) {
-      if (isDev) {
-        console.warn(`⚠️ Using fallback for ${key} in development mode`);
-      } else {
+      // Only show warnings in development or when specifically debugging
+      const showWarnings = isDev || window.location.search.includes('debug=true');
+      if (showWarnings) {
         console.warn(`⚠️ Using fallback for ${key} - environment variable not found`);
       }
       return fallback;
@@ -59,46 +59,58 @@ const firebaseConfig = {
   measurementId: getEnvVar('VITE_FIREBASE_MEASUREMENT_ID', "G-ZP2PTQP8Q4")
 };
 
-// Environment variable debug information
-console.log('🔧 Firebase Environment Debug:', {
-  location: {
-    hostname: window.location.hostname,
-    port: window.location.port,
-    protocol: window.location.protocol
-  },
-  vite: {
-    mode: import.meta.env?.MODE || 'unknown',
-    dev: import.meta.env?.DEV || false,
-    prod: import.meta.env?.PROD || false,
-    hasViteEnv: !!import.meta.env,
-    viteEnvKeys: import.meta.env ? Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')) : []
-  },
-  envVars: {
-    apiKey: import.meta.env?.VITE_FIREBASE_API_KEY ? '✅ Set' : '❌ Missing',
-    authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN ? '✅ Set' : '❌ Missing',
-    databaseURL: import.meta.env?.VITE_FIREBASE_DATABASE_URL ? '✅ Set' : '❌ Missing',
-    projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID ? '✅ Set' : '❌ Missing'
-  }
-});
+// Show debug information only when requested or in development
+const showDebugInfo = window.location.search.includes('debug=true') || 
+                     window.location.hostname === 'localhost' ||
+                     window.location.hostname === '127.0.0.1';
 
-// Additional debug for troubleshooting
-if (!import.meta.env?.VITE_FIREBASE_API_KEY) {
-  console.log('🔍 Detailed Environment Analysis:', {
-    importMetaEnv: import.meta.env,
-    allViteVars: import.meta.env ? Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')) : 'No Vite env available',
-    nodeProcess: typeof process !== 'undefined' ? 'Available' : 'Not available'
+if (showDebugInfo) {
+  // Environment variable debug information
+  console.log('🔧 Firebase Environment Debug:', {
+    location: {
+      hostname: window.location.hostname,
+      port: window.location.port,
+      protocol: window.location.protocol
+    },
+    vite: {
+      mode: import.meta.env?.MODE || 'unknown',
+      dev: import.meta.env?.DEV || false,
+      prod: import.meta.env?.PROD || false,
+      hasViteEnv: !!import.meta.env,
+      viteEnvKeys: import.meta.env ? Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')) : []
+    },
+    envVars: {
+      apiKey: import.meta.env?.VITE_FIREBASE_API_KEY ? '✅ Set' : '❌ Missing',
+      authDomain: import.meta.env?.VITE_FIREBASE_AUTH_DOMAIN ? '✅ Set' : '❌ Missing',
+      databaseURL: import.meta.env?.VITE_FIREBASE_DATABASE_URL ? '✅ Set' : '❌ Missing',
+      projectId: import.meta.env?.VITE_FIREBASE_PROJECT_ID ? '✅ Set' : '❌ Missing'
+    }
   });
+
+  // Additional debug for troubleshooting
+  if (!import.meta.env?.VITE_FIREBASE_API_KEY) {
+    console.log('🔍 Detailed Environment Analysis:', {
+      importMetaEnv: import.meta.env,
+      allViteVars: import.meta.env ? Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')) : 'No Vite env available',
+      nodeProcess: typeof process !== 'undefined' ? 'Available' : 'Not available'
+    });
+  }
 }
 
-// Log the actual config being used (for debugging)
-console.log('Firebase config being used:', {
-  apiKey: firebaseConfig.apiKey ? firebaseConfig.apiKey.substring(0, 10) + '...' : 'MISSING',
-  authDomain: firebaseConfig.authDomain,
-  databaseURL: firebaseConfig.databaseURL,
-  projectId: firebaseConfig.projectId,
-  hasDatabaseURL: !!firebaseConfig.databaseURL,
-  configSource: import.meta.env?.VITE_FIREBASE_API_KEY ? 'Environment Variables' : 'Fallback Values'
-});
+// Log the actual config being used (only when debugging)
+if (showDebugInfo) {
+  console.log('Firebase config being used:', {
+    apiKey: firebaseConfig.apiKey ? firebaseConfig.apiKey.substring(0, 10) + '...' : 'MISSING',
+    authDomain: firebaseConfig.authDomain,
+    databaseURL: firebaseConfig.databaseURL,
+    projectId: firebaseConfig.projectId,
+    hasDatabaseURL: !!firebaseConfig.databaseURL,
+    configSource: import.meta.env?.VITE_FIREBASE_API_KEY ? 'Environment Variables' : 'Fallback Values'
+  });
+} else {
+  // Simple success message for production
+  console.log('🎉 Gender Reveal App: Firebase initialized successfully');
+}
 
 // Global Firebase ready state
 window.firebaseReady = false;
