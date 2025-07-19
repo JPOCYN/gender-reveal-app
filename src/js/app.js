@@ -143,6 +143,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         await db.ref(`parties/${roomId}/info`).set(partyData);
         await db.ref(`parties/${roomId}/adminToken`).set(adminToken);
         
+        // Cache admin token immediately for smooth party owner experience
+        localStorage.setItem(`admin_${roomId}`, adminToken);
+        
+        // Mark as party owner in session storage to prevent loading flash
+        sessionStorage.setItem('isPartyOwner', 'true');
+        
         // Redirect directly to admin mode for smooth flow
         const adminUrl = `${window.location.origin}/vote.html?roomId=${roomId}&adminToken=${adminToken}`;
         window.location.href = adminUrl;

@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Layout elements
+  const loadingState = document.getElementById('loadingState');
   const adminLayout = document.getElementById('adminLayout');
   const guestLayout = document.getElementById('guestLayout');
   const welcomeModal = document.getElementById('welcomeModal');
@@ -143,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const nameKey = `name_${roomId}`;
   const changeKey = `changed_${roomId}`;
   const voteIdKey = `voteId_${roomId}`;
+  const adminCacheKey = `admin_${roomId}`;
 
   // Translation helper function
   function getTranslation(key, lang = localStorage.getItem('lang') || 'en') {
@@ -155,8 +157,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorChangingVote: "Error changing vote. Try again!",
         itsABoy: "It's a BOY 💙!",
         itsAGirl: "It's a GIRL 💖!",
-        guestsCheckedIn: "{count} guests checked in",
-        oneGuestCheckedIn: "{count} guest checked in",
+        guestsCheckedIn: "🎉 {{count}} guests checked in",
+        oneGuestCheckedIn: "🎉 1 guest checked in",
         votedBoyPopup: "💙 {name} just voted for Boy!",
         votedGirlPopup: "💖 {name} just voted for Girl!",
         voteChangedPopup: "🔁 {name} switched vote to {vote}",
@@ -175,8 +177,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorChangingVote: "更改投票時發生錯誤。請重試！",
         itsABoy: "是個男孩 💙！",
         itsAGirl: "是個女孩 💖！",
-        guestsCheckedIn: "{count} 位賓客已報到",
-        oneGuestCheckedIn: "{count} 位賓客已報到",
+        guestsCheckedIn: "🎉 {{count}} 位賓客已報到",
+        oneGuestCheckedIn: "🎉 1 位賓客已報到",
         votedBoyPopup: "💙 {name} 剛投票給男孩！",
         votedGirlPopup: "💖 {name} 剛投票給女孩！",
         voteChangedPopup: "🔁 {name} 改投 {vote}",
@@ -322,17 +324,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 800);
   }
 
+  // Translation helper function that supports interpolation
+  function t(key, params = {}) {
+    let text = getTranslation(key);
+    if (params && typeof params === 'object') {
+      Object.keys(params).forEach(param => {
+        const regex = new RegExp(`{{${param}}}`, 'g');
+        text = text.replace(regex, params[param]);
+      });
+    }
+    return text;
+  }
+
   // Guest counter functionality
   let currentGuestCount = 0;
   function updateGuestCounter(newCount) {
     if (guestCounter && isAdmin) {
       const countText = newCount === 1 ? 
-        getTranslation('oneGuestCheckedIn').replace('{count}', newCount) :
-        getTranslation('guestsCheckedIn').replace('{count}', newCount);
+        t('oneGuestCheckedIn') :
+        t('guestsCheckedIn', { count: newCount });
       
       const span = guestCounter.querySelector('span');
       if (span) {
-        span.textContent = `🎉 ${countText}`;
+        span.textContent = countText;
         
         // Add bounce animation if count increased
         if (newCount > currentGuestCount) {
@@ -353,8 +367,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   
+  // Function to refresh admin badge tooltip when language changes
+  function refreshAdminBadge() {
+    if (adminBadge) {
+      adminBadge.title = getTranslation('partyScreenTooltip');
+    }
+  }
+  
   // Make functions available globally for language switching
   window.refreshGuestCounter = refreshGuestCounter;
+  window.refreshAdminBadge = refreshAdminBadge;
   window.updatePartyName = updatePartyName;
 
   // Vote popup notifications
@@ -489,12 +511,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       function showGuestUI() {
       isAdmin = false;
       
+      // Hide loading state first
+      if (loadingState) loadingState.classList.add('hidden');
+      
       // Show guest layout, hide admin layout
       if (guestLayout) guestLayout.classList.remove('hidden');
       if (adminLayout) adminLayout.classList.add('hidden');
       
       // Hide guest counter for non-admin users (party header stays hidden via CSS)
       if (guestCounter) guestCounter.classList.add('hidden');
+      
+      // Initialize guest flow
+      initializeGuestFlow();
     }
 
   // Enhanced admin instructions
@@ -528,6 +556,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- Admin UI encapsulation ---
   function showAdminUI() {
     isAdmin = true;
+    
+    // Hide loading state first
+    if (loadingState) loadingState.classList.add('hidden');
     
     // Show admin layout, hide guest layout
     if (adminLayout) adminLayout.classList.remove('hidden');
@@ -599,19 +630,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Robust Admin token check (always run on load, never hidden by guest logic)
   function checkAdminMode() {
+    // Check for cached admin status first (party owner detection)
+    const cachedAdminToken = localStorage.getItem(adminCacheKey);
+    const isPartyOwner = sessionStorage.getItem('isPartyOwner') === 'true';
+    
     if (adminTokenParam) {
+      // If this is a party owner just redirected from creation, show admin UI immediately
+      if (isPartyOwner || cachedAdminToken === adminTokenParam) {
+        // Clear the party owner flag since it's one-time use
+        sessionStorage.removeItem('isPartyOwner');
+        showAdminUI();
+        return;
+      }
+      
+      // Verify admin token with Firebase
       adminTokenRef.once('value').then(snap => {
         const token = snap.val();
         if (token && token === adminTokenParam) {
+          // Cache the valid admin token for this party
+          localStorage.setItem(adminCacheKey, adminTokenParam);
           showAdminUI();
         } else {
+          // Invalid token, clear cache and show guest UI
+          localStorage.removeItem(adminCacheKey);
           showGuestUI();
           hideAdminBadge();
         }
+      }).catch(() => {
+        // Firebase error, show guest UI
+        showGuestUI();
+        hideAdminBadge();
       });
     } else {
-      showGuestUI();
-      hideAdminBadge();
+      // No admin token parameter, check if user was previously admin for this party
+      if (cachedAdminToken) {
+        // Verify cached token is still valid
+        adminTokenRef.once('value').then(snap => {
+          const token = snap.val();
+          if (token && token === cachedAdminToken) {
+            // Redirect to admin mode with token
+            const currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('adminToken', cachedAdminToken);
+            window.location.href = currentUrl.toString();
+            return;
+          } else {
+            // Invalid cached token, clear it
+            localStorage.removeItem(adminCacheKey);
+            showGuestUI();
+            hideAdminBadge();
+          }
+        }).catch(() => {
+          // Firebase error, clear cache and show guest UI
+          localStorage.removeItem(adminCacheKey);
+          showGuestUI();
+          hideAdminBadge();
+        });
+      } else {
+        // No cached admin status, show guest UI
+        showGuestUI();
+        hideAdminBadge();
+      }
     }
   }
   checkAdminMode();
@@ -630,22 +708,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // --- Guest flow ---
-  // Guest flow: skip name input if guest param is present
-  if (!adminTokenParam) {
-    if (guestName) {
-      nameSection.classList.add('hidden');
-      voteSection.classList.remove('hidden');
-      localStorage.setItem(nameKey, guestName);
-      // Only hide results if the guest hasn't voted yet
-      if (!localStorage.getItem(votedKey)) {
-        resultsSection.classList.add('hidden');
+  // This will be called after admin verification is complete
+  function initializeGuestFlow() {
+    if (!adminTokenParam && !isAdmin) {
+      if (guestName) {
+        nameSection.classList.add('hidden');
+        voteSection.classList.remove('hidden');
+        localStorage.setItem(nameKey, guestName);
+        // Only hide results if the guest hasn't voted yet
+        if (!localStorage.getItem(votedKey)) {
+          resultsSection.classList.add('hidden');
+        } else {
+          resultsSection.classList.remove('hidden');
+        }
       } else {
-        resultsSection.classList.remove('hidden');
+        nameSection.classList.remove('hidden');
+        voteSection.classList.add('hidden');
+        resultsSection.classList.add('hidden');
       }
-    } else {
-      nameSection.classList.remove('hidden');
-      voteSection.classList.add('hidden');
-      resultsSection.classList.add('hidden');
     }
   }
 
