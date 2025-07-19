@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build && npm run copy-html",
     "preview": "vite preview",
-    "copy-html": "copy src\\wizard.html dist\\ && copy src\\vote.html dist\\ && copy src\\result.html dist\\"
+    "copy-html": "node copy-html.js"
   },
   "devDependencies": {
     "vite": "^5.0.0"
